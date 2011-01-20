@@ -1,0 +1,12 @@
+!!!
+%html
+  %head
+    %title OnlineChecklists
+
+    = javascript_include_tag "http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"
+    = javascript_include_tag "underscore-min"
+    = javascript_include_tag Rails.env == "production" ? "backbone-min" : "backbone"
+    = javascript_include_tag "application"
+  %body
+    = yield
+
