@@ -34,6 +34,7 @@ ActionController::Routing::Routes.draw do |map|
   # map.root :controller => "welcome"
 
   map.resources :checklists
+  map.resources :entries, :only => [:create]
 
   map.root controller: "checklists"
 

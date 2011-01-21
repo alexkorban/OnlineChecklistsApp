@@ -1,5 +1,5 @@
 (function() {
-  var AppController, Checklist, ChecklistCollection, ChecklistListView, ChecklistView, EditChecklistView, EditItemView, Item, ItemCollection, app, root;
+  var AppController, Checklist, ChecklistCollection, ChecklistListView, ChecklistView, EditChecklistView, EditItemView, Entry, Item, ItemCollection, app, root;
   var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
@@ -89,6 +89,14 @@
     }
     return ChecklistCollection;
   })();
+  Entry = (function() {
+    __extends(Entry, Backbone.Model);
+    Entry.prototype.url = "/entries";
+    function Entry(args) {
+      Entry.__super__.constructor.apply(this, arguments);
+    }
+    return Entry;
+  })();
   this.Checklists = new ChecklistCollection;
   ChecklistListView = (function() {
     __extends(ChecklistListView, Backbone.View);
@@ -121,10 +129,13 @@
   })();
   ChecklistView = (function() {
     __extends(ChecklistView, Backbone.View);
+    ChecklistView.prototype.events = {
+      "click .complete": "on_complete"
+    };
     function ChecklistView() {
       ChecklistView.__super__.constructor.apply(this, arguments);
       this.parent = app.active_page();
-      this.template = _.template('<h1><%= name %></h1>\n<ul>\n<% items.each(function(item) { %>\n<li><a href="#items-<%= item.cid %>"><%= item.content() %></a></li>\n<% }); %>\n</ul>');
+      this.template = _.template('<h1><%= name %></h1>\nFor: <input name = "for" type = "text" />\n<ul>\n<% items.each(function(item) { %>\n<li><a href="#items-<%= item.cid %>"><%= item.content() %></a></li>\n<% }); %>\n</ul>\n<button class = "complete">Complete!</button>');
       this.model.items.fetch({
         success: __bind(function() {
           return this.render();
@@ -137,6 +148,14 @@
         items: this.model.items
       }));
       return this.parent.html("").append(this.el);
+    };
+    ChecklistView.prototype.on_complete = function(e) {
+      var entry;
+      entry = new Entry({
+        checklist_id: this.model.id,
+        "for": this.$("input[name=for]").val()
+      });
+      return entry.save();
     };
     return ChecklistView;
   })();

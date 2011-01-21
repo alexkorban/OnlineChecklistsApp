@@ -9,11 +9,19 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110120201733) do
+ActiveRecord::Schema.define(:version => 20110121215424) do
 
   create_table "checklists", :force => true do |t|
     t.string   "name"
     t.integer  "account_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "entries", :force => true do |t|
+    t.integer  "checklist_id", :limit => 8
+    t.string   "for"
+    t.integer  "user_id",      :limit => 8
     t.datetime "created_at"
     t.datetime "updated_at"
   end

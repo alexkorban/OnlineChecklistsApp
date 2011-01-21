@@ -78,6 +78,22 @@ class ChecklistCollection extends Backbone.Collection
     super
 
 
+class Entry extends Backbone.Model
+  url: "/entries"
+
+  constructor: (args) ->
+    super
+
+
+
+#  checklist: (checklist) ->
+#    @set {checklist_id: checklist.id}
+#
+#
+#  for: (content) ->
+#    @set {for: content}
+
+
 #  parse: (response) ->
 #    console.log("in Checklists.parse")
 #    res = _.map response, (attrs, key) ->
@@ -127,6 +143,9 @@ class ChecklistListView extends Backbone.View
 
 
 class ChecklistView extends Backbone.View
+  events: {
+    "click .complete": "on_complete"
+  }
   constructor: ->
     super
 
@@ -134,20 +153,28 @@ class ChecklistView extends Backbone.View
 
     @template = _.template('''
       <h1><%= name %></h1>
+      For: <input name = "for" type = "text" />
       <ul>
       <% items.each(function(item) { %>
       <li><a href="#items-<%= item.cid %>"><%= item.content() %></a></li>
       <% }); %>
       </ul>
+      <button class = "complete">Complete!</button>
       ''')
 
     @model.items.fetch {success: =>
       @render()
     }
 
+
   render: ->
     $(@el).html(@template({name: @model.name(), items : @model.items}))
     @parent.html("").append(@el)
+
+
+  on_complete: (e) ->
+    entry = new Entry({checklist_id: @model.id, for: @$("input[name=for]").val()})
+    entry.save()
 
 
 class EditItemView extends Backbone.View
