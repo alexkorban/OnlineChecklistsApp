@@ -15,7 +15,11 @@ class ChecklistsController < ApplicationController
   end
 
   def create
-    logger.info params
+    checklist = Checklist.create(:name => params[:name])
+    params[:items].each { |item|
+      checklist.items.create :content => item[:content]
+    }
+
     respond_to { |format|
       format.json { render :json => {}, :status => :ok }
     }
@@ -42,4 +46,11 @@ class ChecklistsController < ApplicationController
     }
   end
 
+  def destroy
+    checklist = Checklist.find(params[:id]) # current_user.account.checklists.find(params[:id])
+    checklist.destroy
+    respond_to { |format|
+      format.json { render :json => {}, :status => :ok }
+    }
+  end
 end

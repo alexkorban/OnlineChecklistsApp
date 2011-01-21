@@ -54,6 +54,7 @@ class ItemCollection extends Backbone.Collection
 
 
 class Checklist extends Backbone.Model
+  defaults: {name: "New checklist"}
   constructor: ->
     super
     @items = new ItemCollection
@@ -88,51 +89,65 @@ class ChecklistCollection extends Backbone.Collection
 
 
 class ChecklistListView extends Backbone.View
+  events: {
+    "click .remove": "on_remove"
+  }
   constructor: ->
     super
-    @el = app.active_page()
+    @parent = app.active_page()
 
     @template = _.template('''
-      <div>
       <ul>
       <% checklists.each(function(checklist) { %>
-      <li><a href="#checklists-<%= checklist.cid %>"><%= checklist.name() %></a> (<a href = "#checklists-<%= checklist.cid %>-edit">Edit</a>)</li>
+      <li><a href="#checklists-<%= checklist.cid %>"><%= checklist.name() %></a>
+        (<a href = "#checklists-<%= checklist.cid %>-edit">Edit</a> | <a id = "remove_<%= checklist.cid %>" class = "remove" href = "#">X</a>)</li>
       <% }); %>
       </ul>
-      </div>
+      <a href = "#create">Create new list</a>
       ''')
 
     @render()
 
 
   render: ->
-    @el.html(@template({checklists : Checklists}))
+    $(@el).html(@template({checklists : Checklists}))
+    @parent.html("").append(@el)
+
+
+  on_remove: (e) ->
+    console.log "cid = ", e.target.id.substr(7)
+    checklist = Checklists.getByCid(e.target.id.substr(7))
+    checklist.destroy()
+    Checklists.remove(checklist)
+    @render()
+    e.preventDefault()
+    e.stopPropagation()
+
+
 
 
 class ChecklistView extends Backbone.View
   constructor: ->
     super
 
-    @el = app.active_page()
+    @parent = app.active_page()
 
     @template = _.template('''
-      <div>
       <h1><%= name %></h1>
       <ul>
       <% items.each(function(item) { %>
       <li><a href="#items-<%= item.cid %>"><%= item.content() %></a></li>
       <% }); %>
       </ul>
-      </div>
       ''')
 
     @model.items.fetch {success: =>
       @render()
     }
 
-
   render: ->
-    @el.html(@template({name: @model.name(), items : @model.items}))
+    $(@el).html(@template({name: @model.name(), items : @model.items}))
+    @parent.html("").append(@el)
 
 
 class EditItemView extends Backbone.View
@@ -148,6 +163,7 @@ class EditItemView extends Backbone.View
     @template = _.template('''
       <input type = "text" value = "<%= item.content() %>" /> <a href = "#" class = "remove_item">X</a>
     ''')
+
 
   render: ->
     $(@el).html(@template({item: @model}))
@@ -191,7 +207,14 @@ class EditChecklistView extends Backbone.View
     @model.items.bind "remove", @remove_item
     @model.items.bind "refresh", @add_items
 
-    @model.items.fetch()
+    @render()
+    @item_el = $(@el).find("ul")
+
+    if @model.id?
+      @model.items.fetch()
+    else
+      @model.items.refresh([new Item, new Item, new Item])
+
 
 #    @model.items.fetch {success: =>
 #      @render()
@@ -220,8 +243,6 @@ class EditChecklistView extends Backbone.View
 
 
   add_items: =>
-    @render()
-    @item_el = $(@el).find("ul")
     @model.items.each(@add_item)
 
 
@@ -239,9 +260,11 @@ class AppController extends Backbone.Controller
     "checklists-:cid-edit": "edit"
     "checklists-:cid": "show"
     "checklists": "checklists"
+    "create": "create"
 
   constructor: ->
     super
+
 
   checklists: ->
     @view = new ChecklistListView
@@ -249,6 +272,12 @@ class AppController extends Backbone.Controller
 
   show: (cid) ->
     @view = new ChecklistView { model: Checklists.getByCid(cid) }
+
+
+  create: ->
+    c = new Checklist
+    Checklists.add(c)
+    @view = new EditChecklistView { model : c }
 
   edit: (cid) ->
     @view = new EditChecklistView { model : Checklists.getByCid(cid) }

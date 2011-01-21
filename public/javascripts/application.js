@@ -61,6 +61,9 @@
   })();
   Checklist = (function() {
     __extends(Checklist, Backbone.Model);
+    Checklist.prototype.defaults = {
+      name: "New checklist"
+    };
     function Checklist() {
       Checklist.__super__.constructor.apply(this, arguments);
       this.items = new ItemCollection;
@@ -89,16 +92,30 @@
   this.Checklists = new ChecklistCollection;
   ChecklistListView = (function() {
     __extends(ChecklistListView, Backbone.View);
+    ChecklistListView.prototype.events = {
+      "click .remove": "on_remove"
+    };
     function ChecklistListView() {
       ChecklistListView.__super__.constructor.apply(this, arguments);
-      this.el = app.active_page();
-      this.template = _.template('<div>\n<ul>\n<% checklists.each(function(checklist) { %>\n<li><a href="#checklists-<%= checklist.cid %>"><%= checklist.name() %></a> (<a href = "#checklists-<%= checklist.cid %>-edit">Edit</a>)</li>\n<% }); %>\n</ul>\n</div>');
+      this.parent = app.active_page();
+      this.template = _.template('<ul>\n<% checklists.each(function(checklist) { %>\n<li><a href="#checklists-<%= checklist.cid %>"><%= checklist.name() %></a>\n  (<a href = "#checklists-<%= checklist.cid %>-edit">Edit</a> | <a id = "remove_<%= checklist.cid %>" class = "remove" href = "#">X</a>)</li>\n<% }); %>\n</ul>\n<a href = "#create">Create new list</a>');
       this.render();
     }
     ChecklistListView.prototype.render = function() {
-      return this.el.html(this.template({
+      $(this.el).html(this.template({
         checklists: Checklists
       }));
+      return this.parent.html("").append(this.el);
+    };
+    ChecklistListView.prototype.on_remove = function(e) {
+      var checklist;
+      console.log("cid = ", e.target.id.substr(7));
+      checklist = Checklists.getByCid(e.target.id.substr(7));
+      checklist.destroy();
+      Checklists.remove(checklist);
+      this.render();
+      e.preventDefault();
+      return e.stopPropagation();
     };
     return ChecklistListView;
   })();
@@ -106,8 +123,8 @@
     __extends(ChecklistView, Backbone.View);
     function ChecklistView() {
       ChecklistView.__super__.constructor.apply(this, arguments);
-      this.el = app.active_page();
-      this.template = _.template('<div>\n<h1><%= name %></h1>\n<ul>\n<% items.each(function(item) { %>\n<li><a href="#items-<%= item.cid %>"><%= item.content() %></a></li>\n<% }); %>\n</ul>\n</div>');
+      this.parent = app.active_page();
+      this.template = _.template('<h1><%= name %></h1>\n<ul>\n<% items.each(function(item) { %>\n<li><a href="#items-<%= item.cid %>"><%= item.content() %></a></li>\n<% }); %>\n</ul>');
       this.model.items.fetch({
         success: __bind(function() {
           return this.render();
@@ -115,10 +132,11 @@
       });
     }
     ChecklistView.prototype.render = function() {
-      return this.el.html(this.template({
+      $(this.el).html(this.template({
         name: this.model.name(),
         items: this.model.items
       }));
+      return this.parent.html("").append(this.el);
     };
     return ChecklistView;
   })();
@@ -169,7 +187,13 @@
       this.model.items.bind("add", this.add_item);
       this.model.items.bind("remove", this.remove_item);
       this.model.items.bind("refresh", this.add_items);
-      this.model.items.fetch();
+      this.render();
+      this.item_el = $(this.el).find("ul");
+      if (this.model.id != null) {
+        this.model.items.fetch();
+      } else {
+        this.model.items.refresh([new Item, new Item, new Item]);
+      }
     }
     EditChecklistView.prototype.on_save = function(e) {
       return this.model.save();
@@ -196,8 +220,6 @@
       return this.item_el.append(view.render());
     };
     EditChecklistView.prototype.add_items = function() {
-      this.render();
-      this.item_el = $(this.el).find("ul");
       return this.model.items.each(this.add_item);
     };
     EditChecklistView.prototype.remove_item = function(item) {
@@ -215,7 +237,8 @@
     AppController.prototype.routes = {
       "checklists-:cid-edit": "edit",
       "checklists-:cid": "show",
-      "checklists": "checklists"
+      "checklists": "checklists",
+      "create": "create"
     };
     function AppController() {
       AppController.__super__.constructor.apply(this, arguments);
@@ -226,6 +249,14 @@
     AppController.prototype.show = function(cid) {
       return this.view = new ChecklistView({
         model: Checklists.getByCid(cid)
+      });
+    };
+    AppController.prototype.create = function() {
+      var c;
+      c = new Checklist;
+      Checklists.add(c);
+      return this.view = new EditChecklistView({
+        model: c
       });
     };
     AppController.prototype.edit = function(cid) {
