@@ -1,5 +1,5 @@
 (function() {
-  var AppController, Checklist, ChecklistCollection, ChecklistListView, ChecklistView, Item, app, root;
+  var AppController, Checklist, ChecklistCollection, ChecklistListView, ChecklistView, EditChecklistView, EditItemView, Item, ItemCollection, app, root;
   var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
@@ -14,6 +14,10 @@
   };
   String.prototype.ends_with = function(str) {
     return this.match(str + "$") === str;
+  };
+  jQuery.fn.log = function(msg) {
+    console.log("%s: %o", msg, this);
+    return this;
   };
   root.append_fn = function(fn, fn_to_append) {
     if (!(fn != null)) {
@@ -33,8 +37,12 @@
       return $.historyBack();
     }
   };
+  Backbone.emulateHTTP = true;
   Item = (function() {
     __extends(Item, Backbone.Model);
+    Item.prototype.defaults = {
+      content: "New item"
+    };
     function Item() {
       Item.__super__.constructor.apply(this, arguments);
     }
@@ -43,13 +51,29 @@
     };
     return Item;
   })();
+  ItemCollection = (function() {
+    __extends(ItemCollection, Backbone.Collection);
+    ItemCollection.prototype.model = Item;
+    function ItemCollection() {
+      ItemCollection.__super__.constructor.apply(this, arguments);
+    }
+    return ItemCollection;
+  })();
   Checklist = (function() {
     __extends(Checklist, Backbone.Model);
     function Checklist() {
       Checklist.__super__.constructor.apply(this, arguments);
+      this.items = new ItemCollection;
+      this.items.url = "/checklists/" + this.id;
     }
     Checklist.prototype.name = function() {
       return this.get("name");
+    };
+    Checklist.prototype.save = function() {
+      this.set({
+        items: this.items
+      });
+      return Checklist.__super__.save.apply(this, arguments);
     };
     return Checklist;
   })();
@@ -68,11 +92,10 @@
     function ChecklistListView() {
       ChecklistListView.__super__.constructor.apply(this, arguments);
       this.el = app.active_page();
-      this.template = _.template('<div>\n<ul>\n<% checklists.each(function(checklist) { %>\n<li><a href="#checklists-<%= checklist.cid %>"><%= checklist.name() %></a></li>\n<% }); %>\n</ul>\n</div>');
+      this.template = _.template('<div>\n<ul>\n<% checklists.each(function(checklist) { %>\n<li><a href="#checklists-<%= checklist.cid %>"><%= checklist.name() %></a> (<a href = "#checklists-<%= checklist.cid %>-edit">Edit</a>)</li>\n<% }); %>\n</ul>\n</div>');
       this.render();
     }
     ChecklistListView.prototype.render = function() {
-      console.log("rendering checklist list");
       return this.el.html(this.template({
         checklists: Checklists
       }));
@@ -84,16 +107,108 @@
     function ChecklistView() {
       ChecklistView.__super__.constructor.apply(this, arguments);
       this.el = app.active_page();
-      this.template = _.template('<div>\n<ul>\n<% items.each(function(item) { %>\n<li><a href="#items-<%= item.cid %>"><%= item.content() %></a></li>\n<% }); %>\n</ul>\n</div>');
-      this.render();
+      this.template = _.template('<div>\n<h1><%= name %></h1>\n<ul>\n<% items.each(function(item) { %>\n<li><a href="#items-<%= item.cid %>"><%= item.content() %></a></li>\n<% }); %>\n</ul>\n</div>');
+      this.model.items.fetch({
+        success: __bind(function() {
+          return this.render();
+        }, this)
+      });
     }
     ChecklistView.prototype.render = function() {
-      console.log("rendering checklist");
       return this.el.html(this.template({
-        items: Items
+        name: this.model.name(),
+        items: this.model.items
       }));
     };
     return ChecklistView;
+  })();
+  EditItemView = (function() {
+    __extends(EditItemView, Backbone.View);
+    EditItemView.prototype.model = Item;
+    EditItemView.prototype.tagName = "li";
+    EditItemView.prototype.events = {
+      "click .remove_item": "on_remove_item",
+      "change input[type=text]": "on_change"
+    };
+    function EditItemView() {
+      EditItemView.__super__.constructor.apply(this, arguments);
+      this.template = _.template('<input type = "text" value = "<%= item.content() %>" /> <a href = "#" class = "remove_item">X</a>');
+    }
+    EditItemView.prototype.render = function() {
+      $(this.el).html(this.template({
+        item: this.model
+      }));
+      return $(this.el);
+    };
+    EditItemView.prototype.on_remove_item = function(e) {
+      this.collection.remove(this.model);
+      e.preventDefault();
+      return e.stopPropagation();
+    };
+    EditItemView.prototype.on_change = function(e) {
+      return this.model.set({
+        "content": $(e.target).val()
+      });
+    };
+    return EditItemView;
+  })();
+  EditChecklistView = (function() {
+    __extends(EditChecklistView, Backbone.View);
+    EditChecklistView.prototype.events = {
+      "click .save": "on_save",
+      "click .add_item": "on_add_item",
+      "change .checklist_name": "on_change"
+    };
+    EditChecklistView.prototype.tagName = "div";
+    EditChecklistView.prototype.id = "edit";
+    function EditChecklistView() {
+      this.add_items = __bind(this.add_items, this);;
+      this.add_item = __bind(this.add_item, this);;      EditChecklistView.__super__.constructor.apply(this, arguments);
+      this.parent = app.active_page();
+      this.template = _.template('<input type = "text" class = "checklist_name" value = "<%= name %>" /><br/><br/>\n<ul>\n</ul>\n<a href = "#" class = "add_item">Add item</a>\n<br/>\n<a href = "#checklists" class = "save">Save</a>');
+      this.model.items.bind("add", this.add_item);
+      this.model.items.bind("remove", this.remove_item);
+      this.model.items.bind("refresh", this.add_items);
+      this.model.items.fetch();
+    }
+    EditChecklistView.prototype.on_save = function(e) {
+      return this.model.save();
+    };
+    EditChecklistView.prototype.on_add_item = function(e) {
+      this.model.items.add();
+      e.preventDefault();
+      return e.stopPropagation();
+    };
+    EditChecklistView.prototype.render = function() {
+      $(this.el).html(this.template({
+        name: this.model.name(),
+        items: this.model.items
+      }));
+      return $(this.parent).html("").append(this.el);
+    };
+    EditChecklistView.prototype.add_item = function(item) {
+      var view;
+      view = new EditItemView({
+        model: item,
+        collection: this.model.items
+      });
+      item.view = view;
+      return this.item_el.append(view.render());
+    };
+    EditChecklistView.prototype.add_items = function() {
+      this.render();
+      this.item_el = $(this.el).find("ul");
+      return this.model.items.each(this.add_item);
+    };
+    EditChecklistView.prototype.remove_item = function(item) {
+      return item.view.remove();
+    };
+    EditChecklistView.prototype.on_change = function(e) {
+      return this.model.set({
+        "name": $(e.target).val()
+      });
+    };
+    return EditChecklistView;
   })();
   AppController = (function() {
     __extends(AppController, Backbone.Controller);
@@ -104,23 +219,26 @@
     };
     function AppController() {
       AppController.__super__.constructor.apply(this, arguments);
-      this.views = {};
     }
     AppController.prototype.checklists = function() {
-      var _base;
-      console.log("in AppController.checklists");
-      return (_base = this.views)['checklists'] || (_base['checklists'] = new ChecklistListView);
+      return this.view = new ChecklistListView;
+    };
+    AppController.prototype.show = function(cid) {
+      return this.view = new ChecklistView({
+        model: Checklists.getByCid(cid)
+      });
+    };
+    AppController.prototype.edit = function(cid) {
+      return this.view = new EditChecklistView({
+        model: Checklists.getByCid(cid)
+      });
     };
     return AppController;
   })();
   app.appController = new AppController();
   $(document).ready(function() {
     return $.getJSON("/checklists", __bind(function(data, textStatus, xhr) {
-      console.log(data);
       Checklists.refresh(data);
-      Checklists.each(function(checklist) {
-        return console.log(JSON.stringify(checklist));
-      });
       Backbone.history.start();
       return app.appController.checklists();
     }, this));

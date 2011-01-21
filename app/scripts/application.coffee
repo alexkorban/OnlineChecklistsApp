@@ -9,6 +9,12 @@ String::ends_with = (str) ->
   this.match(str + "$") == str
 
 
+# add a chainable logging function to jQuery
+jQuery.fn.log = (msg) ->
+  console.log("%s: %o", msg, this)
+  return this
+
+
 root.append_fn = (fn, fn_to_append) ->
     if !fn?
     	return fn_to_append
@@ -27,7 +33,11 @@ app =
     $.historyBack()
 
 
+Backbone.emulateHTTP = true;    # use _method parameter instead of PUT and DELETE HTTP requests
+
 class Item extends Backbone.Model
+  defaults: {content: "New item"}
+
   constructor: ->
     super
 
@@ -36,12 +46,27 @@ class Item extends Backbone.Model
     @get "content"
 
 
-class Checklist extends Backbone.Model
+class ItemCollection extends Backbone.Collection
+  model: Item
+
   constructor: ->
     super
 
+
+class Checklist extends Backbone.Model
+  constructor: ->
+    super
+    @items = new ItemCollection
+    @items.url = "/checklists/#{@id}"
+    #@items.bind("refresh", @f)
+
   name: ->
     @get "name"
+
+
+  save: ->
+    @set {items: @items}
+    super
 
 
 class ChecklistCollection extends Backbone.Collection
@@ -71,7 +96,7 @@ class ChecklistListView extends Backbone.View
       <div>
       <ul>
       <% checklists.each(function(checklist) { %>
-      <li><a href="#checklists-<%= checklist.cid %>"><%= checklist.name() %></a></li>
+      <li><a href="#checklists-<%= checklist.cid %>"><%= checklist.name() %></a> (<a href = "#checklists-<%= checklist.cid %>-edit">Edit</a>)</li>
       <% }); %>
       </ul>
       </div>
@@ -81,18 +106,18 @@ class ChecklistListView extends Backbone.View
 
 
   render: ->
-    # Render the content
-    console.log("rendering checklist list")
     @el.html(@template({checklists : Checklists}))
 
 
 class ChecklistView extends Backbone.View
   constructor: ->
     super
+
     @el = app.active_page()
 
     @template = _.template('''
       <div>
+      <h1><%= name %></h1>
       <ul>
       <% items.each(function(item) { %>
       <li><a href="#items-<%= item.cid %>"><%= item.content() %></a></li>
@@ -101,35 +126,136 @@ class ChecklistView extends Backbone.View
       </div>
       ''')
 
-    @render()
+    @model.items.fetch {success: =>
+      @render()
+    }
 
 
   render: ->
-    # Render the content
-    console.log("rendering checklist")
-    @el.html(@template({items : Items}))
+    @el.html(@template({name: @model.name(), items : @model.items}))
 
-class AppController extends Backbone.Controller
-  routes:
-    "checklists-:cid-edit" : "edit"
-    "checklists-:cid" : "show"
-    "checklists" : "checklists"
+
+class EditItemView extends Backbone.View
+  model: Item
+  tagName: "li"
+  events: {
+    "click .remove_item": "on_remove_item"
+    "change input[type=text]": "on_change"
+  }
 
   constructor: ->
     super
-    @views = {}
+    @template = _.template('''
+      <input type = "text" value = "<%= item.content() %>" /> <a href = "#" class = "remove_item">X</a>
+    ''')
+
+  render: ->
+    $(@el).html(@template({item: @model}))
+    return $(@el)
+
+
+  on_remove_item: (e) ->
+    @collection.remove(@model)
+    e.preventDefault()
+    e.stopPropagation()
+
+
+  on_change: (e) ->
+    @model.set {"content": $(e.target).val()}
+
+
+class EditChecklistView extends Backbone.View
+  events: {
+    "click .save": "on_save"
+    "click .add_item": "on_add_item"
+    "change .checklist_name": "on_change"
+  }
+  tagName: "div"
+  id: "edit"
+
+  constructor: ->
+    super
+
+    @parent = app.active_page()
+
+    @template = _.template('''
+      <input type = "text" class = "checklist_name" value = "<%= name %>" /><br/><br/>
+      <ul>
+      </ul>
+      <a href = "#" class = "add_item">Add item</a>
+      <br/>
+      <a href = "#checklists" class = "save">Save</a>
+      ''')
+
+    @model.items.bind "add", @add_item
+    @model.items.bind "remove", @remove_item
+    @model.items.bind "refresh", @add_items
+
+    @model.items.fetch()
+
+#    @model.items.fetch {success: =>
+#      @render()
+#    }
+
+
+  on_save: (e) ->
+    @model.save()
+
+
+  on_add_item: (e) ->
+    @model.items.add()
+    e.preventDefault()
+    e.stopPropagation()
+
+
+  render: ->
+    $(@el).html(@template({name: @model.name(), items : @model.items}))
+    $(@parent).html("").append @el
+
+
+  add_item: (item) =>
+    view = new EditItemView {model: item, collection: @model.items}
+    item.view = view
+    @item_el.append view.render()
+
+
+  add_items: =>
+    @render()
+    @item_el = $(@el).find("ul")
+    @model.items.each(@add_item)
+
+
+  remove_item: (item) ->
+    item.view.remove()
+
+
+  on_change: (e) ->
+    @model.set {"name": $(e.target).val()}
+
+
+
+class AppController extends Backbone.Controller
+  routes:
+    "checklists-:cid-edit": "edit"
+    "checklists-:cid": "show"
+    "checklists": "checklists"
+
+  constructor: ->
+    super
 
   checklists: ->
-    console.log "in AppController.checklists"
-    @views['checklists'] ||= new ChecklistListView
+    @view = new ChecklistListView
 
-#  show: (cid) ->
-#    @views["venues-#{cid}"] ||= new ShowVenueView { model : Venues.getByCid(cid) }
-#
-#  edit: (cid) ->
-#    @views["venues-#{cid}-edit"] ||= new EditVenueView { model : Venues.getByCid(cid) }
+
+  show: (cid) ->
+    @view = new ChecklistView { model: Checklists.getByCid(cid) }
+
+  edit: (cid) ->
+    @view = new EditChecklistView { model : Checklists.getByCid(cid) }
+
 
 app.appController = new AppController()
+
 
 #
 # Start the app
@@ -137,10 +263,7 @@ app.appController = new AppController()
 
 $(document).ready ->
   $.getJSON "/checklists", (data, textStatus, xhr) =>
-    console.log(data)
     Checklists.refresh(data)
-    Checklists.each (checklist) ->
-      console.log(JSON.stringify(checklist))
 
     Backbone.history.start()
     app.appController.checklists()
