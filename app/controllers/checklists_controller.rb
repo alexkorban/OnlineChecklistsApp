@@ -1,6 +1,6 @@
 class ChecklistsController < ApplicationController
   def index
-    @checklists = Checklist.all # current_user.account.checklists.all
+    @checklists = Checklist.order("id").all # current_user.account.checklists.all
     respond_to { |format|
       format.json { render :json => @checklists }
       format.html { render "index" }
@@ -10,7 +10,7 @@ class ChecklistsController < ApplicationController
   def show
     checklist = Checklist.find(params[:id]) # current_user.account.checklists.find(params[:id])
     respond_to { |format|
-      format.json { render :json => checklist.items }
+      format.json { render :json => checklist.items.order("id") }
     }
   end
 
