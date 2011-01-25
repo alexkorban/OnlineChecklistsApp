@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110125053802) do
+ActiveRecord::Schema.define(:version => 20110125060956) do
 
   create_table "checklists", :force => true do |t|
     t.string   "name"
@@ -50,6 +50,9 @@ ActiveRecord::Schema.define(:version => 20110125053802) do
     t.datetime "updated_at"
     t.string   "invitation_token",     :limit => 20
     t.datetime "invitation_sent_at"
+    t.string   "confirmation_token"
+    t.datetime "confirmed_at"
+    t.datetime "confirmation_sent_at"
   end
 
   add_index "users", ["email"], :name => "index_users_on_email", :unique => true

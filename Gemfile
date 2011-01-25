@@ -7,6 +7,11 @@ gem 'pg', "0.9.0"
 gem "devise", "1.1.5"
 gem "devise_invitable", "0.3.5"
 
+group :development do
+  gem 'hpricot'
+  gem 'ruby_parser'
+end
+
 # Use unicorn as the web server
 # gem 'unicorn'
 

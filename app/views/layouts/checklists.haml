@@ -8,6 +8,14 @@
     = javascript_include_tag "underscore-min"
     = javascript_include_tag Rails.env == "production" ? "backbone-min" : "backbone"
     = javascript_include_tag "application"
+
+    = stylesheet_link_tag "checklists"
+
   %body
-    = yield
+    #header
+      #{current_user.email}
+      |
+      = link_to 'Sign out', destroy_user_session_path
+    #main
+      = yield
 
