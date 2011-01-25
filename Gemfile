@@ -2,10 +2,10 @@ source 'http://rubygems.org'
 
 gem 'rails', '3.0.3'
 
-# Bundle edge Rails instead:
 gem "haml", "3.0.18"
-
 gem 'pg', "0.9.0"
+gem "devise", "1.1.5"
+gem "devise_invitable", "0.3.5"
 
 # Use unicorn as the web server
 # gem 'unicorn'

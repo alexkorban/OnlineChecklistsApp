@@ -1,4 +1,6 @@
 OnlineChecklistsApp::Application.routes.draw do
+  devise_for :users
+
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
@@ -53,6 +55,8 @@ OnlineChecklistsApp::Application.routes.draw do
   resources :checklists
   resources :entries, :only => [:create]
   root :to => "checklists#index"
+
+  devise_for :users
 
 
   # See how all your routes lay out with "rake routes"
