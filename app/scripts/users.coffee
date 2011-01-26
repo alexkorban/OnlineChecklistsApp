@@ -10,7 +10,7 @@ class User extends Backbone.Model
 
 
   name: ->
-    @get "email"
+    @get "name"
 
 
 class UserCollection extends Backbone.Collection
@@ -26,13 +26,17 @@ class Invitation extends Backbone.Model
     super
 
 
+  name: ->
+    @get "name"
+
+
   email: ->
     @get "email"
 
 
 class InvitationCollection extends Backbone.Collection
   model: Invitation
-  url: "/users/invitations"
+  url: "/users/invitation"
 
   constructor: ->
     super
@@ -41,6 +45,9 @@ class InvitationCollection extends Backbone.Collection
 class root.UserListView extends Backbone.View
   tagName: "div"
   id: "user_list"
+  events: {
+    "click .remove": "on_remove"
+  }
 
   constructor: ->
     super
@@ -48,8 +55,8 @@ class root.UserListView extends Backbone.View
     @template = _.template('''
       <ul>
       <% users.each(function(user) { %>
-      <li><a href="#users-<%= user.cid %>"><%= user.name() %></a>
-        (<a href = "#users-<%= user.cid %>-edit">Edit</a> | <a id = "remove_<%= user.cid %>" class = "remove" href = "#">X</a>)</li>
+      <li><%= user.name() %> (<%= user.email() %>)
+        (<a id = "remove_<%= user.cid %>" class = "remove" href = "#">X</a>)</li>
       <% }); %>
       </ul>
       ''')
@@ -65,6 +72,12 @@ class root.UserListView extends Backbone.View
     $("#" + @id).replaceWith(@el)
 
 
+  on_remove: (e) ->
+    e.target.id.match("^remove_(.+)")
+    @users.getByCid(RegExp.$1).destroy()
+    e.preventDefault()
+
+
 class root.InvitationItemView extends Backbone.View
   model: Invitation
   tagName: "div"
@@ -77,7 +90,8 @@ class root.InvitationItemView extends Backbone.View
     super
 
     @template = _.template('''
-      <input type = "text" value = "<%= item.email() %>" /> <a href = "#" class = "remove_item">X</a>
+      Name: <input type = "text" name = "name" value = "" />
+      Email: <input type = "text" name = "email" value = "" /> <a href = "#" class = "remove_item">X</a>
     ''')
 
 
@@ -93,7 +107,9 @@ class root.InvitationItemView extends Backbone.View
 
 
   on_change: (e) ->
-    @model.set {"email": $(e.target).val()}
+    attr = {}
+    attr[$(e.target).attr("name")] = $(e.target).val()
+    @model.set attr
 
 
 class root.InvitationView extends Backbone.View
@@ -147,6 +163,7 @@ class root.InvitationView extends Backbone.View
 
   on_save: (e) ->
     for invitation in @invitations.models
+      console.log invitation
       invitation.save() if invitation.email().length > 0
 
 
@@ -168,4 +185,4 @@ class root.UserPageView extends Backbone.View
 
   render: ->
     $(@el).html(@template({users: @users}))
-    $("##{@id}").replaceWith(@el)
+    $("#" + @id).replaceWith(@el)
