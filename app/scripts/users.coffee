@@ -62,8 +62,8 @@ class InvitationSet extends Backbone.Model
 
 
 class root.UserListView extends Backbone.View
-  tagName: "div"
   id: "user_list"
+  tagName: "div"
   events: {
     "click .remove": "on_remove"
   }
@@ -80,24 +80,23 @@ class root.UserListView extends Backbone.View
       </ul>
       ''')
 
+    $("#" + @id).replaceWith(@el)
+
     @users = users
 
 
   render: =>
-    console.log("rendering user list view")
     $(@el).html(@template({users: @users}))
-    console.log($(@el).html())
-    console.log @id, $("#" + @id)
-    $("#" + @id).replaceWith(@el)
 
 
   on_remove: (e) ->
+    console.log("in on_remove")
     e.target.id.match("^remove_(.+)")
     user = @users.getByCid(RegExp.$1)
     user.destroy()
     @users.remove(user)
-    @render()
     e.preventDefault()
+
 
 
 class root.InvitationItemView extends Backbone.View
@@ -146,6 +145,7 @@ class root.InvitationView extends Backbone.View
     super
 
     @users = users
+    $("#" + @id).replaceWith(@el)
 
     @template = _.template('''
       <h2>Invite users</h2>
@@ -165,7 +165,6 @@ class root.InvitationView extends Backbone.View
 
   render: ->
     $(@el).html(@template())
-    $("#" + @id).replaceWith(@el)
     @item_el = $("#invitation_items")
 
 
@@ -207,16 +206,17 @@ class root.UserPageView extends Backbone.View
     super
     @template = _.template('''
       <h1>Users</h1>
-      <div id = "user_list"></div>
       <div id = "invitations"></div>
+      <div id = "user_list"></div>
       ''')
+    $("#" + @id).replaceWith(@el)
     @render()
     @users = new UserCollection
     @user_list_view = new UserListView(@users)
     @invitation_view = new InvitationView(@users)
     @users.bind("refresh", @user_list_view.render)
+    @users.bind("remove", @user_list_view.render)
     @users.fetch()
 
   render: ->
     $(@el).html(@template())
-    $("#" + @id).replaceWith(@el)

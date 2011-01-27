@@ -17,6 +17,11 @@ class User < ActiveRecord::Base
   # Setup accessible (or protected) attributes for your model
   attr_accessible :email, :password, :password_confirmation, :remember_me, :name
 
-  # callbacks
-  #before_create {|user| user.account = current_user.account }
+  def active?
+    # Comment out the below debug statement to view the properties of the returned self model values.
+    # logger.debug self.to_yaml
+
+    super && active && account.active
+  end
+
 end

@@ -1,4 +1,6 @@
 class RegistrationsController < Devise::RegistrationsController
+  layout :registrations_layout
+
   def index
     logger.info "in registrations::index"
     @users = current_account.users
@@ -9,10 +11,18 @@ class RegistrationsController < Devise::RegistrationsController
 
   # DELETE /users/:id
   def destroy
-    current_account.users.destroy(params[:id])
-    respond_to { |format|
-      format.json { render :json => {}, :status => :ok }
-    }
+    if params[:id]    # deactivating a user
+      u = current_account.users.find(params[:id])
+      u.active = false
+      u.save
+      respond_to { |format|
+        format.json { render :json => {}, :status => :ok }
+      }
+    else              # deactivating the account
+      current_account.active = false
+      current_account.save
+      redirect_to destroy_user_session_path
+    end
   end
 
   def create
@@ -38,6 +48,12 @@ class RegistrationsController < Devise::RegistrationsController
       clean_up_passwords(resource)
       render_with_scope :new
     end
+  end
+
+  protected
+
+  def registrations_layout
+    action_name == "edit" ? "checklists" : nil
   end
 
 end

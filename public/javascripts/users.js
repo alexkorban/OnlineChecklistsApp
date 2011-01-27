@@ -75,32 +75,29 @@
   })();
   root.UserListView = (function() {
     __extends(UserListView, Backbone.View);
-    UserListView.prototype.tagName = "div";
     UserListView.prototype.id = "user_list";
+    UserListView.prototype.tagName = "div";
     UserListView.prototype.events = {
       "click .remove": "on_remove"
     };
     function UserListView(users) {
       this.render = __bind(this.render, this);;      UserListView.__super__.constructor.apply(this, arguments);
       this.template = _.template('<ul>\n<% users.each(function(user) { %>\n<li><%= user.name() %> (<%= user.email() %>)\n  (<a id = "remove_<%= user.cid %>" class = "remove" href = "#">X</a>)</li>\n<% }); %>\n</ul>');
+      $("#" + this.id).replaceWith(this.el);
       this.users = users;
     }
     UserListView.prototype.render = function() {
-      console.log("rendering user list view");
-      $(this.el).html(this.template({
+      return $(this.el).html(this.template({
         users: this.users
       }));
-      console.log($(this.el).html());
-      console.log(this.id, $("#" + this.id));
-      return $("#" + this.id).replaceWith(this.el);
     };
     UserListView.prototype.on_remove = function(e) {
       var user;
+      console.log("in on_remove");
       e.target.id.match("^remove_(.+)");
       user = this.users.getByCid(RegExp.$1);
       user.destroy();
       this.users.remove(user);
-      this.render();
       return e.preventDefault();
     };
     return UserListView;
@@ -148,6 +145,7 @@
       this.remove_item = __bind(this.remove_item, this);;
       this.add_item = __bind(this.add_item, this);;      InvitationView.__super__.constructor.apply(this, arguments);
       this.users = users;
+      $("#" + this.id).replaceWith(this.el);
       this.template = _.template('<h2>Invite users</h2>\n<div id = "invitation_items"></div>\n<a href = "#" class = "add_item">Add item</a>\n<br/>\n<a href = "#" class = "save">Save</a>');
       this.render();
       this.invitations = new InvitationSet;
@@ -157,7 +155,6 @@
     }
     InvitationView.prototype.render = function() {
       $(this.el).html(this.template());
-      $("#" + this.id).replaceWith(this.el);
       return this.item_el = $("#invitation_items");
     };
     InvitationView.prototype.add_item = function(item) {
@@ -196,17 +193,18 @@
     UserPageView.prototype.id = "content";
     function UserPageView() {
       UserPageView.__super__.constructor.apply(this, arguments);
-      this.template = _.template('<h1>Users</h1>\n<div id = "user_list"></div>\n<div id = "invitations"></div>');
+      this.template = _.template('<h1>Users</h1>\n<div id = "invitations"></div>\n<div id = "user_list"></div>');
+      $("#" + this.id).replaceWith(this.el);
       this.render();
       this.users = new UserCollection;
       this.user_list_view = new UserListView(this.users);
       this.invitation_view = new InvitationView(this.users);
       this.users.bind("refresh", this.user_list_view.render);
+      this.users.bind("remove", this.user_list_view.render);
       this.users.fetch();
     }
     UserPageView.prototype.render = function() {
-      $(this.el).html(this.template());
-      return $("#" + this.id).replaceWith(this.el);
+      return $(this.el).html(this.template());
     };
     return UserPageView;
   })();
