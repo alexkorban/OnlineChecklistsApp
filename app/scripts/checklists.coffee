@@ -86,7 +86,7 @@ class root.ChecklistListView extends Backbone.View
         (<a href = "#checklists-<%= checklist.cid %>-edit">Edit</a> | <a id = "remove_<%= checklist.cid %>" class = "remove" href = "#">X</a>)</li>
       <% }); %>
       </ul>
-      <a href = "#create">Create new list</a> <a href = "#users">Invite users</a>
+      <a href = "#create">Create new list</a> <% if (current_user.role == "admin") { %> <a href = "#users">Invite users</a> <% } %>
       ''')
 
     @render()

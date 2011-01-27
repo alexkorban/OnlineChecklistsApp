@@ -20,6 +20,9 @@
     User.prototype.name = function() {
       return this.get("name");
     };
+    User.prototype.is_current = function() {
+      return this.get("is_current");
+    };
     return User;
   })();
   UserCollection = (function() {
@@ -82,7 +85,7 @@
     };
     function UserListView(users) {
       this.render = __bind(this.render, this);;      UserListView.__super__.constructor.apply(this, arguments);
-      this.template = _.template('<ul>\n<% users.each(function(user) { %>\n<li><%= user.name() %> (<%= user.email() %>)\n  (<a id = "remove_<%= user.cid %>" class = "remove" href = "#">X</a>)</li>\n<% }); %>\n</ul>');
+      this.template = _.template('<ul>\n<% users.each(function(user) { %>\n<li><%= user.name() %> (<%= user.email() %>)\n  <% if (user.email() != current_user.email) { %>(<a id = "remove_<%= user.cid %>" class = "remove" href = "#">X</a>)<% } %></li>\n<% }); %>\n</ul>');
       $("#" + this.id).replaceWith(this.el);
       this.users = users;
     }

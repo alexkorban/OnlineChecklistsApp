@@ -2,14 +2,13 @@ class RegistrationsController < Devise::RegistrationsController
   layout :registrations_layout
 
   def index
-    logger.info "in registrations::index"
     @users = current_account.users
     respond_to { |format|
       format.json { render :json => @users, :status => :ok}
     }
   end
 
-  # DELETE /users/:id
+  # DELETE /users/(:id)
   def destroy
     if params[:id]    # deactivating a user
       u = current_account.users.find(params[:id])

@@ -13,6 +13,8 @@
 
     = stylesheet_link_tag "checklists"
 
+    :javascript
+      var current_user = #{current_user.to_json}
   %body
     #header
       #{current_user.email}

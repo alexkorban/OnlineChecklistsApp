@@ -13,6 +13,10 @@ class User extends Backbone.Model
     @get "name"
 
 
+  is_current: ->
+    @get "is_current"
+
+
 class UserCollection extends Backbone.Collection
   model: User
   url: "/users"
@@ -75,7 +79,7 @@ class root.UserListView extends Backbone.View
       <ul>
       <% users.each(function(user) { %>
       <li><%= user.name() %> (<%= user.email() %>)
-        (<a id = "remove_<%= user.cid %>" class = "remove" href = "#">X</a>)</li>
+        <% if (user.email() != current_user.email) { %>(<a id = "remove_<%= user.cid %>" class = "remove" href = "#">X</a>)<% } %></li>
       <% }); %>
       </ul>
       ''')
