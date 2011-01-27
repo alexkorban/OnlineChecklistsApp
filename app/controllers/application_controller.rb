@@ -3,4 +3,10 @@ class ApplicationController < ActionController::Base
 
   before_filter :authenticate_user!
 
+  protected
+
+  def current_account
+    current_user.account
+  end
+
 end

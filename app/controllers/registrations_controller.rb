@@ -1,7 +1,7 @@
 class RegistrationsController < Devise::RegistrationsController
   def index
     logger.info "in registrations::index"
-    @users = User.all
+    @users = current_account.users
     respond_to { |format|
       format.json { render :json => @users, :status => :ok}
     }
@@ -9,7 +9,10 @@ class RegistrationsController < Devise::RegistrationsController
 
   # DELETE /users/:id
   def destroy
-    current_user.account.users.destroy(params[:id])
+    current_account.users.destroy(params[:id])
+    respond_to { |format|
+      format.json { render :json => {}, :status => :ok }
+    }
   end
 
   def create

@@ -36,9 +36,28 @@ class Invitation extends Backbone.Model
 
 class InvitationCollection extends Backbone.Collection
   model: Invitation
+
+  constructor: ->
+    super
+
+
+class InvitationSet extends Backbone.Model
   url: "/users/invitation"
 
   constructor: ->
+    super
+    @items = new InvitationCollection
+
+
+  add: (item) ->
+    @items.add(item)
+
+
+  bind: (event, handler) ->
+    @items.bind(event, handler)
+
+  save: ->
+    @set {invitations: @items}
     super
 
 
@@ -49,7 +68,7 @@ class root.UserListView extends Backbone.View
     "click .remove": "on_remove"
   }
 
-  constructor: ->
+  constructor: (users) ->
     super
 
     @template = _.template('''
@@ -61,20 +80,23 @@ class root.UserListView extends Backbone.View
       </ul>
       ''')
 
-    @users = new UserCollection
-    @users.fetch {success: =>
-      @render()
-    }
+    @users = users
 
 
-  render: ->
+  render: =>
+    console.log("rendering user list view")
     $(@el).html(@template({users: @users}))
+    console.log($(@el).html())
+    console.log @id, $("#" + @id)
     $("#" + @id).replaceWith(@el)
 
 
   on_remove: (e) ->
     e.target.id.match("^remove_(.+)")
-    @users.getByCid(RegExp.$1).destroy()
+    user = @users.getByCid(RegExp.$1)
+    user.destroy()
+    @users.remove(user)
+    @render()
     e.preventDefault()
 
 
@@ -120,20 +142,22 @@ class root.InvitationView extends Backbone.View
     "click .save": "on_save"
   }
 
-  constructor: ->
+  constructor: (users) ->
     super
+
+    @users = users
 
     @template = _.template('''
       <h2>Invite users</h2>
       <div id = "invitation_items"></div>
       <a href = "#" class = "add_item">Add item</a>
       <br/>
-      <a href = "#checklists" class = "save">Save</a>
+      <a href = "#" class = "save">Save</a>
       ''')
 
     @render()
 
-    @invitations = new InvitationCollection
+    @invitations = new InvitationSet
     @invitations.bind "add", @add_item
     @invitations.bind "remove", @remove_item
     @invitations.add(new Invitation)
@@ -162,9 +186,17 @@ class root.InvitationView extends Backbone.View
 
 
   on_save: (e) ->
-    for invitation in @invitations.models
-      console.log invitation
-      invitation.save() if invitation.email().length > 0
+    @invitations.save({}, {success: (model, response) =>
+      console.log("response:", response)
+      console.log("users before:", @users)
+      @users.refresh(response)
+      console.log("users after:", @users)
+    })
+    e.preventDefault()
+
+#    for invitation in @invitations.models
+#      console.log invitation
+#      invitation.save() if invitation.email().length > 0
 
 
 class root.UserPageView extends Backbone.View
@@ -179,10 +211,12 @@ class root.UserPageView extends Backbone.View
       <div id = "invitations"></div>
       ''')
     @render()
-    @user_list_view = new UserListView
-    @invitation_view = new InvitationView
-
+    @users = new UserCollection
+    @user_list_view = new UserListView(@users)
+    @invitation_view = new InvitationView(@users)
+    @users.bind("refresh", @user_list_view.render)
+    @users.fetch()
 
   render: ->
-    $(@el).html(@template({users: @users}))
+    $(@el).html(@template())
     $("#" + @id).replaceWith(@el)

@@ -1,6 +1,6 @@
 class ChecklistsController < ApplicationController
   def index
-    @checklists = Checklist.order("id").all # current_user.account.checklists.all
+    @checklists = current_account.checklists.order("id").all
     respond_to { |format|
       format.json { render :json => @checklists }
       format.html { render "index" }
@@ -8,14 +8,14 @@ class ChecklistsController < ApplicationController
   end
 
   def show
-    checklist = Checklist.find(params[:id]) # current_user.account.checklists.find(params[:id])
+    checklist = current_account.checklists.find(params[:id])
     respond_to { |format|
       format.json { render :json => checklist.items.order("id") }
     }
   end
 
   def create
-    checklist = Checklist.create(:name => params[:name])
+    checklist = current_account.checklists.create(:name => params[:name])
     params[:items].each { |item|
       checklist.items.create :content => item[:content]
     }
@@ -26,7 +26,7 @@ class ChecklistsController < ApplicationController
   end
 
   def update
-    checklist = Checklist.find(params[:id]) # current_user.account.checklists.find(params[:id])
+    checklist = current_account.checklists.find(params[:id])
     checklist.name = params[:name]
     checklist.save
     checklist.item_ids = params[:items].map {|item| item[:id]}
@@ -47,7 +47,7 @@ class ChecklistsController < ApplicationController
   end
 
   def destroy
-    checklist = Checklist.find(params[:id]) # current_user.account.checklists.find(params[:id])
+    checklist = checklist = current_account.checklists.find(params[:id])
     checklist.destroy
     respond_to { |format|
       format.json { render :json => {}, :status => :ok }

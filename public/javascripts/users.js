@@ -1,5 +1,5 @@
 (function() {
-  var Invitation, InvitationCollection, User, UserCollection, root;
+  var Invitation, InvitationCollection, InvitationSet, User, UserCollection, root;
   var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
@@ -47,11 +47,31 @@
   InvitationCollection = (function() {
     __extends(InvitationCollection, Backbone.Collection);
     InvitationCollection.prototype.model = Invitation;
-    InvitationCollection.prototype.url = "/users/invitation";
     function InvitationCollection() {
       InvitationCollection.__super__.constructor.apply(this, arguments);
     }
     return InvitationCollection;
+  })();
+  InvitationSet = (function() {
+    __extends(InvitationSet, Backbone.Model);
+    InvitationSet.prototype.url = "/users/invitation";
+    function InvitationSet() {
+      InvitationSet.__super__.constructor.apply(this, arguments);
+      this.items = new InvitationCollection;
+    }
+    InvitationSet.prototype.add = function(item) {
+      return this.items.add(item);
+    };
+    InvitationSet.prototype.bind = function(event, handler) {
+      return this.items.bind(event, handler);
+    };
+    InvitationSet.prototype.save = function() {
+      this.set({
+        invitations: this.items
+      });
+      return InvitationSet.__super__.save.apply(this, arguments);
+    };
+    return InvitationSet;
   })();
   root.UserListView = (function() {
     __extends(UserListView, Backbone.View);
@@ -60,25 +80,27 @@
     UserListView.prototype.events = {
       "click .remove": "on_remove"
     };
-    function UserListView() {
-      UserListView.__super__.constructor.apply(this, arguments);
+    function UserListView(users) {
+      this.render = __bind(this.render, this);;      UserListView.__super__.constructor.apply(this, arguments);
       this.template = _.template('<ul>\n<% users.each(function(user) { %>\n<li><%= user.name() %> (<%= user.email() %>)\n  (<a id = "remove_<%= user.cid %>" class = "remove" href = "#">X</a>)</li>\n<% }); %>\n</ul>');
-      this.users = new UserCollection;
-      this.users.fetch({
-        success: __bind(function() {
-          return this.render();
-        }, this)
-      });
+      this.users = users;
     }
     UserListView.prototype.render = function() {
+      console.log("rendering user list view");
       $(this.el).html(this.template({
         users: this.users
       }));
+      console.log($(this.el).html());
+      console.log(this.id, $("#" + this.id));
       return $("#" + this.id).replaceWith(this.el);
     };
     UserListView.prototype.on_remove = function(e) {
+      var user;
       e.target.id.match("^remove_(.+)");
-      this.users.getByCid(RegExp.$1).destroy();
+      user = this.users.getByCid(RegExp.$1);
+      user.destroy();
+      this.users.remove(user);
+      this.render();
       return e.preventDefault();
     };
     return UserListView;
@@ -122,12 +144,13 @@
       "click .add_item": "on_add_item",
       "click .save": "on_save"
     };
-    function InvitationView() {
+    function InvitationView(users) {
       this.remove_item = __bind(this.remove_item, this);;
       this.add_item = __bind(this.add_item, this);;      InvitationView.__super__.constructor.apply(this, arguments);
-      this.template = _.template('<h2>Invite users</h2>\n<div id = "invitation_items"></div>\n<a href = "#" class = "add_item">Add item</a>\n<br/>\n<a href = "#checklists" class = "save">Save</a>');
+      this.users = users;
+      this.template = _.template('<h2>Invite users</h2>\n<div id = "invitation_items"></div>\n<a href = "#" class = "add_item">Add item</a>\n<br/>\n<a href = "#" class = "save">Save</a>');
       this.render();
-      this.invitations = new InvitationCollection;
+      this.invitations = new InvitationSet;
       this.invitations.bind("add", this.add_item);
       this.invitations.bind("remove", this.remove_item);
       this.invitations.add(new Invitation);
@@ -155,15 +178,15 @@
       return e.stopPropagation();
     };
     InvitationView.prototype.on_save = function(e) {
-      var invitation, _i, _len, _ref, _results;
-      _ref = this.invitations.models;
-      _results = [];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        invitation = _ref[_i];
-        console.log(invitation);
-        _results.push(invitation.email().length > 0 ? invitation.save() : void 0);
-      }
-      return _results;
+      this.invitations.save({}, {
+        success: __bind(function(model, response) {
+          console.log("response:", response);
+          console.log("users before:", this.users);
+          this.users.refresh(response);
+          return console.log("users after:", this.users);
+        }, this)
+      });
+      return e.preventDefault();
     };
     return InvitationView;
   })();
@@ -175,13 +198,14 @@
       UserPageView.__super__.constructor.apply(this, arguments);
       this.template = _.template('<h1>Users</h1>\n<div id = "user_list"></div>\n<div id = "invitations"></div>');
       this.render();
-      this.user_list_view = new UserListView;
-      this.invitation_view = new InvitationView;
+      this.users = new UserCollection;
+      this.user_list_view = new UserListView(this.users);
+      this.invitation_view = new InvitationView(this.users);
+      this.users.bind("refresh", this.user_list_view.render);
+      this.users.fetch();
     }
     UserPageView.prototype.render = function() {
-      $(this.el).html(this.template({
-        users: this.users
-      }));
+      $(this.el).html(this.template());
       return $("#" + this.id).replaceWith(this.el);
     };
     return UserPageView;
