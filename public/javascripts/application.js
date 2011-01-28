@@ -42,7 +42,8 @@
       "reports": "reports",
       "timeline": "timeline",
       "timeline/:week_offset/u:user_id/c:checklist_id": "timeline",
-      "charts": "charts"
+      "charts": "charts",
+      "charts/u:user_ids/c:checklist_id": "charts"
     };
     function AppController() {
       AppController.__super__.constructor.apply(this, arguments);
@@ -85,8 +86,13 @@
         checklist_id: checklist_id
       });
     };
-    AppController.prototype.charts = function() {
+    AppController.prototype.charts = function(user_ids, checklist_id) {
+      if (!(checklist_id != null)) {
+        checklist_id = Checklists.at(0).id;
+      }
       return this.view = new ChartView({
+        user_ids: user_ids,
+        checklist_id: checklist_id,
         users: Users,
         checklists: Checklists
       });

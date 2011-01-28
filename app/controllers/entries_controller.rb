@@ -14,7 +14,7 @@ class EntriesController < ApplicationController
     from = d.beginning_of_week
     to = d.end_of_week
 
-    entries = current_account.entries.between_dates(from, to)
+    entries = current_account.entries.between_dates(from, to).order("created_at")
 
     checklist_id = params[:checklist_id] ? params[:checklist_id].to_i : 0
     entries = entries.for_checklist(checklist_id) if checklist_id > 0
@@ -26,6 +26,19 @@ class EntriesController < ApplicationController
       format.json {
         render json: Entry::get_json_entries_by_day(entries), status: :ok
       }
+    }
+  end
+
+  def counts
+    checklist_id = params[:checklist_id] ? params[:checklist_id].to_i : 0
+
+    entries = current_account.entries.within_one_year(Date.today)
+    entries = entries.for_checklist(checklist_id) if checklist_id > 0
+
+    counts = Entry.unscoped { entries.monthly_counts }
+    logger.info "COUNTS: ", counts.inspect
+    respond_to {|format|
+      format.json { render json: {}, status: :ok }
     }
   end
 end

@@ -1,9 +1,14 @@
 class Entry < ActiveRecord::Base
-  default_scope :order => "created_at"
-
   scope :between_dates, lambda { |from, to| where("created_at >= ? AND created_at <= ?", from.to_s, to.to_s) }
   scope :for_checklist, lambda { |checklist_id| where("checklist_id = ?", checklist_id) }
   scope :for_user, lambda { |user_id| where("user_id = ?", user_id) }
+  scope :within_one_year, lambda { |today| where("created_at > ?", today - 1.year)}
+  scope :monthly_counts, :select => "count(id), extract(month from date_trunc('month', created_at)) as month,
+         extract(year from date_trunc('month', created_at)) as year",  :group => "date_trunc('month', created_at)",
+        :order => "date_trunc('month', created_at)"
+
+#  select extract(month from date_trunc('month', created_at)),
+#         extract(year from date_trunc('month', created_at)), count(*) from entries group by date_trunc('month', created_at);
 
   belongs_to :checklist
   belongs_to :user
