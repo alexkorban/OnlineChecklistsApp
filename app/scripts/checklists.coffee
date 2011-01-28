@@ -18,12 +18,12 @@ class ItemCollection extends Backbone.Collection
     super
 
 
-class Checklist extends Backbone.Model
+class root.Checklist extends Backbone.Model
   defaults: {name: "New checklist"}
   constructor: ->
     super
     @items = new ItemCollection
-    @items.url = "/checklists/#{@id}"
+    @set_items_url()
     #@items.bind("refresh", @f)
 
 
@@ -34,6 +34,11 @@ class Checklist extends Backbone.Model
   save: ->
     @set {items: @items}
     super
+
+
+  set_items_url: ->
+    @items.url = "/checklists/#{@id}"
+
 
 
 class ChecklistCollection extends Backbone.Collection
@@ -216,7 +221,11 @@ class root.EditChecklistView extends Backbone.View
 
 
   on_save: (e) ->
-    @model.save()
+    @model.save({}, success: (model, response) =>
+      console.log "checklist id after save: ", @model.id
+      @model.set_items_url()
+      #@model.set {id: response.id}
+    )
 
 
   on_add_item: (e) ->

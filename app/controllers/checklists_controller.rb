@@ -21,7 +21,7 @@ class ChecklistsController < ApplicationController
     }
 
     respond_to { |format|
-      format.json { render :json => {}, :status => :ok }
+      format.json { render :json => checklist, :status => :ok }
     }
   end
 

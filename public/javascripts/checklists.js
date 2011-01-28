@@ -1,5 +1,5 @@
 (function() {
-  var Checklist, ChecklistCollection, Entry, Item, ItemCollection, root;
+  var ChecklistCollection, Entry, Item, ItemCollection, root;
   var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
@@ -30,7 +30,7 @@
     }
     return ItemCollection;
   })();
-  Checklist = (function() {
+  root.Checklist = (function() {
     __extends(Checklist, Backbone.Model);
     Checklist.prototype.defaults = {
       name: "New checklist"
@@ -38,7 +38,7 @@
     function Checklist() {
       Checklist.__super__.constructor.apply(this, arguments);
       this.items = new ItemCollection;
-      this.items.url = "/checklists/" + this.id;
+      this.set_items_url();
     }
     Checklist.prototype.name = function() {
       return this.get("name");
@@ -48,6 +48,9 @@
         items: this.items
       });
       return Checklist.__super__.save.apply(this, arguments);
+    };
+    Checklist.prototype.set_items_url = function() {
+      return this.items.url = "/checklists/" + this.id;
     };
     return Checklist;
   })();
@@ -186,7 +189,12 @@
       }
     }
     EditChecklistView.prototype.on_save = function(e) {
-      return this.model.save();
+      return this.model.save({}, {
+        success: __bind(function(model, response) {
+          console.log("checklist id after save: ", this.model.id);
+          return this.model.set_items_url();
+        }, this)
+      });
     };
     EditChecklistView.prototype.on_add_item = function(e) {
       this.model.items.add();

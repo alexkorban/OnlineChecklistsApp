@@ -17,7 +17,7 @@
       var current_user = #{current_user.to_json}
   %body
     #header
-      #{current_user.email}
+      #{current_user.name.empty? ? current_user.email : current_user.name}
       |
       = link_to "Settings", edit_user_registration_path
       |
