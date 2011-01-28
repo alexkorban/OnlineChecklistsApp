@@ -34,11 +34,14 @@ class root.TimelineView extends Backbone.View
   id: "content"
   tagName: "div"
 
-  constructor: (users, checklists) ->
+  constructor: (week_offset, users, checklists) ->
     super
+    @week_offset = if week_offset? then Number(week_offset) else 0
     @users = users
     @checklists = checklists
+
     @all = "- All -"
+
 
     console.log(@users)
     $("#" + @id).replaceWith(@el)
@@ -46,8 +49,10 @@ class root.TimelineView extends Backbone.View
     @template = _.template('''
       <h1>Reports &gt; Timeline</h1>
       <div class = "controls">
-        <a href = "#" class = "prev_week">Prev week</a>
-        <a href = "#" class = "next_week">Next week</a>
+        <a href = "#timeline-<%= Number(week_offset) + 1 %>" class = "prev_week">Prev week</a>
+        <% if (week_offset > 0) { %>
+          <a href = "#timeline-<%= Number(week_offset) - 1 %>" class = "next_week">Next week</a>
+        <% } %>
         User:
         <select class = "users">
           <option><%= all %></option>
@@ -72,9 +77,9 @@ class root.TimelineView extends Backbone.View
       <% }); %>
     ''')
 
-    $.getJSON "/entries", (data, textStatus, xhr) =>
+    $.getJSON "/entries/?week_offset=#{@week_offset}", (data, textStatus, xhr) =>
       @entries_by_day = data
       @render()
 
   render: ->
-    $(@el).html(@template({all: @all, users: @users, checklists: @checklists, entries_by_day: @entries_by_day}))
+    $(@el).html(@template({all: @all, users: @users, checklists: @checklists, entries_by_day: @entries_by_day, week_offset: @week_offset}))

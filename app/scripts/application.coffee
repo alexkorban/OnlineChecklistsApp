@@ -38,6 +38,7 @@ class AppController extends Backbone.Controller
     "users": "users"
     "reports": "reports"
     "timeline": "timeline"
+    "timeline-:week_offset": "timeline"
     "charts": "charts"
 
   constructor: ->
@@ -70,8 +71,8 @@ class AppController extends Backbone.Controller
     @view = new ReportPageView
 
 
-  timeline: ->
-    @view = new TimelineView(Users, Checklists)
+  timeline: (week_offset) ->
+    @view = new TimelineView(week_offset, Users, Checklists)
 
 
   charts: ->

@@ -10,7 +10,7 @@ class EntriesController < ApplicationController
   def index
     # if anything is wrong, return current week; note that to_i returns 0 if it failed to convert a string
     week_offset = params[:week_offset] ? params[:week_offset].to_i : 0
-    d = Date.today.advance weeks: week_offset
+    d = Date.today.advance weeks: -week_offset
     from = d.beginning_of_week
     to = d.end_of_week
 

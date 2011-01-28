@@ -41,6 +41,7 @@
       "users": "users",
       "reports": "reports",
       "timeline": "timeline",
+      "timeline-:week_offset": "timeline",
       "charts": "charts"
     };
     function AppController() {
@@ -75,8 +76,8 @@
     AppController.prototype.reports = function() {
       return this.view = new ReportPageView;
     };
-    AppController.prototype.timeline = function() {
-      return this.view = new TimelineView(Users, Checklists);
+    AppController.prototype.timeline = function(week_offset) {
+      return this.view = new TimelineView(week_offset, Users, Checklists);
     };
     AppController.prototype.charts = function() {
       return this.view = new ChartsView(Users, Checklists);

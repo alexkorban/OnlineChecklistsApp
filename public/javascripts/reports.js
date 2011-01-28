@@ -35,15 +35,16 @@
     __extends(TimelineView, Backbone.View);
     TimelineView.prototype.id = "content";
     TimelineView.prototype.tagName = "div";
-    function TimelineView(users, checklists) {
+    function TimelineView(week_offset, users, checklists) {
       TimelineView.__super__.constructor.apply(this, arguments);
+      this.week_offset = week_offset != null ? Number(week_offset) : 0;
       this.users = users;
       this.checklists = checklists;
       this.all = "- All -";
       console.log(this.users);
       $("#" + this.id).replaceWith(this.el);
-      this.template = _.template('<h1>Reports &gt; Timeline</h1>\n<div class = "controls">\n  <a href = "#" class = "prev_week">Prev week</a>\n  <a href = "#" class = "next_week">Next week</a>\n  User:\n  <select class = "users">\n    <option><%= all %></option>\n    <% users.each(function(user) { %>\n      <option value = "<%= user.cid %>"><%= user.name() == null || user.name().length == 0 ? user.email() : user.name() %></option>\n    <% }); %>\n  </select>\n  Checklist:\n  <select class = "checklists">\n    <option><%= all %></option>\n    <% checklists.each(function(checklist) { %>\n      <option value = "<%= checklist.cid %>"><%= checklist.name() %></option>\n    <% }); %>\n  </select>\n</div>\n<% _.each(entries_by_day, function(entries, day) { %>\n  <h2><%= day %></h2>\n  <% _.each(entries, function(entry) { %>\n    <% console.log(day, ": ", entry); %>\n    <%= entry["for"] %> <%= entry.user_name %> <%= entry.display_time %><br/>\n  <% }); %>\n<% }); %>');
-      $.getJSON("/entries", __bind(function(data, textStatus, xhr) {
+      this.template = _.template('<h1>Reports &gt; Timeline</h1>\n<div class = "controls">\n  <a href = "#timeline-<%= Number(week_offset) + 1 %>" class = "prev_week">Prev week</a>\n  <% if (week_offset > 0) { %>\n    <a href = "#timeline-<%= Number(week_offset) - 1 %>" class = "next_week">Next week</a>\n  <% } %>\n  User:\n  <select class = "users">\n    <option><%= all %></option>\n    <% users.each(function(user) { %>\n      <option value = "<%= user.cid %>"><%= user.name() == null || user.name().length == 0 ? user.email() : user.name() %></option>\n    <% }); %>\n  </select>\n  Checklist:\n  <select class = "checklists">\n    <option><%= all %></option>\n    <% checklists.each(function(checklist) { %>\n      <option value = "<%= checklist.cid %>"><%= checklist.name() %></option>\n    <% }); %>\n  </select>\n</div>\n<% _.each(entries_by_day, function(entries, day) { %>\n  <h2><%= day %></h2>\n  <% _.each(entries, function(entry) { %>\n    <% console.log(day, ": ", entry); %>\n    <%= entry["for"] %> <%= entry.user_name %> <%= entry.display_time %><br/>\n  <% }); %>\n<% }); %>');
+      $.getJSON("/entries/?week_offset=" + this.week_offset, __bind(function(data, textStatus, xhr) {
         this.entries_by_day = data;
         return this.render();
       }, this));
@@ -53,7 +54,8 @@
         all: this.all,
         users: this.users,
         checklists: this.checklists,
-        entries_by_day: this.entries_by_day
+        entries_by_day: this.entries_by_day,
+        week_offset: this.week_offset
       }));
     };
     return TimelineView;
