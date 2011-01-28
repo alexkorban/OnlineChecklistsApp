@@ -52,7 +52,7 @@ OnlineChecklistsApp::Application.routes.draw do
   # root :to => "welcome#index"
 
   resources :checklists
-  resources :entries, :only => [:create]
+  resources :entries, :only => [:create, :index]
   root :to => "checklists#index"
 
 

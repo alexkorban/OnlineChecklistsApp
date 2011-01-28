@@ -25,6 +25,9 @@ class UserCollection extends Backbone.Collection
     super
 
 
+root.Users = new UserCollection
+
+
 class Invitation extends Backbone.Model
   constructor: ->
     super
@@ -87,6 +90,7 @@ class root.UserListView extends Backbone.View
     $("#" + @id).replaceWith(@el)
 
     @users = users
+    @render()
 
 
   render: =>
@@ -220,7 +224,6 @@ class root.UserPageView extends Backbone.View
     @invitation_view = new InvitationView(@users)
     @users.bind("refresh", @user_list_view.render)
     @users.bind("remove", @user_list_view.render)
-    @users.fetch()
 
   render: ->
     $(@el).html(@template())

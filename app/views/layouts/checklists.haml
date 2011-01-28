@@ -9,15 +9,17 @@
     = javascript_include_tag Rails.env == "production" ? "backbone-min" : "backbone"
     = javascript_include_tag "users"
     = javascript_include_tag "checklists"
+    = javascript_include_tag "reports"
     = javascript_include_tag "application"
 
     = stylesheet_link_tag "checklists"
 
     :javascript
-      var current_user = #{current_user.to_json}
+      var current_user = #{current_user.to_json(:only => [:id, :name, :email])};
+
   %body
     #header
-      #{current_user.name.nil? || current_user.name.empty? ? current_user.email : current_user.name}
+      #{current_user.safe_name}
       |
       = link_to "Settings", edit_user_registration_path
       |

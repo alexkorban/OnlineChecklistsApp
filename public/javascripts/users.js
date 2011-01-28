@@ -34,6 +34,7 @@
     }
     return UserCollection;
   })();
+  root.Users = new UserCollection;
   Invitation = (function() {
     __extends(Invitation, Backbone.Model);
     function Invitation() {
@@ -88,6 +89,7 @@
       this.template = _.template('<ul>\n<% users.each(function(user) { %>\n<li><%= user.name() %> (<%= user.email() %>)\n  <% if (user.email() != current_user.email) { %>(<a id = "remove_<%= user.cid %>" class = "remove" href = "#">X</a>)<% } %></li>\n<% }); %>\n</ul>');
       $("#" + this.id).replaceWith(this.el);
       this.users = users;
+      this.render();
     }
     UserListView.prototype.render = function() {
       return $(this.el).html(this.template({
@@ -204,7 +206,6 @@
       this.invitation_view = new InvitationView(this.users);
       this.users.bind("refresh", this.user_list_view.render);
       this.users.bind("remove", this.user_list_view.render);
-      this.users.fetch();
     }
     UserPageView.prototype.render = function() {
       return $(this.el).html(this.template());

@@ -7,7 +7,7 @@
     child.prototype = new ctor;
     child.__super__ = parent.prototype;
     return child;
-  }, __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  };
   root = this;
   String.prototype.starts_with = function(str) {
     return this.match("^" + str) === str;
@@ -38,7 +38,10 @@
       "checklists": "checklists",
       "": "checklists",
       "create": "create",
-      "users": "users"
+      "users": "users",
+      "reports": "reports",
+      "timeline": "timeline",
+      "charts": "charts"
     };
     function AppController() {
       AppController.__super__.constructor.apply(this, arguments);
@@ -65,16 +68,24 @@
       });
     };
     AppController.prototype.users = function() {
-      return this.view = new UserPageView;
+      return this.view = new UserPageView({
+        users: this.users
+      });
+    };
+    AppController.prototype.reports = function() {
+      return this.view = new ReportPageView;
+    };
+    AppController.prototype.timeline = function() {
+      return this.view = new TimelineView(Users, Checklists);
+    };
+    AppController.prototype.charts = function() {
+      return this.view = new ChartsView(Users, Checklists);
     };
     return AppController;
   })();
   appController = new AppController();
   $(document).ready(function() {
-    return $.getJSON("/checklists", __bind(function(data, textStatus, xhr) {
-      Checklists.refresh(data);
-      return Backbone.history.start();
-    }, this));
+    return Backbone.history.start();
   });
   this.app = appController;
 }).call(this);

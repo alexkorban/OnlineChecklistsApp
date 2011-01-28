@@ -24,4 +24,7 @@ class User < ActiveRecord::Base
     super && active && account.active
   end
 
+  def safe_name
+    name.nil? || name.empty? ? email : name
+  end
 end

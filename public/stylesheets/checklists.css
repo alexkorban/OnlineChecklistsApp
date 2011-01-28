@@ -8,3 +8,9 @@ html, body {
   background-color: #f0f0f0;
   width: auto;
   margin: 0; }
+
+.prev_week {
+  float: left; }
+
+.next_week {
+  float: right; }

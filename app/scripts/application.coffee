@@ -36,6 +36,9 @@ class AppController extends Backbone.Controller
     "": "checklists"
     "create": "create"
     "users": "users"
+    "reports": "reports"
+    "timeline": "timeline"
+    "charts": "charts"
 
   constructor: ->
     super
@@ -60,7 +63,19 @@ class AppController extends Backbone.Controller
 
 
   users: ->
-    @view = new UserPageView
+    @view = new UserPageView { users: @users }
+
+
+  reports: ->
+    @view = new ReportPageView
+
+
+  timeline: ->
+    @view = new TimelineView(Users, Checklists)
+
+
+  charts: ->
+    @view = new ChartsView(Users, Checklists)
 
 
 appController = new AppController()
@@ -71,10 +86,10 @@ appController = new AppController()
 #
 
 $(document).ready ->
-  $.getJSON "/checklists", (data, textStatus, xhr) =>
-    Checklists.refresh(data)
-
+    #Checklists.fetch()
+    #Users.fetch()
     Backbone.history.start()
+#  $.getJSON "/checklists", (data, textStatus, xhr) =>
     #appController.checklists()
 
 @app = appController
