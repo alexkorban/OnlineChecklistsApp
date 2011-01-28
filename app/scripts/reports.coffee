@@ -47,7 +47,6 @@ class root.TimelineView extends Backbone.View
 
     @all = "- All -"
 
-
     console.log(@users)
     $("#" + @id).replaceWith(@el)
 
@@ -127,3 +126,38 @@ class root.TimelineView extends Backbone.View
     @checklist_id = $(e.target).val() if e.target.id is "checklists"
     window.location.hash = @link(@week_offset)
     e.preventDefault()
+
+
+class root.ChartView extends Backbone.View
+  tagName: "div"
+  id: "content"
+
+  constructor: (args) ->
+    super
+
+    @users = args.users
+    @checklists = args.checklists
+    @checklist_id = args.checklist_id
+    @all = "- All -"
+
+    $("#" + @id).replaceWith(@el)
+
+    @template = _.template('''
+      <h1>Reports &gt; Charts</h1>
+      <div class = "controls">
+        Checklist:
+        <select id = "checklists" class = "filter">
+          <option value = "0"><%= all %></option>
+          <% checklists.each(function(checklist) { %>
+            <option value = "<%= checklist.id %>"><%= checklist.name() %></option>
+          <% }); %>
+        </select>
+      </div>
+    ''')
+
+    @render()
+
+
+  render: ->
+    $(@el).html(@template({checklists: @checklists, all: @all}))
+    @$("#checklists").val(@checklist_id) if @checklist_id

@@ -86,7 +86,10 @@
       });
     };
     AppController.prototype.charts = function() {
-      return this.view = new ChartsView(Users, Checklists);
+      return this.view = new ChartView({
+        users: Users,
+        checklists: Checklists
+      });
     };
     return AppController;
   })();

@@ -105,4 +105,29 @@
     };
     return TimelineView;
   })();
+  root.ChartView = (function() {
+    __extends(ChartView, Backbone.View);
+    ChartView.prototype.tagName = "div";
+    ChartView.prototype.id = "content";
+    function ChartView(args) {
+      ChartView.__super__.constructor.apply(this, arguments);
+      this.users = args.users;
+      this.checklists = args.checklists;
+      this.checklist_id = args.checklist_id;
+      this.all = "- All -";
+      $("#" + this.id).replaceWith(this.el);
+      this.template = _.template('<h1>Reports &gt; Charts</h1>\n<div class = "controls">\n  Checklist:\n  <select id = "checklists" class = "filter">\n    <option value = "0"><%= all %></option>\n    <% checklists.each(function(checklist) { %>\n      <option value = "<%= checklist.id %>"><%= checklist.name() %></option>\n    <% }); %>\n  </select>\n</div>');
+      this.render();
+    }
+    ChartView.prototype.render = function() {
+      $(this.el).html(this.template({
+        checklists: this.checklists,
+        all: this.all
+      }));
+      if (this.checklist_id) {
+        return this.$("#checklists").val(this.checklist_id);
+      }
+    };
+    return ChartView;
+  })();
 }).call(this);

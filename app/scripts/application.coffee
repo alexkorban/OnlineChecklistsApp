@@ -76,7 +76,7 @@ class AppController extends Backbone.Controller
 
 
   charts: ->
-    @view = new ChartsView(Users, Checklists)
+    @view = new ChartView({users: Users, checklists: Checklists})
 
 
 appController = new AppController()
