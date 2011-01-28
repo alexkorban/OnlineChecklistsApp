@@ -33,15 +33,15 @@
   AppController = (function() {
     __extends(AppController, Backbone.Controller);
     AppController.prototype.routes = {
-      "checklists-:cid-edit": "edit",
-      "checklists-:cid": "show",
-      "checklists": "checklists",
       "": "checklists",
+      "checklists": "checklists",
+      "checklists/:cid/edit": "edit",
+      "checklists/:cid": "show",
       "create": "create",
       "users": "users",
       "reports": "reports",
       "timeline": "timeline",
-      "timeline-:week_offset": "timeline",
+      "timeline/:week_offset/u:user_id/c:checklist_id": "timeline",
       "charts": "charts"
     };
     function AppController() {
@@ -76,8 +76,14 @@
     AppController.prototype.reports = function() {
       return this.view = new ReportPageView;
     };
-    AppController.prototype.timeline = function(week_offset) {
-      return this.view = new TimelineView(week_offset, Users, Checklists);
+    AppController.prototype.timeline = function(week_offset, user_id, checklist_id) {
+      return this.view = new TimelineView({
+        week_offset: week_offset,
+        users: Users,
+        checklists: Checklists,
+        user_id: user_id,
+        checklist_id: checklist_id
+      });
     };
     AppController.prototype.charts = function() {
       return this.view = new ChartsView(Users, Checklists);

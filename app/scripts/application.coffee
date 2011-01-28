@@ -30,15 +30,15 @@ Backbone.emulateHTTP = true;    # use _method parameter instead of PUT and DELET
 
 class AppController extends Backbone.Controller
   routes:
-    "checklists-:cid-edit": "edit"
-    "checklists-:cid": "show"
-    "checklists": "checklists"
     "": "checklists"
+    "checklists": "checklists"
+    "checklists/:cid/edit": "edit"
+    "checklists/:cid": "show"
     "create": "create"
     "users": "users"
     "reports": "reports"
     "timeline": "timeline"
-    "timeline-:week_offset": "timeline"
+    "timeline/:week_offset/u:user_id/c:checklist_id": "timeline"
     "charts": "charts"
 
   constructor: ->
@@ -71,8 +71,8 @@ class AppController extends Backbone.Controller
     @view = new ReportPageView
 
 
-  timeline: (week_offset) ->
-    @view = new TimelineView(week_offset, Users, Checklists)
+  timeline: (week_offset, user_id, checklist_id) ->
+    @view = new TimelineView({week_offset: week_offset, users: Users, checklists: Checklists, user_id: user_id, checklist_id: checklist_id})
 
 
   charts: ->

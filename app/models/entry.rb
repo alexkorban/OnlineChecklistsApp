@@ -2,6 +2,8 @@ class Entry < ActiveRecord::Base
   default_scope :order => "created_at"
 
   scope :between_dates, lambda { |from, to| where("created_at >= ? AND created_at <= ?", from.to_s, to.to_s) }
+  scope :for_checklist, lambda { |checklist_id| where("checklist_id = ?", checklist_id) }
+  scope :for_user, lambda { |user_id| where("user_id = ?", user_id) }
 
   belongs_to :checklist
   belongs_to :user

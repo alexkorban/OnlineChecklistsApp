@@ -80,7 +80,7 @@
     function ChecklistListView() {
       ChecklistListView.__super__.constructor.apply(this, arguments);
       this.parent = $("#content");
-      this.template = _.template('<h1>Checklists</h1>\n<ul>\n<% checklists.each(function(checklist) { %>\n<li><a href="#checklists-<%= checklist.cid %>"><%= checklist.name() %></a>\n  (<a href = "#checklists-<%= checklist.cid %>-edit">Edit</a> | <a id = "remove_<%= checklist.cid %>" class = "remove" href = "#">X</a>)</li>\n<% }); %>\n</ul>\n<a href = "#create">Create new list</a> <a href = "#reports">View reports</a>\n<% if (current_user.role == "admin") { %> <a href = "#users">Invite users</a> <% } %>');
+      this.template = _.template('<h1>Checklists</h1>\n<ul>\n<% checklists.each(function(checklist) { %>\n<li><a href="#checklists/<%= checklist.cid %>"><%= checklist.name() %></a>\n  (<a href = "#checklists/<%= checklist.cid %>/edit">Edit</a> | <a id = "remove_<%= checklist.cid %>" class = "remove" href = "#">X</a>)</li>\n<% }); %>\n</ul>\n<a href = "#create">Create new list</a> <a href = "#reports">View reports</a>\n<% if (current_user.role == "admin") { %> <a href = "#users">Invite users</a> <% } %>');
       this.render();
     }
     ChecklistListView.prototype.render = function() {

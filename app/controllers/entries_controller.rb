@@ -16,6 +16,12 @@ class EntriesController < ApplicationController
 
     entries = current_account.entries.between_dates(from, to)
 
+    checklist_id = params[:checklist_id] ? params[:checklist_id].to_i : 0
+    entries = entries.for_checklist(checklist_id) if checklist_id > 0
+
+    user_id = params[:user_id] ? params[:user_id].to_i : 0
+    entries = entries.for_user(user_id) if user_id > 0
+
     respond_to {|format|
       format.json {
         render json: Entry::get_json_entries_by_day(entries), status: :ok
