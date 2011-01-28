@@ -8,6 +8,12 @@ class RegistrationsController < Devise::RegistrationsController
     }
   end
 
+  def new
+    flash.now[:plan] = params[:plan]
+    flash.now[:plan] = "basic" if !["basic", "professional", "premier"].include? flash.now[:plan]
+    super
+  end
+
   # DELETE /users/(:id)
   def destroy
     if params[:id]    # deactivating a user
@@ -30,6 +36,7 @@ class RegistrationsController < Devise::RegistrationsController
     begin
       Account.transaction {
         acc = Account.new
+        acc.plan = params[resource_name][:plan]
         build_resource
         resource.role = "admin"
         acc.users << resource
@@ -45,6 +52,7 @@ class RegistrationsController < Devise::RegistrationsController
     else
       flash.now[:error] ||= "Sign up failed, please try again"
       clean_up_passwords(resource)
+      flash.now[:plan] = params[resource_name][:plan]
       render_with_scope :new
     end
   end
