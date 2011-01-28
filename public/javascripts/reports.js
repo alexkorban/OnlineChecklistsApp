@@ -149,23 +149,17 @@
       return $.getJSON(this.counts_url(), __bind(function(data, textStatus, xhr) {
         this.counts = data;
         return google.load('visualization', '1', {
-          'packages': ['corechart'],
+          'packages': ['annotatedtimeline'],
           callback: __bind(function() {
             var chart;
-            console.log("creating chart");
             data = new google.visualization.DataTable();
-            console.log("created data table");
-            data.addColumn('string', 'Task');
-            data.addColumn('number', 'Hours per Day');
-            data.addRows([['Work', 11], ['Eat', 2], ['Commute', 2], ['Watch TV', 2], ['Sleep', 7]]);
-            console.log("added data");
-            chart = new google.visualization.PieChart(document.getElementById('chart'));
-            console.log("chart: ", chart);
+            data.addColumn('date', 'Date');
+            data.addColumn('number', 'Sold Pencils');
+            data.addColumn('number', 'Sold Pens');
+            data.addRows([[new Date(2008, 1, 1), 30000, 40645], [new Date(2008, 1, 2), 14045, 20374], [new Date(2008, 1, 3), 55022, 50766], [new Date(2008, 1, 4), 75284, 14334], [new Date(2008, 1, 5), 41476, 66467], [new Date(2008, 1, 6), 33322, 39463]]);
+            chart = new google.visualization.AnnotatedTimeLine(document.getElementById('chart'));
             return chart.draw(data, {
-              width: 400,
-              height: 240,
-              is3D: true,
-              title: 'My Daily Activities'
+              displayAnnotations: false
             });
           }, this)
         });
@@ -187,7 +181,7 @@
       this.checklist_id = args.checklist_id;
       this.all = "- All -";
       $("#" + this.id).replaceWith(this.el);
-      this.template = _.template('<h1>Reports &gt; Charts</h1>\n<div class = "controls">\n  Checklist:\n  <select id = "checklists"></select>\n</div>\n<div id = "chart"></div>');
+      this.template = _.template('<h1>Reports &gt; Charts</h1>\n<div class = "controls">\n  Checklist:\n  <select id = "checklists"></select>\n</div>\n<div id = "chart" style=\'width: 700px; height: 240px;\'></div>');
       this.checklist_dropdown = new ChecklistDropdown({
         id: "checklists",
         checklists: this.checklists
@@ -207,7 +201,8 @@
         chart_url: this.chart_url()
       }));
       this.checklist_dropdown.render();
-      return this.chart.render();
+      this.chart.render();
+      return this.$("#checklists").val(this.checklist_id);
     };
     ChartView.prototype.chart_url = function() {
       var url;
