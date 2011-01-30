@@ -24,7 +24,7 @@ class EntriesController < ApplicationController
 
     respond_to {|format|
       format.json {
-        render json: Entry::get_entries_by_day(entries), status: :ok
+        render json: Entry.get_entries_by_day(entries), status: :ok
       }
     }
   end
@@ -35,10 +35,12 @@ class EntriesController < ApplicationController
     entries = current_account.entries.within_one_year(Date.today)
     entries = entries.for_checklist(checklist_id) if checklist_id > 0
 
-    counts = Entry.unscoped { entries.monthly_counts }
+    counts = entries.monthly_counts
     logger.info "COUNTS: ", counts.inspect
+    user_ids = current_account.users.select("id").order("id")
     respond_to {|format|
-      format.json { render json: Entry::transpose_counts(counts), status: :ok }
+      format.json { render json: {user_ids: user_ids.map(&:id), counts: Entry.transpose_counts(counts, user_ids),
+                                  totals: Entry.get_totals(counts)}, status: :ok }
     }
   end
 end

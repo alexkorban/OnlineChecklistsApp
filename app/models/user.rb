@@ -4,9 +4,6 @@ class User < ActiveRecord::Base
   devise :invitable, :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable
 
-  # defaults
-  default_scope :order => 'name'
-
   # validations
   validates :role, format: /user|admin/
 

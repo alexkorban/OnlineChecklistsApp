@@ -4,8 +4,8 @@ class Entry < ActiveRecord::Base
   scope :for_user, lambda { |user_id| where("user_id = ?", user_id) }
   scope :within_one_year, lambda { |today| where("created_at > ?", today - 1.year)}
   scope :monthly_counts, :select => "count(id), extract(month from date_trunc('month', created_at)) as month,
-         extract(year from date_trunc('month', created_at)) as year",  :group => "date_trunc('month', created_at)",
-        :order => "date_trunc('month', created_at)"
+         extract(year from date_trunc('month', created_at)) as year, user_id",  :group => "date_trunc('month', created_at), user_id",
+        :order => "date_trunc('month', created_at), user_id"
 
 #  select extract(month from date_trunc('month', created_at)),
 #         extract(year from date_trunc('month', created_at)), count(*) from entries group by date_trunc('month', created_at);
@@ -45,16 +45,39 @@ class Entry < ActiveRecord::Base
     }
   end
 
-  def self.transpose_counts(counts)
+  # counts must be the result of monthly_counts scope
+  def self.transpose_counts(counts, users)
+
     counts.group_by {|row|
 
       [row.month, row.year]
 
     }.map {|date, counts|
 
-      [Date.new(date.last.to_i, date.first.to_i, 1).end_of_month, counts.map(&:count)].flatten
+      user_counts = get_user_counts(counts, users)
+      [Date.new(date.last.to_i, date.first.to_i, 1).end_of_month] + user_counts
 
     }
   end
 
+  # users must be sorted by id
+  def self.get_user_counts(counts, users)
+    counts_by_id = counts.inject({}) {|hash, count| hash[count[:user_id]] = count[:count]; hash}
+    users.map {|u|
+      counts_by_id.include?(u.id) ? counts_by_id[u.id].to_i : 0
+    }
+  end
+
+  # counts must be the result of monthly_counts scope
+  def self.get_totals(counts)
+    counts.group_by { |row|
+
+      [row.month, row.year]
+
+    }.map { |date, counts|
+
+      [Date.new(date.last.to_i, date.first.to_i, 1).end_of_month, counts.inject(0) {|sum, count| sum += count[:count].to_i; sum}]
+
+    }
+  end
 end

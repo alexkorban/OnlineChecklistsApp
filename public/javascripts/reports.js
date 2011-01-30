@@ -1,5 +1,5 @@
 (function() {
-  var Chart, ChecklistDropdown, Report, root;
+  var ChecklistDropdown, PieChart, Report, TimelineChart, root;
   var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
@@ -131,66 +131,92 @@
     };
     return TimelineView;
   })();
-  Chart = (function() {
-    __extends(Chart, Backbone.View);
-    Chart.prototype.id = "chart";
-    Chart.prototype.tagName = "div";
-    function Chart(args) {
-      this.render = __bind(this.render, this);;      Chart.__super__.constructor.apply(this, arguments);
-      this.checklist_id = args.checklist_id;
-      $("#" + this.id).replaceWith(this.el);
-      console.log("el in constructor: ", this.el);
+  PieChart = (function() {
+    __extends(PieChart, Backbone.View);
+    PieChart.prototype.id = "pie_chart";
+    PieChart.prototype.tagName = "div";
+    function PieChart(args) {
+      this.render = __bind(this.render, this);;      PieChart.__super__.constructor.apply(this, arguments);
+      this.counts = args.counts;
+      this.users = args.users;
+      this.user_ids = args.user_ids;
     }
-    Chart.prototype.counts_url = function() {
-      return "/entries/counts?checklist_id=" + this.checklist_id;
-    };
-    Chart.prototype.render = function() {
-      console.log("starting to render chart");
-      return $.getJSON(this.counts_url(), __bind(function(data, textStatus, xhr) {
-        var arr, i, item, _i, _len, _ref;
-        this.counts = [];
-        for (_i = 0, _len = data.length; _i < _len; _i++) {
-          item = data[_i];
-          arr = [new Date(item[0])];
-          for (i = 1, _ref = item.length - 1; (1 <= _ref ? i <= _ref : i >= _ref); (1 <= _ref ? i += 1 : i -= 1)) {
-            arr.push(Number(item[i]));
+    PieChart.prototype.render = function() {
+      console.log("starting to render pie chart");
+      return google.load('visualization', '1', {
+        'packages': ['corechart'],
+        callback: __bind(function() {
+          var chart, data, i, _ref;
+          data = new google.visualization.DataTable();
+          console.log("created data table");
+          data.addColumn('string', 'Task');
+          data.addColumn('number', 'Hours per Day');
+          for (i = 0, _ref = this.user_ids.length; (0 <= _ref ? i < _ref : i > _ref); (0 <= _ref ? i += 1 : i -= 1)) {
+            data.addRow([this.users.get(this.user_ids[i]).name(), this.counts[i + 1]]);
           }
-          this.counts.push(arr);
-        }
-        console.log(this.counts);
-        return google.load('visualization', '1', {
-          'packages': ['annotatedtimeline'],
-          callback: __bind(function() {
-            var chart;
-            data = new google.visualization.DataTable();
-            data.addColumn('date', 'Date');
-            data.addColumn('number', '-All-');
-            data.addRows(this.counts);
-            chart = new google.visualization.AnnotatedTimeLine(document.getElementById('chart'));
-            return chart.draw(data, {
-              displayAnnotations: false
-            });
-          }, this)
-        });
-      }, this));
+          console.log("added data");
+          console.log('_' + this.id, document.getElementById('_' + this.id));
+          chart = new google.visualization.PieChart(document.getElementById('_' + this.id));
+          console.log("chart: ", chart);
+          return chart.draw(data, {
+            width: 400,
+            height: 240,
+            is3D: true,
+            title: 'My Daily Activities'
+          });
+        }, this)
+      });
     };
-    return Chart;
+    return PieChart;
+  })();
+  TimelineChart = (function() {
+    __extends(TimelineChart, Backbone.View);
+    TimelineChart.prototype.id = "timeline_chart";
+    TimelineChart.prototype.tagName = "div";
+    function TimelineChart(args) {
+      this.render = __bind(this.render, this);;      TimelineChart.__super__.constructor.apply(this, arguments);
+      this.counts = args.counts;
+      this.users = args.users;
+      this.user_ids = args.user_ids;
+    }
+    TimelineChart.prototype.render = function() {
+      console.log("starting to render timeline chart");
+      return google.load('visualization', '1', {
+        'packages': ['annotatedtimeline'],
+        callback: __bind(function() {
+          var chart, data, id, _i, _len, _ref;
+          data = new google.visualization.DataTable();
+          data.addColumn('date', 'Date');
+          _ref = this.user_ids;
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            id = _ref[_i];
+            data.addColumn('number', this.users.get(id).name());
+          }
+          data.addRows(this.counts);
+          chart = new google.visualization.AnnotatedTimeLine(document.getElementById(this.id));
+          return chart.draw(data, {
+            displayAnnotations: false
+          });
+        }, this)
+      });
+    };
+    return TimelineChart;
   })();
   root.ChartView = (function() {
     __extends(ChartView, Backbone.View);
     ChartView.prototype.tagName = "div";
     ChartView.prototype.id = "content";
     ChartView.prototype.events = {
-      "change .filter": "on_change_filter"
+      "change .filter": "on_change_filter",
+      "change .month": "on_change_month"
     };
     function ChartView(args) {
       ChartView.__super__.constructor.apply(this, arguments);
       this.users = args.users;
       this.checklists = args.checklists;
+      this.users = args.users;
       this.checklist_id = args.checklist_id;
       this.all = "- All -";
-      $("#" + this.id).replaceWith(this.el);
-      this.template = _.template('<h1>Reports &gt; Charts</h1>\n<div class = "controls">\n  Checklist:\n  <select id = "checklists"></select>\n</div>\n<div id = "chart" style=\'width: 700px; height: 240px;\'></div>');
       this.checklist_dropdown = new ChecklistDropdown({
         id: "checklists",
         checklists: this.checklists
@@ -198,24 +224,47 @@
       if (!(this.checklist_id != null)) {
         this.checklist_id = this.checklists.at(0).id;
       }
-      this.chart = new Chart({
-        checklist_id: this.checklist_id
-      });
-      this.render();
+      $("#" + this.id).replaceWith(this.el);
+      this.template = _.template('<h1>Reports &gt; Charts</h1>\n<div class = "controls">\n  Checklist:\n  <select id = "checklists"></select>\n</div>\n<div style = "text-align: top">\n  <div id = "timeline_chart" style=\'width: 700px; height: 400px; display: inline-block\'></div>\n  <div id = "user_list" style  = "display: inline-block; min-height: 400px">\n    <input type = "checkbox" value = "0" id = "checkbox_0" /><label for="checkbox_0"><%= all %></label><br/>\n    <% console.log(users); %>\n    <% _.each(users.models, function(user) { %>\n      <input type = "checkbox" id = "checkbox_<%= user.id %>" /><label for="checkbox_<%= user.id %>"><%= user.name() %></label><br/>\n    <% }); %>\n  </div>\n</div>\n<div id = "pie_chart">\n  <select class = "month">\n    <% months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]; %>\n    <% _.each(counts, function(count, index) { %>\n      <option value = "<%= index %>"><%= months[count[0].getMonth()] + \' \' + String(count[0].getYear() + 1900) %></option>\n    <% }); %>\n  </select>\n  <div id = "_pie_chart"></div>\n</div>');
+      $.getJSON(this.counts_url(), __bind(function(data, textStatus, xhr) {
+        var item, _i, _j, _len, _len2, _ref, _ref2;
+        this.counts = data.counts;
+        _ref = this.counts;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          item = _ref[_i];
+          item[0] = new Date(item[0]);
+        }
+        this.totals = data.totals;
+        _ref2 = this.totals;
+        for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
+          item = _ref2[_j];
+          item[0] = new Date(item[0]);
+        }
+        this.user_ids = data.user_ids;
+        this.timeline_chart = new TimelineChart({
+          counts: this.counts,
+          users: this.users,
+          user_ids: this.user_ids
+        });
+        this.pie_chart = new PieChart({
+          users: this.users,
+          user_ids: this.user_ids,
+          counts: this.counts[this.counts.length - 1]
+        });
+        return this.render();
+      }, this));
     }
     ChartView.prototype.render = function() {
       $(this.el).html(this.template({
         checklists: this.checklists,
-        all: this.all,
-        chart_url: this.chart_url()
+        users: this.users,
+        counts: this.counts,
+        all: this.all
       }));
       this.checklist_dropdown.render();
-      this.chart.render();
+      this.timeline_chart.render();
+      this.pie_chart.render();
       return this.$("#checklists").val(this.checklist_id);
-    };
-    ChartView.prototype.chart_url = function() {
-      var url;
-      return url = "http://aoteastudios.com/images/logo.png";
     };
     ChartView.prototype.link = function() {
       var link;
@@ -224,12 +273,19 @@
       link += "/c" + this.checklist_id;
       return link;
     };
+    ChartView.prototype.counts_url = function() {
+      return "/entries/counts?checklist_id=" + this.checklist_id;
+    };
     ChartView.prototype.on_change_filter = function(e) {
       if (e.target.id === "checklists") {
         this.checklist_id = $(e.target).val();
       }
       window.location.hash = this.link();
       return e.preventDefault();
+    };
+    ChartView.prototype.on_change_month = function(e) {
+      this.pie_chart.counts = this.counts[Number($(e.target).val())];
+      return this.pie_chart.render();
     };
     return ChartView;
   })();

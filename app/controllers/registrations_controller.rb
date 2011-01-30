@@ -2,7 +2,7 @@ class RegistrationsController < Devise::RegistrationsController
   layout :registrations_layout
 
   def index
-    @users = current_account.users
+    @users = current_account.users.order("name")
     respond_to { |format|
       format.json { render :json => @users, :status => :ok}
     }
