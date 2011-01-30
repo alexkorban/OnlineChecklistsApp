@@ -147,16 +147,25 @@
     Chart.prototype.render = function() {
       console.log("starting to render chart");
       return $.getJSON(this.counts_url(), __bind(function(data, textStatus, xhr) {
-        this.counts = data;
+        var arr, i, item, _i, _len, _ref;
+        this.counts = [];
+        for (_i = 0, _len = data.length; _i < _len; _i++) {
+          item = data[_i];
+          arr = [new Date(item[0])];
+          for (i = 1, _ref = item.length - 1; (1 <= _ref ? i <= _ref : i >= _ref); (1 <= _ref ? i += 1 : i -= 1)) {
+            arr.push(Number(item[i]));
+          }
+          this.counts.push(arr);
+        }
+        console.log(this.counts);
         return google.load('visualization', '1', {
           'packages': ['annotatedtimeline'],
           callback: __bind(function() {
             var chart;
             data = new google.visualization.DataTable();
             data.addColumn('date', 'Date');
-            data.addColumn('number', 'Sold Pencils');
-            data.addColumn('number', 'Sold Pens');
-            data.addRows([[new Date(2008, 1, 1), 30000, 40645], [new Date(2008, 1, 2), 14045, 20374], [new Date(2008, 1, 3), 55022, 50766], [new Date(2008, 1, 4), 75284, 14334], [new Date(2008, 1, 5), 41476, 66467], [new Date(2008, 1, 6), 33322, 39463]]);
+            data.addColumn('number', '-All-');
+            data.addRows(this.counts);
             chart = new google.visualization.AnnotatedTimeLine(document.getElementById('chart'));
             return chart.draw(data, {
               displayAnnotations: false

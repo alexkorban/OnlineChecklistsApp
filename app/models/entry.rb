@@ -29,18 +29,32 @@ class Entry < ActiveRecord::Base
     created_at.strftime("%H:%M")
   end
 
-  # entries must be sorted by created_at
-  def self.get_json_entries_by_day(entries)
-    entries_by_day = entries.group_by { |entry| entry.created_at.to_date }
+  def self.get_entries_by_day(entries)
+    entries.group_by {|entry|               # group entries by date - produces a hash of entry arrays with dates as keys
 
-    # Make group keys dates instead of indexes, and convert entries to JSON
-    json_entries_by_day = {}
-    entries_by_day.each { |index, entries|
-      json_entries_by_day[entries.first.created_at.strftime("%A, %d %b %Y")] = entries.map {|e|
+      entry.created_at.to_date
+
+    }.inject({}) {|hash, entries_for_date|
+
+      # Format keys (which are dates) for display, and filter out unnecessary attributes from the entries
+      # the result is still a hash of entry arrays with formatted dates as keys
+      hash[entries_for_date.first.strftime("%A, %d %b %Y")] = entries_for_date.last.map { |e|
         {for: e.for, checklist_name: e.checklist_name, user_name: e.user_name, display_time: e.display_time}
-        }
+      }; hash
+
     }
-    json_entries_by_day
+  end
+
+  def self.transpose_counts(counts)
+    counts.group_by {|row|
+
+      [row.month, row.year]
+
+    }.map {|date, counts|
+
+      [Date.new(date.last.to_i, date.first.to_i, 1).end_of_month, counts.map(&:count)].flatten
+
+    }
   end
 
 end

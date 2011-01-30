@@ -171,7 +171,14 @@ class Chart extends Backbone.View
   render: =>
     console.log "starting to render chart"
     $.getJSON @counts_url(), (data, textStatus, xhr) =>
-      @counts = data
+      @counts = []
+      for item in data
+        arr = [new Date(item[0])]
+        for i in [1..item.length - 1]
+          arr.push Number(item[i])
+        @counts.push arr
+
+      console.log @counts
       # Load the Visualization API and the piechart package.
       google.load('visualization', '1', {'packages':['annotatedtimeline'], callback: =>
 #        console.log("creating chart")
@@ -193,16 +200,17 @@ class Chart extends Backbone.View
 #        chart.draw(data, {width: 400, height: 240, is3D: true, title: 'My Daily Activities'})
         data = new google.visualization.DataTable()
         data.addColumn('date', 'Date')
-        data.addColumn('number', 'Sold Pencils')
-        data.addColumn('number', 'Sold Pens')
-        data.addRows([
-          [new Date(2008, 1 ,1), 30000, 40645],
-          [new Date(2008, 1 ,2), 14045, 20374],
-          [new Date(2008, 1 ,3), 55022, 50766],
-          [new Date(2008, 1 ,4), 75284, 14334],
-          [new Date(2008, 1 ,5), 41476, 66467],
-          [new Date(2008, 1 ,6), 33322, 39463]
-        ])
+        data.addColumn('number', '-All-')
+        #data.addColumn('number', 'Sold Pens')
+        data.addRows(@counts)
+#        data.addRows([
+#          [new Date(2008, 1 ,1), 30000, 40645],
+#          [new Date(2008, 1 ,2), 14045, 20374],
+#          [new Date(2008, 1 ,3), 55022, 50766],
+#          [new Date(2008, 1 ,4), 75284, 14334],
+#          [new Date(2008, 1 ,5), 41476, 66467],
+#          [new Date(2008, 1 ,6), 33322, 39463]
+#        ])
 
         chart = new google.visualization.AnnotatedTimeLine(document.getElementById('chart'));
         chart.draw(data, {displayAnnotations: false});
