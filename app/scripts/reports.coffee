@@ -51,10 +51,8 @@ class ChecklistDropdown extends Backbone.View
 
 
   render: ->
-    console.log "rendering checklist", @el, @checklists
     $("#" + @id).replaceWith(@template({allow_all: @allow_all, checklists: @checklists}))
     #@el = $("#" + @id)[0]
-    console.log "after", @el
 
 
 class root.TimelineView extends Backbone.View
@@ -74,7 +72,6 @@ class root.TimelineView extends Backbone.View
 
     @all = "- All -"
 
-    console.log(@users)
     $("#" + @id).replaceWith(@el)
 
     @template = _.template('''
@@ -167,20 +164,15 @@ class PieChart extends Backbone.View
 
 
   render: =>
-    console.log("starting to render pie chart")
     google.load('visualization', '1', {'packages':['corechart'], callback: =>
       data = new google.visualization.DataTable()
-      console.log "created data table"
       data.addColumn('string', 'Task')
       data.addColumn('number', 'Hours per Day')
-      for i in [0...@user_ids.length]
-        data.addRow([@users.get(@user_ids[i]).name(), @counts[i + 1]])
-      console.log "added data"
+      for i in [0...@user_ids.length - 1]
+        data.addRow([(if @user_ids[i] is 0 then "Total" else @users.get(@user_ids[i]).name()), @counts[i + 1]])
       # Instantiate and draw our chart, passing in some options.
-      console.log '_' + @id, document.getElementById('_' + @id)
-      chart = new google.visualization.PieChart(document.getElementById('_' + @id))
-      console.log "chart: ", chart
-      chart.draw(data, {width: 400, height: 240, is3D: true, title: 'My Daily Activities'})
+      @chart = new google.visualization.PieChart(document.getElementById('_' + @id))
+      @chart.draw(data, {width: 400, height: 240, is3D: true, title: 'My Daily Activities'})
     })
 
 
@@ -193,24 +185,27 @@ class TimelineChart extends Backbone.View
     @counts = args.counts
     @users = args.users
     @user_ids = args.user_ids
+    @first_render = true
 
     #$("#" + @id).replaceWith(@el)
 
 
   render: =>
-    console.log "starting to render timeline chart"
 
       # Load the Visualization API and the piechart package.
     google.load('visualization', '1', {'packages':['annotatedtimeline'], callback: =>
       data = new google.visualization.DataTable()
       data.addColumn('date', 'Date')
       for id in @user_ids
-        data.addColumn('number', @users.get(id).name())
+        data.addColumn('number', if id is 0 then "Total" else @users.get(id).name())
       data.addRows(@counts)
 
-      chart = new google.visualization.AnnotatedTimeLine(document.getElementById(@id));
-      chart.draw(data, {displayAnnotations: false});
-
+      @chart = new google.visualization.AnnotatedTimeLine(document.getElementById(@id));
+      @chart.draw(data, {displayAnnotations: false});
+      if @first_render
+        for i in [0...@user_ids.length - 1]
+          @chart.hideDataColumns(i)
+        @first_render = false
     })
 
 
@@ -221,6 +216,7 @@ class root.ChartView extends Backbone.View
   events: {
     "change .filter": "on_change_filter"
     "change .month" : "on_change_month"
+    "change .user_checkbox" : "on_change_user_checkbox"
   }
 
   constructor: (args) ->
@@ -246,10 +242,9 @@ class root.ChartView extends Backbone.View
       <div style = "text-align: top">
         <div id = "timeline_chart" style='width: 700px; height: 400px; display: inline-block'></div>
         <div id = "user_list" style  = "display: inline-block; min-height: 400px">
-          <input type = "checkbox" value = "0" id = "checkbox_0" /><label for="checkbox_0"><%= all %></label><br/>
-          <% console.log(users); %>
+          <input type = "checkbox" class = "user_checkbox" value = "0" id = "checkbox_0" checked = "checked" /><label for="checkbox_0"><%= all %></label><br/>
           <% _.each(users.models, function(user) { %>
-            <input type = "checkbox" id = "checkbox_<%= user.id %>" /><label for="checkbox_<%= user.id %>"><%= user.name() %></label><br/>
+            <input type = "checkbox" class = "user_checkbox" id = "checkbox_<%= user.id %>" value = "<%= user.id %>" /><label for="checkbox_<%= user.id %>"><%= user.name() %></label><br/>
           <% }); %>
         </div>
       </div>
@@ -257,7 +252,9 @@ class root.ChartView extends Backbone.View
         <select class = "month">
           <% months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]; %>
           <% _.each(counts, function(count, index) { %>
-            <option value = "<%= index %>"><%= months[count[0].getMonth()] + ' ' + String(count[0].getYear() + 1900) %></option>
+            <option value = "<%= index %>"
+              <% if (index == counts.length - 1) { %> selected = "selected" <% } %> >
+              <%= months[count[0].getMonth()] + ' ' + String(count[0].getYear() + 1900) %></option>
           <% }); %>
         </select>
         <div id = "_pie_chart"></div>
@@ -266,17 +263,15 @@ class root.ChartView extends Backbone.View
 
     $.getJSON @counts_url(), (data, textStatus, xhr) =>
       @counts = data.counts #@type_cast(data.counts)
-      for item in @counts
-        item[0] = new Date(item[0])
 
-      @totals = data.totals
-      for item in @totals
-        item[0] = new Date(item[0])
+      if @counts.length > 0
+        for item in @counts
+          item[0] = new Date(item[0])
 
-      @user_ids = data.user_ids
+        @user_ids = data.user_ids
 
-      @timeline_chart = new TimelineChart({counts: @counts, users: @users, user_ids: @user_ids})
-      @pie_chart = new PieChart({users: @users, user_ids: @user_ids, counts: @counts[@counts.length - 1]})
+        @timeline_chart = new TimelineChart({counts: @counts, users: @users, user_ids: @user_ids})
+        @pie_chart = new PieChart({users: @users, user_ids: @user_ids, counts: @counts[@counts.length - 1]})
 
       @render()
 
@@ -287,8 +282,11 @@ class root.ChartView extends Backbone.View
   render: ->
     $(@el).html(@template({checklists: @checklists, users: @users, counts: @counts, all: @all}))
     @checklist_dropdown.render()
-    @timeline_chart.render()
-    @pie_chart.render()
+    if @counts.length > 0
+      @timeline_chart.render()
+      @pie_chart.render()
+    else
+      @$("#timeline_chart").html("<b>No data available</b>")
     @$("#checklists").val(@checklist_id)
 
 
@@ -312,3 +310,12 @@ class root.ChartView extends Backbone.View
   on_change_month: (e) ->
     @pie_chart.counts = @counts[Number($(e.target).val())]
     @pie_chart.render()
+
+
+  on_change_user_checkbox: (e) ->
+    index = _.lastIndexOf(@user_ids, Number($(e.target).val()))
+    if $(e.target).is(":checked")
+      @timeline_chart.chart.showDataColumns(index)
+    else
+      @timeline_chart.chart.hideDataColumns(index)
+#    for checkbox in @$(".user_checkbox:checked")
