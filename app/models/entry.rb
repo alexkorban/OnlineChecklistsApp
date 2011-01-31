@@ -55,7 +55,7 @@ class Entry < ActiveRecord::Base
     }.map {|date, counts|
 
       user_counts = get_user_counts(counts, users)
-      [Date.new(date.last.to_i, date.first.to_i, 1).end_of_month] + user_counts
+      [Date.new(date.last.to_i, date.first.to_i, 1).end_of_month] + user_counts + [counts.inject(0) { |sum, count| sum += count[:count].to_i; sum }]
 
     }
   end
@@ -65,19 +65,6 @@ class Entry < ActiveRecord::Base
     counts_by_id = counts.inject({}) {|hash, count| hash[count[:user_id]] = count[:count]; hash}
     users.map {|u|
       counts_by_id.include?(u.id) ? counts_by_id[u.id].to_i : 0
-    }
-  end
-
-  # counts must be the result of monthly_counts scope
-  def self.get_totals(counts)
-    counts.group_by { |row|
-
-      [row.month, row.year]
-
-    }.map { |date, counts|
-
-      [Date.new(date.last.to_i, date.first.to_i, 1).end_of_month, counts.inject(0) {|sum, count| sum += count[:count].to_i; sum}]
-
     }
   end
 end

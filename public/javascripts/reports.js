@@ -42,12 +42,10 @@
       this.template = _.template('<select id = "checklists" class = "filter">\n  <% if (allow_all) { %> <option value = "0">- All -</option> <% } %>\n  <% checklists.each(function(checklist) { %>\n    <option value = "<%= checklist.id %>"><%= checklist.name() %></option>\n  <% }); %>\n</select>');
     }
     ChecklistDropdown.prototype.render = function() {
-      console.log("rendering checklist", this.el, this.checklists);
-      $("#" + this.id).replaceWith(this.template({
+      return $("#" + this.id).replaceWith(this.template({
         allow_all: this.allow_all,
         checklists: this.checklists
       }));
-      return console.log("after", this.el);
     };
     return ChecklistDropdown;
   })();
@@ -66,7 +64,6 @@
       this.user_id = args.user_id != null ? args.user_id : 0;
       this.checklist_id = args.checklist_id != null ? args.checklist_id : 0;
       this.all = "- All -";
-      console.log(this.users);
       $("#" + this.id).replaceWith(this.el);
       this.template = _.template('<h1>Reports &gt; Timeline</h1>\n<div class = "controls">\n  <a href = "#<%= prev_week_link %>" class = "prev_week">Prev week</a>\n  <% if (next_week_link != null) { %>\n    <a href = "#<%= next_week_link %>" class = "next_week">Next week</a>\n  <% } %>\n  User:\n  <select id = "users" class = "filter">\n    <option value = "0"><%= all %></option>\n    <% users.each(function(user) { %>\n      <option value = "<%= user.id %>"><%= user.name() == null || user.name().length == 0 ? user.email() : user.name() %></option>\n    <% }); %>\n  </select>\n  Checklist:\n  <select id = "checklists"></select>\n</div>\n<% _.each(entries_by_day, function(entries, day) { %>\n  <h2><%= day %></h2>\n  <% _.each(entries, function(entry) { %>\n    <%= entry["for"] %> <%= entry.user_name %> <%= entry.display_time %><br/>\n  <% }); %>\n<% }); %>');
       this.checklist_dropdown = new ChecklistDropdown({
@@ -142,23 +139,18 @@
       this.user_ids = args.user_ids;
     }
     PieChart.prototype.render = function() {
-      console.log("starting to render pie chart");
       return google.load('visualization', '1', {
         'packages': ['corechart'],
         callback: __bind(function() {
-          var chart, data, i, _ref;
+          var data, i, _ref;
           data = new google.visualization.DataTable();
-          console.log("created data table");
           data.addColumn('string', 'Task');
           data.addColumn('number', 'Hours per Day');
-          for (i = 0, _ref = this.user_ids.length; (0 <= _ref ? i < _ref : i > _ref); (0 <= _ref ? i += 1 : i -= 1)) {
-            data.addRow([this.users.get(this.user_ids[i]).name(), this.counts[i + 1]]);
+          for (i = 0, _ref = this.user_ids.length - 1; (0 <= _ref ? i < _ref : i > _ref); (0 <= _ref ? i += 1 : i -= 1)) {
+            data.addRow([(this.user_ids[i] === 0 ? "Total" : this.users.get(this.user_ids[i]).name()), this.counts[i + 1]]);
           }
-          console.log("added data");
-          console.log('_' + this.id, document.getElementById('_' + this.id));
-          chart = new google.visualization.PieChart(document.getElementById('_' + this.id));
-          console.log("chart: ", chart);
-          return chart.draw(data, {
+          this.chart = new google.visualization.PieChart(document.getElementById('_' + this.id));
+          return this.chart.draw(data, {
             width: 400,
             height: 240,
             is3D: true,
@@ -178,25 +170,31 @@
       this.counts = args.counts;
       this.users = args.users;
       this.user_ids = args.user_ids;
+      this.first_render = true;
     }
     TimelineChart.prototype.render = function() {
-      console.log("starting to render timeline chart");
       return google.load('visualization', '1', {
         'packages': ['annotatedtimeline'],
         callback: __bind(function() {
-          var chart, data, id, _i, _len, _ref;
+          var data, i, id, _i, _len, _ref, _ref2;
           data = new google.visualization.DataTable();
           data.addColumn('date', 'Date');
           _ref = this.user_ids;
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             id = _ref[_i];
-            data.addColumn('number', this.users.get(id).name());
+            data.addColumn('number', id === 0 ? "Total" : this.users.get(id).name());
           }
           data.addRows(this.counts);
-          chart = new google.visualization.AnnotatedTimeLine(document.getElementById(this.id));
-          return chart.draw(data, {
+          this.chart = new google.visualization.AnnotatedTimeLine(document.getElementById(this.id));
+          this.chart.draw(data, {
             displayAnnotations: false
           });
+          if (this.first_render) {
+            for (i = 0, _ref2 = this.user_ids.length - 1; (0 <= _ref2 ? i < _ref2 : i > _ref2); (0 <= _ref2 ? i += 1 : i -= 1)) {
+              this.chart.hideDataColumns(i);
+            }
+            return this.first_render = false;
+          }
         }, this)
       });
     };
@@ -208,7 +206,8 @@
     ChartView.prototype.id = "content";
     ChartView.prototype.events = {
       "change .filter": "on_change_filter",
-      "change .month": "on_change_month"
+      "change .month": "on_change_month",
+      "change .user_checkbox": "on_change_user_checkbox"
     };
     function ChartView(args) {
       ChartView.__super__.constructor.apply(this, arguments);
@@ -225,32 +224,28 @@
         this.checklist_id = this.checklists.at(0).id;
       }
       $("#" + this.id).replaceWith(this.el);
-      this.template = _.template('<h1>Reports &gt; Charts</h1>\n<div class = "controls">\n  Checklist:\n  <select id = "checklists"></select>\n</div>\n<div style = "text-align: top">\n  <div id = "timeline_chart" style=\'width: 700px; height: 400px; display: inline-block\'></div>\n  <div id = "user_list" style  = "display: inline-block; min-height: 400px">\n    <input type = "checkbox" value = "0" id = "checkbox_0" /><label for="checkbox_0"><%= all %></label><br/>\n    <% console.log(users); %>\n    <% _.each(users.models, function(user) { %>\n      <input type = "checkbox" id = "checkbox_<%= user.id %>" /><label for="checkbox_<%= user.id %>"><%= user.name() %></label><br/>\n    <% }); %>\n  </div>\n</div>\n<div id = "pie_chart">\n  <select class = "month">\n    <% months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]; %>\n    <% _.each(counts, function(count, index) { %>\n      <option value = "<%= index %>"><%= months[count[0].getMonth()] + \' \' + String(count[0].getYear() + 1900) %></option>\n    <% }); %>\n  </select>\n  <div id = "_pie_chart"></div>\n</div>');
+      this.template = _.template('<h1>Reports &gt; Charts</h1>\n<div class = "controls">\n  Checklist:\n  <select id = "checklists"></select>\n</div>\n<div style = "text-align: top">\n  <div id = "timeline_chart" style=\'width: 700px; height: 400px; display: inline-block\'></div>\n  <div id = "user_list" style  = "display: inline-block; min-height: 400px">\n    <input type = "checkbox" class = "user_checkbox" value = "0" id = "checkbox_0" checked = "checked" /><label for="checkbox_0"><%= all %></label><br/>\n    <% _.each(users.models, function(user) { %>\n      <input type = "checkbox" class = "user_checkbox" id = "checkbox_<%= user.id %>" value = "<%= user.id %>" /><label for="checkbox_<%= user.id %>"><%= user.name() %></label><br/>\n    <% }); %>\n  </div>\n</div>\n<div id = "pie_chart">\n  <select class = "month">\n    <% months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]; %>\n    <% _.each(counts, function(count, index) { %>\n      <option value = "<%= index %>"\n        <% if (index == counts.length - 1) { %> selected = "selected" <% } %> >\n        <%= months[count[0].getMonth()] + \' \' + String(count[0].getYear() + 1900) %></option>\n    <% }); %>\n  </select>\n  <div id = "_pie_chart"></div>\n</div>');
       $.getJSON(this.counts_url(), __bind(function(data, textStatus, xhr) {
-        var item, _i, _j, _len, _len2, _ref, _ref2;
+        var item, _i, _len, _ref;
         this.counts = data.counts;
-        _ref = this.counts;
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          item = _ref[_i];
-          item[0] = new Date(item[0]);
+        if (this.counts.length > 0) {
+          _ref = this.counts;
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            item = _ref[_i];
+            item[0] = new Date(item[0]);
+          }
+          this.user_ids = data.user_ids;
+          this.timeline_chart = new TimelineChart({
+            counts: this.counts,
+            users: this.users,
+            user_ids: this.user_ids
+          });
+          this.pie_chart = new PieChart({
+            users: this.users,
+            user_ids: this.user_ids,
+            counts: this.counts[this.counts.length - 1]
+          });
         }
-        this.totals = data.totals;
-        _ref2 = this.totals;
-        for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
-          item = _ref2[_j];
-          item[0] = new Date(item[0]);
-        }
-        this.user_ids = data.user_ids;
-        this.timeline_chart = new TimelineChart({
-          counts: this.counts,
-          users: this.users,
-          user_ids: this.user_ids
-        });
-        this.pie_chart = new PieChart({
-          users: this.users,
-          user_ids: this.user_ids,
-          counts: this.counts[this.counts.length - 1]
-        });
         return this.render();
       }, this));
     }
@@ -262,8 +257,12 @@
         all: this.all
       }));
       this.checklist_dropdown.render();
-      this.timeline_chart.render();
-      this.pie_chart.render();
+      if (this.counts.length > 0) {
+        this.timeline_chart.render();
+        this.pie_chart.render();
+      } else {
+        this.$("#timeline_chart").html("<b>No data available</b>");
+      }
       return this.$("#checklists").val(this.checklist_id);
     };
     ChartView.prototype.link = function() {
@@ -286,6 +285,15 @@
     ChartView.prototype.on_change_month = function(e) {
       this.pie_chart.counts = this.counts[Number($(e.target).val())];
       return this.pie_chart.render();
+    };
+    ChartView.prototype.on_change_user_checkbox = function(e) {
+      var index;
+      index = _.lastIndexOf(this.user_ids, Number($(e.target).val()));
+      if ($(e.target).is(":checked")) {
+        return this.timeline_chart.chart.showDataColumns(index);
+      } else {
+        return this.timeline_chart.chart.hideDataColumns(index);
+      }
     };
     return ChartView;
   })();

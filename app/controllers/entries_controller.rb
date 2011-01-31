@@ -39,8 +39,7 @@ class EntriesController < ApplicationController
     logger.info "COUNTS: ", counts.inspect
     user_ids = current_account.users.select("id").order("id")
     respond_to {|format|
-      format.json { render json: {user_ids: user_ids.map(&:id), counts: Entry.transpose_counts(counts, user_ids),
-                                  totals: Entry.get_totals(counts)}, status: :ok }
+      format.json { render json: {user_ids: user_ids.map(&:id) + [0], counts: Entry.transpose_counts(counts, user_ids)}, status: :ok }
     }
   end
 end
