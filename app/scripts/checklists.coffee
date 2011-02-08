@@ -196,12 +196,14 @@ class root.EditChecklistView extends Backbone.View
     @parent = $("#content")
 
     @template = _.template('''
-      <input type = "text" class = "checklist_name" value = "<%= name %>" /><br/><br/>
+      Checklist: <input type = "text" class = "checklist_name" value = "<%= name %>" /><br/><br/>
       <ul>
       </ul>
-      <a class = "button" href = "#" class = "add_item">Add item</a>
+      <ul><li><a class = "button add_item" href = "#">Add step</a></li></ul>
       <br/>
-      <a class = "button" href = "#checklists" class = "save">Save</a>
+      <br/>
+      <a class = "button save" href = "#checklists">Save checklist</a>
+      <span style = "margin-left: 20px; margin-right: 10px">or</span>  <a href = "#checklists">Cancel</a>
       ''')
 
     @model.items.bind "add", @add_item
@@ -209,7 +211,7 @@ class root.EditChecklistView extends Backbone.View
     @model.items.bind "refresh", @add_items
 
     @render()
-    @item_el = $(@el).find("ul")
+    @item_el = $(@el).find("ul:first")
 
     if @model.id?
       @model.items.fetch()
@@ -238,6 +240,7 @@ class root.EditChecklistView extends Backbone.View
 
   render: ->
     $(@el).html(@template({name: @model.name(), items : @model.items}))
+    $("#heading").html("Create checklist")
     $(@parent).html("").append @el
 
 
