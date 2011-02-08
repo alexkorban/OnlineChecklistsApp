@@ -84,6 +84,9 @@ class root.ChecklistListView extends Backbone.View
     @parent = $("#content")
 
     @template = _.template('''
+      <% if (flash != null) { %>
+        <div id = 'flash' class = 'notice'><div><%= flash %></div></div>
+      <% } %>
       <ul>
       <% checklists.each(function(checklist) { %>
       <li><a href="#checklists/<%= checklist.cid %>"><%= checklist.name() %></a>
@@ -99,7 +102,7 @@ class root.ChecklistListView extends Backbone.View
 
 
   render: ->
-    $(@el).html(@template({checklists : Checklists}))
+    $(@el).html(@template({checklists : Checklists, flash: window.app.get_flash()}))
     $("#heading").html("Checklists")
     @parent.html("").append(@el)
 
@@ -129,10 +132,10 @@ class root.ChecklistView extends Backbone.View
       For: <input name = "for" type = "text" />
       <ul>
       <% items.each(function(item) { %>
-      <li><a href="#items-<%= item.cid %>"><%= item.content() %></a></li>
+      <li><%= item.content() %></li>
       <% }); %>
       </ul>
-      <button class = "complete">Complete!</button>
+      <a href = "#checklists" class = "button complete">Complete!</a>
       ''')
 
     @model.items.fetch {success: =>
@@ -149,6 +152,7 @@ class root.ChecklistView extends Backbone.View
   on_complete: (e) ->
     entry = new Entry({checklist_id: @model.id, for: @$("input[name=for]").val()})
     entry.save()
+    window.app.flash = "Completed checklist: #{@model.name()}"
 
 
 class root.EditItemView extends Backbone.View

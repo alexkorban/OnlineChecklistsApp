@@ -47,7 +47,14 @@
     };
     function AppController() {
       AppController.__super__.constructor.apply(this, arguments);
+      this.flash = null;
     }
+    AppController.prototype.get_flash = function() {
+      var s;
+      s = this.flash;
+      this.flash = null;
+      return s;
+    };
     AppController.prototype.checklists = function() {
       return this.view = new ChecklistListView;
     };
@@ -100,7 +107,7 @@
     return AppController;
   })();
   $(document).ready(function() {
+    window.app = new AppController();
     return Backbone.history.start();
   });
-  this.app = new AppController();
 }).call(this);

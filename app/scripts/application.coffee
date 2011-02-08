@@ -44,7 +44,13 @@ class AppController extends Backbone.Controller
 
   constructor: ->
     super
+    @flash = null
 
+
+  get_flash: ->
+    s = @flash
+    @flash = null
+    s
 
   checklists: ->
     @view = new ChecklistListView
@@ -86,6 +92,7 @@ class AppController extends Backbone.Controller
 #
 
 $(document).ready ->
+  window.app = new AppController()
   Backbone.history.start()
 
-@app = new AppController()
+
