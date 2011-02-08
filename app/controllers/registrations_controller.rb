@@ -41,10 +41,20 @@ class RegistrationsController < Devise::RegistrationsController
         resource.role = "admin"
         acc.users << resource
         acc.save!
+
+        plans = Spreedly::SubscriptionPlan.all
+        trial_plan = plans.detect {|plan| plan.trial? && plan.name =~ /^#{acc.plan}/i }
+        subscriber = Spreedly::Subscriber.create!(resource.id, email: resource.email, screen_name: resource.name)
+
+        subscriber.activate_free_trial(trial_plan.id)
+
         success = true
       }
     rescue ActiveRecord::RecordInvalid
-      flash.now[:error] = "The email address is already in use."
+      flash.now[:error] = "The email address is already in use, please log into your existing account or use another email address to create a new account."
+    rescue
+      flash.now[:error] = "Account couldn't be created, sorry about that. Please contact us at #{SUPPORT_EMAIL} and we'll sort it out for you."
+      raise
     end
     if success
       set_flash_message :notice, :signed_up
@@ -60,7 +70,7 @@ class RegistrationsController < Devise::RegistrationsController
   protected
 
   def registrations_layout
-    action_name == "edit" ? "checklists" : nil
+    action_name == "edit" ? "application" : nil
   end
 
 end

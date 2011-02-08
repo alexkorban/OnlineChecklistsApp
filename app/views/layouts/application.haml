@@ -20,11 +20,20 @@
 
   %body
     #header
-      #{current_user.safe_name}
-      |
-      = link_to "Settings", edit_user_registration_path
-      |
-      = link_to 'Sign out', destroy_user_session_path
+      #nav
+        .logo
+          %a(href = "#{root_path}")
+            <span class = "capital">O</span>nline<span class = "capital">C</span>hecklists
+
+        - if current_user
+          #{current_user.safe_name}
+          |
+          = link_to "Settings", edit_user_registration_path
+          |
+          = link_to 'Sign out', destroy_user_session_path
+      %h1#heading
+        = yield :heading
+
     #main
       = yield
 

@@ -47,15 +47,16 @@ module OnlineChecklistsApp
     config.action_mailer.raise_delivery_errors = true
     config.action_mailer.default charset: "utf-8"
     config.action_mailer.register_template_extension('haml')
-    config.action_mailer.smtp_settings =
-      {
-        :address => "smtp.gmail.com",
-        :port => "587",
-        :authentication => :plain,
-        :user_name => "***REMOVED***",
-        :password => "***REMOVED***",
-        :enable_starttls_auto => true
-      }
+    config.action_mailer.smtp_settings = {
+      :address => "smtp.gmail.com",
+      :port => "587",
+      :authentication => :plain,
+      :user_name => "***REMOVED***",
+      :password => "***REMOVED***",
+      :enable_starttls_auto => true
+    }
 
+
+    Spreedly.configure("AoteaStudios-test", "***REMOVED***")
   end
 end

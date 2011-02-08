@@ -84,15 +84,15 @@ class root.ChecklistListView extends Backbone.View
     @parent = $("#content")
 
     @template = _.template('''
-      <h1>Checklists</h1>
       <ul>
       <% checklists.each(function(checklist) { %>
       <li><a href="#checklists/<%= checklist.cid %>"><%= checklist.name() %></a>
         (<a href = "#checklists/<%= checklist.cid %>/edit">Edit</a> | <a id = "remove_<%= checklist.cid %>" class = "remove" href = "#">X</a>)</li>
       <% }); %>
       </ul>
-      <a href = "#create">Create new list</a> <a href = "#reports">View reports</a>
-      <% if (current_user.role == "admin") { %> <a href = "#users">Invite users</a> <% } %>
+      <a class = "button" href = "#create">Create new list</a>
+      <a class = "button" href = "#reports">View reports</a>
+      <% if (current_user.role == "admin") { %> <a class = "button" href = "#users">Invite users</a> <% } %>
       ''')
 
     @render()
@@ -100,6 +100,7 @@ class root.ChecklistListView extends Backbone.View
 
   render: ->
     $(@el).html(@template({checklists : Checklists}))
+    $("#heading").html("Checklists")
     @parent.html("").append(@el)
 
 
@@ -125,7 +126,6 @@ class root.ChecklistView extends Backbone.View
     @parent = $("#content")
 
     @template = _.template('''
-      <h1><%= name %></h1>
       For: <input name = "for" type = "text" />
       <ul>
       <% items.each(function(item) { %>
@@ -141,7 +141,8 @@ class root.ChecklistView extends Backbone.View
 
 
   render: ->
-    $(@el).html(@template({name: @model.name(), items : @model.items}))
+    $(@el).html(@template({items : @model.items}))
+    $("#heading").html(@model.name())
     @parent.html("").append(@el)
 
 
@@ -198,9 +199,9 @@ class root.EditChecklistView extends Backbone.View
       <input type = "text" class = "checklist_name" value = "<%= name %>" /><br/><br/>
       <ul>
       </ul>
-      <a href = "#" class = "add_item">Add item</a>
+      <a class = "button" href = "#" class = "add_item">Add item</a>
       <br/>
-      <a href = "#checklists" class = "save">Save</a>
+      <a class = "button" href = "#checklists" class = "save">Save</a>
       ''')
 
     @model.items.bind "add", @add_item

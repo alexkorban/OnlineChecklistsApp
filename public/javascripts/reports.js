@@ -23,11 +23,12 @@
     function ReportPageView() {
       ReportPageView.__super__.constructor.apply(this, arguments);
       $("#" + this.id).replaceWith(this.el);
-      this.template = _.template('<h1>Reports</h1>\n<ul>\n  <li><a href = "#timeline">Timeline</a></li>\n  <li><a href = "#charts">Charts</a></li>\n</ul>');
+      this.template = _.template('<ul>\n  <li><a href = "#timeline">Timeline</a></li>\n  <li><a href = "#charts">Charts</a></li>\n</ul>');
       this.render();
     }
     ReportPageView.prototype.render = function() {
-      return $(this.el).html(this.template());
+      $(this.el).html(this.template());
+      return $("#heading").html("Reports");
     };
     return ReportPageView;
   })();
@@ -65,7 +66,7 @@
       this.checklist_id = args.checklist_id != null ? args.checklist_id : 0;
       this.all = "- All -";
       $("#" + this.id).replaceWith(this.el);
-      this.template = _.template('<h1>Reports &gt; Timeline</h1>\n<div class = "controls">\n  <a href = "#<%= prev_week_link %>" class = "prev_week">Prev week</a>\n  <% if (next_week_link != null) { %>\n    <a href = "#<%= next_week_link %>" class = "next_week">Next week</a>\n  <% } %>\n  User:\n  <select id = "users" class = "filter">\n    <option value = "0"><%= all %></option>\n    <% users.each(function(user) { %>\n      <option value = "<%= user.id %>"><%= user.name() == null || user.name().length == 0 ? user.email() : user.name() %></option>\n    <% }); %>\n  </select>\n  Checklist:\n  <select id = "checklists"></select>\n</div>\n<% _.each(entries_by_day, function(entries, day) { %>\n  <h2><%= day %></h2>\n  <% _.each(entries, function(entry) { %>\n    <%= entry["for"] %> <%= entry.user_name %> <%= entry.display_time %><br/>\n  <% }); %>\n<% }); %>');
+      this.template = _.template('<div class = "controls">\n  <a href = "#<%= prev_week_link %>" class = "prev_week">Prev week</a>\n  <% if (next_week_link != null) { %>\n    <a href = "#<%= next_week_link %>" class = "next_week">Next week</a>\n  <% } %>\n  User:\n  <select id = "users" class = "filter">\n    <option value = "0"><%= all %></option>\n    <% users.each(function(user) { %>\n      <option value = "<%= user.id %>"><%= user.name() == null || user.name().length == 0 ? user.email() : user.name() %></option>\n    <% }); %>\n  </select>\n  Checklist:\n  <select id = "checklists"></select>\n</div>\n<% _.each(entries_by_day, function(entries, day) { %>\n  <h2><%= day %></h2>\n  <% _.each(entries, function(entry) { %>\n    <%= entry["for"] %> <%= entry.user_name %> <%= entry.display_time %><br/>\n  <% }); %>\n<% }); %>');
       this.checklist_dropdown = new ChecklistDropdown({
         id: "checklists",
         checklists: this.checklists,
@@ -85,6 +86,7 @@
         next_week_link: this.next_week_link(),
         prev_week_link: this.prev_week_link()
       }));
+      $("#heading").html("Reports &gt; Timeline");
       this.checklist_dropdown.render();
       if (this.user_id) {
         this.$("#users").val(this.user_id);
@@ -224,7 +226,7 @@
         this.checklist_id = this.checklists.at(0).id;
       }
       $("#" + this.id).replaceWith(this.el);
-      this.template = _.template('<h1>Reports &gt; Charts</h1>\n<div class = "controls">\n  Checklist:\n  <select id = "checklists"></select>\n</div>\n<div style = "text-align: top">\n  <div id = "timeline_chart" style=\'width: 700px; height: 400px; display: inline-block\'></div>\n  <div id = "user_list" style  = "display: inline-block; min-height: 400px">\n    <input type = "checkbox" class = "user_checkbox" value = "0" id = "checkbox_0" checked = "checked" /><label for="checkbox_0"><%= all %></label><br/>\n    <% _.each(users.models, function(user) { %>\n      <input type = "checkbox" class = "user_checkbox" id = "checkbox_<%= user.id %>" value = "<%= user.id %>" /><label for="checkbox_<%= user.id %>"><%= user.name() %></label><br/>\n    <% }); %>\n  </div>\n</div>\n<div id = "pie_chart">\n  <select class = "month">\n    <% months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]; %>\n    <% _.each(counts, function(count, index) { %>\n      <option value = "<%= index %>"\n        <% if (index == counts.length - 1) { %> selected = "selected" <% } %> >\n        <%= months[count[0].getMonth()] + \' \' + String(count[0].getYear() + 1900) %></option>\n    <% }); %>\n  </select>\n  <div id = "_pie_chart"></div>\n</div>');
+      this.template = _.template('<div class = "controls">\n  Checklist:\n  <select id = "checklists"></select>\n</div>\n<div style = "text-align: top">\n  <div id = "timeline_chart" style=\'width: 700px; height: 400px; display: inline-block\'></div>\n  <div id = "user_list" style  = "display: inline-block; min-height: 400px">\n    <input type = "checkbox" class = "user_checkbox" value = "0" id = "checkbox_0" checked = "checked" /><label for="checkbox_0"><%= all %></label><br/>\n    <% _.each(users.models, function(user) { %>\n      <input type = "checkbox" class = "user_checkbox" id = "checkbox_<%= user.id %>" value = "<%= user.id %>" /><label for="checkbox_<%= user.id %>"><%= user.name() %></label><br/>\n    <% }); %>\n  </div>\n</div>\n<div id = "pie_chart">\n  <select class = "month">\n    <% months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]; %>\n    <% _.each(counts, function(count, index) { %>\n      <option value = "<%= index %>"\n        <% if (index == counts.length - 1) { %> selected = "selected" <% } %> >\n        <%= months[count[0].getMonth()] + \' \' + String(count[0].getYear() + 1900) %></option>\n    <% }); %>\n  </select>\n  <div id = "_pie_chart"></div>\n</div>');
       $.getJSON(this.counts_url(), __bind(function(data, textStatus, xhr) {
         var item, _i, _len, _ref;
         this.counts = data.counts;
@@ -256,6 +258,7 @@
         counts: this.counts,
         all: this.all
       }));
+      $("#heading").html("Reports &gt; Charts");
       this.checklist_dropdown.render();
       if (this.counts.length > 0) {
         this.timeline_chart.render();

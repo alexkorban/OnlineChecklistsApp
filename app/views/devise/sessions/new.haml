@@ -1,16 +1,24 @@
-%h2 Sign in
-= form_for(resource, :as => resource_name, :url => session_path(resource_name)) do |f|
-  %p
-    = f.label :email
+- content_for :heading do
+  Sign in
+
+.center
+  = form_for(resource, :as => resource_name, :url => session_path(resource_name)) do |f|
+    = render_messages(:alert)
+    = devise_error_messages!
+    %div
+      = f.label :email
+      %br/
+      = f.text_field :email
+    %div
+      = f.label :password
+      %br/
+      = f.password_field :password
+    - if devise_mapping.rememberable?
+      %div
+        = f.check_box :remember_me
+        = f.label :remember_me
     %br/
-    = f.text_field :email
-  %p
-    = f.label :password
-    %br/
-    = f.password_field :password
-  - if devise_mapping.rememberable?
-    %p
-      = f.check_box :remember_me
-      = f.label :remember_me
-  %p= f.submit "Sign in"
-= render :partial => "devise/shared/links"
+    = f.submit "Sign in"
+
+  %div(style = "width: 50%; margin-top: 20px; margin-left: auto; margin-right: auto; text-align: left")
+    = render :partial => "devise/shared/links"

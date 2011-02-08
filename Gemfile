@@ -6,6 +6,7 @@ gem "haml", "3.0.18"
 gem 'pg', "0.9.0"
 gem "devise", "1.1.5"
 gem "devise_invitable", "0.3.5"
+gem "spreedly", "1.3.4"
 
 group :development do
   gem 'hpricot'

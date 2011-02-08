@@ -1,16 +1,126 @@
+// general elements
+
 html, body
   margin: 0
   padding: 0
+  font-family: Helvetica, Arial, sans-serif
+  font-size: 14px
+
+h1
+  margin: 10px
+  color: #ffffff
+
+input
+  font-size: 20px
+  padding: 4px
+  border: 1px solid #d0d0d0
+  &:focus
+    background-color: #f6feff
+
+label
+  margin-bottom: 4px
+
+form
+  text-align: left
+  width: 50%
+  margin:
+    left: auto
+    right: auto
+
+a
+  color: #3c62a1
+  font-weight: bold
+  text-decoration: none
+  border-bottom: 1px dotted #3c62a1
+  &:hover
+    border-bottom: 1px solid #3c62a1
+
+// sections
 
 #header
-  padding: 5px
-  text-align: right
-  background-color: #f0f0f0
-  width: auto
-  margin: 0
+  height: 120px
+  background: url("/images/bg-home-header-content.jpg") repeat-x center top
+
+  #nav
+    padding: 5px
+    text-align: right
+    width: auto
+    margin: 0
+    height: 46px
+    color: white
+
+    a
+      color: white
+      border-bottom: 1px dotted white
+      &:hover
+        border-bottom: 1px solid white
+
+    .logo
+      a
+        font-weight: bold
+        color: #ffffff
+        float: left
+        margin-top: 10px
+        font-size: 16px
+        border-bottom: none
+        .capital
+          color: #e2effc
+
+#main
+  padding-top: 15px
+  background: white url("/images/bg-container.gif") repeat-x 0% 0%
+  border-top: 1px solid white
+
+// UI elements
+
+#flash
+  background-color: #ffcc66
+  padding: 10px
+  margin: 10px
+  font-size: 18px
+  border-bottom-color: #c5c5c5
+  box-shadow: 0 1px 0 #e2e2e2
+  -webkit-box-shadow: 0 1px 0 #e2e2e2
+  -moz-box-shadow: 0 1px 0 #e2e2e2
+  border-radius: 5px
+  -moz-border-radius: 5px
+  -webkit-border-radius: 5px
+  div
+    background: #e5e5e5 url("/images/bg-box.gif") repeat-x left top
+    border-radius: 4px
+    -moz-border-radius: 4px
+    -webkit-border-radius: 4px
+    padding: 10px
+
+.center
+  text-align: center
 
 .prev_week
   float: left
 
 .next_week
   float: right
+
+.button, input[type=submit]
+  padding: 5px
+  box-shadow: #548E06 1px 2px 4px
+  -webkit-box-shadow: #548E06 1px 2px 4px
+  -moz-box-shadow: #548E06 1px 2px 4px
+  background: #7CC319 url("/images/bg-button.gif") repeat-x 0% 100%
+  border: 1px solid #6AAD0F
+  border-bottom-left-radius: 5px 5px
+  border-bottom-right-radius: 5px 5px
+  border-top-left-radius: 5px 5px
+  border-top-right-radius: 5px 5px
+  color: white
+  font-size: 18px
+  font-weight: bold
+  text-align: center
+  text-shadow: #395C09 0px 1px 0px
+  &:hover
+    background-image: url("/images/bg-button-over.gif")
+    background-position: left top
+  &:active
+    box-shadow: -1px -1px 4px #c0c0c0
+    -webkit-box-shadow: 0px 0px 4px #c0c0c0
+    -moz-box-shadow: -1px -1px 4px #c0c0c0

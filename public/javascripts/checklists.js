@@ -80,13 +80,14 @@
     function ChecklistListView() {
       ChecklistListView.__super__.constructor.apply(this, arguments);
       this.parent = $("#content");
-      this.template = _.template('<h1>Checklists</h1>\n<ul>\n<% checklists.each(function(checklist) { %>\n<li><a href="#checklists/<%= checklist.cid %>"><%= checklist.name() %></a>\n  (<a href = "#checklists/<%= checklist.cid %>/edit">Edit</a> | <a id = "remove_<%= checklist.cid %>" class = "remove" href = "#">X</a>)</li>\n<% }); %>\n</ul>\n<a href = "#create">Create new list</a> <a href = "#reports">View reports</a>\n<% if (current_user.role == "admin") { %> <a href = "#users">Invite users</a> <% } %>');
+      this.template = _.template('<ul>\n<% checklists.each(function(checklist) { %>\n<li><a href="#checklists/<%= checklist.cid %>"><%= checklist.name() %></a>\n  (<a href = "#checklists/<%= checklist.cid %>/edit">Edit</a> | <a id = "remove_<%= checklist.cid %>" class = "remove" href = "#">X</a>)</li>\n<% }); %>\n</ul>\n<a class = "button" href = "#create">Create new list</a>\n<a class = "button" href = "#reports">View reports</a>\n<% if (current_user.role == "admin") { %> <a class = "button" href = "#users">Invite users</a> <% } %>');
       this.render();
     }
     ChecklistListView.prototype.render = function() {
       $(this.el).html(this.template({
         checklists: Checklists
       }));
+      $("#heading").html("Checklists");
       return this.parent.html("").append(this.el);
     };
     ChecklistListView.prototype.on_remove = function(e) {
@@ -109,7 +110,7 @@
     function ChecklistView() {
       ChecklistView.__super__.constructor.apply(this, arguments);
       this.parent = $("#content");
-      this.template = _.template('<h1><%= name %></h1>\nFor: <input name = "for" type = "text" />\n<ul>\n<% items.each(function(item) { %>\n<li><a href="#items-<%= item.cid %>"><%= item.content() %></a></li>\n<% }); %>\n</ul>\n<button class = "complete">Complete!</button>');
+      this.template = _.template('For: <input name = "for" type = "text" />\n<ul>\n<% items.each(function(item) { %>\n<li><a href="#items-<%= item.cid %>"><%= item.content() %></a></li>\n<% }); %>\n</ul>\n<button class = "complete">Complete!</button>');
       this.model.items.fetch({
         success: __bind(function() {
           return this.render();
@@ -118,9 +119,9 @@
     }
     ChecklistView.prototype.render = function() {
       $(this.el).html(this.template({
-        name: this.model.name(),
         items: this.model.items
       }));
+      $("#heading").html(this.model.name());
       return this.parent.html("").append(this.el);
     };
     ChecklistView.prototype.on_complete = function(e) {
@@ -176,7 +177,7 @@
       this.add_items = __bind(this.add_items, this);;
       this.add_item = __bind(this.add_item, this);;      EditChecklistView.__super__.constructor.apply(this, arguments);
       this.parent = $("#content");
-      this.template = _.template('<input type = "text" class = "checklist_name" value = "<%= name %>" /><br/><br/>\n<ul>\n</ul>\n<a href = "#" class = "add_item">Add item</a>\n<br/>\n<a href = "#checklists" class = "save">Save</a>');
+      this.template = _.template('<input type = "text" class = "checklist_name" value = "<%= name %>" /><br/><br/>\n<ul>\n</ul>\n<a class = "button" href = "#" class = "add_item">Add item</a>\n<br/>\n<a class = "button" href = "#checklists" class = "save">Save</a>');
       this.model.items.bind("add", this.add_item);
       this.model.items.bind("remove", this.remove_item);
       this.model.items.bind("refresh", this.add_items);

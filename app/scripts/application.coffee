@@ -81,18 +81,11 @@ class AppController extends Backbone.Controller
     @view = new ChartView({user_ids: user_ids, checklist_id: checklist_id, users: Users, checklists: Checklists})
 
 
-appController = new AppController()
-
-
 #
 # Start the app
 #
 
 $(document).ready ->
-    #Checklists.fetch()
-    #Users.fetch()
-    Backbone.history.start()
-#  $.getJSON "/checklists", (data, textStatus, xhr) =>
-    #appController.checklists()
+  Backbone.history.start()
 
-@app = appController
+@app = new AppController()

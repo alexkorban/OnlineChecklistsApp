@@ -1,5 +1,5 @@
 (function() {
-  var AppController, appController, root;
+  var AppController, root;
   var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
@@ -99,9 +99,8 @@
     };
     return AppController;
   })();
-  appController = new AppController();
   $(document).ready(function() {
     return Backbone.history.start();
   });
-  this.app = appController;
+  this.app = new AppController();
 }).call(this);

@@ -158,9 +158,9 @@ class root.InvitationView extends Backbone.View
     @template = _.template('''
       <h2>Invite users</h2>
       <div id = "invitation_items"></div>
-      <a href = "#" class = "add_item">Add item</a>
+      <a class = "button" href = "#" class = "add_item">Invite another person</a>
       <br/>
-      <a href = "#" class = "save">Save</a>
+      <a class = "button" href = "#" class = "save">Send invitations</a>
       ''')
 
     @render()
@@ -213,7 +213,6 @@ class root.UserPageView extends Backbone.View
   constructor: ->
     super
     @template = _.template('''
-      <h1>Users</h1>
       <div id = "invitations"></div>
       <div id = "user_list"></div>
       ''')
@@ -227,3 +226,4 @@ class root.UserPageView extends Backbone.View
 
   render: ->
     $(@el).html(@template())
+    $("#heading").html("Users")

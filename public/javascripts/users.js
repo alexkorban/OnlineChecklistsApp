@@ -151,7 +151,7 @@
       this.add_item = __bind(this.add_item, this);;      InvitationView.__super__.constructor.apply(this, arguments);
       this.users = users;
       $("#" + this.id).replaceWith(this.el);
-      this.template = _.template('<h2>Invite users</h2>\n<div id = "invitation_items"></div>\n<a href = "#" class = "add_item">Add item</a>\n<br/>\n<a href = "#" class = "save">Save</a>');
+      this.template = _.template('<h2>Invite users</h2>\n<div id = "invitation_items"></div>\n<a class = "button" href = "#" class = "add_item">Invite another person</a>\n<br/>\n<a class = "button" href = "#" class = "save">Send invitations</a>');
       this.render();
       this.invitations = new InvitationSet;
       this.invitations.bind("add", this.add_item);
@@ -198,7 +198,7 @@
     UserPageView.prototype.id = "content";
     function UserPageView() {
       UserPageView.__super__.constructor.apply(this, arguments);
-      this.template = _.template('<h1>Users</h1>\n<div id = "invitations"></div>\n<div id = "user_list"></div>');
+      this.template = _.template('<div id = "invitations"></div>\n<div id = "user_list"></div>');
       $("#" + this.id).replaceWith(this.el);
       this.render();
       this.users = new UserCollection;
@@ -208,7 +208,8 @@
       this.users.bind("remove", this.user_list_view.render);
     }
     UserPageView.prototype.render = function() {
-      return $(this.el).html(this.template());
+      $(this.el).html(this.template());
+      return $("#heading").html("Users");
     };
     return UserPageView;
   })();

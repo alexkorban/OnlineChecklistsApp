@@ -16,7 +16,6 @@ class root.ReportPageView extends Backbone.View
     $("#" + @id).replaceWith(@el)
 
     @template = _.template('''
-      <h1>Reports</h1>
       <ul>
         <li><a href = "#timeline">Timeline</a></li>
         <li><a href = "#charts">Charts</a></li>
@@ -28,7 +27,7 @@ class root.ReportPageView extends Backbone.View
 
   render: ->
     $(@el).html(@template())
-
+    $("#heading").html("Reports")
 
 class ChecklistDropdown extends Backbone.View
   tagName: "select"
@@ -75,7 +74,6 @@ class root.TimelineView extends Backbone.View
     $("#" + @id).replaceWith(@el)
 
     @template = _.template('''
-      <h1>Reports &gt; Timeline</h1>
       <div class = "controls">
         <a href = "#<%= prev_week_link %>" class = "prev_week">Prev week</a>
         <% if (next_week_link != null) { %>
@@ -114,6 +112,7 @@ class root.TimelineView extends Backbone.View
       next_week_link: @next_week_link()
       prev_week_link: @prev_week_link()
       })
+    $("#heading").html("Reports &gt; Timeline")
     @checklist_dropdown.render()
     @$("#users").val(@user_id) if @user_id
     @$("#checklists").val(@checklist_id) if @checklist_id
@@ -234,7 +233,6 @@ class root.ChartView extends Backbone.View
     $("#" + @id).replaceWith(@el)
 
     @template = _.template('''
-      <h1>Reports &gt; Charts</h1>
       <div class = "controls">
         Checklist:
         <select id = "checklists"></select>
@@ -281,6 +279,7 @@ class root.ChartView extends Backbone.View
 
   render: ->
     $(@el).html(@template({checklists: @checklists, users: @users, counts: @counts, all: @all}))
+    $("#heading").html("Reports &gt; Charts")
     @checklist_dropdown.render()
     if @counts.length > 0
       @timeline_chart.render()

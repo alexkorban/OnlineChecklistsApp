@@ -58,7 +58,6 @@ OnlineChecklistsApp::Application.routes.draw do
 
   root :to => "checklists#index"
 
-
   devise_for :users, controllers: {registrations: "registrations", invitations: "invitations"} do
     get "users", :to => "registrations#index"
     delete "users/:id", :to => "registrations#destroy"
