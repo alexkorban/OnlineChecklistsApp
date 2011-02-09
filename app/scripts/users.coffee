@@ -68,6 +68,10 @@ class InvitationSet extends Backbone.Model
     super
 
 
+  remove: (item) ->
+    @items.remove(item)
+
+
 class root.UserListView extends Backbone.View
   id: "user_list"
   tagName: "div"
@@ -157,10 +161,11 @@ class root.InvitationView extends Backbone.View
 
     @template = _.template('''
       <h2>Invite users</h2>
-      <div id = "invitation_items"></div>
-      <a class = "button" href = "#" class = "add_item">Invite another person</a>
-      <br/>
-      <a class = "button" href = "#" class = "save">Send invitations</a>
+      <div id = "invitation_items" style = "margin-bottom: 20px"></div>
+
+      <a class = "button add_item" href = "#">Add another person</a>
+      <br/><br/><br/>
+      <a class = "button save" href = "#">Send invitations</a>
       ''')
 
     @render()

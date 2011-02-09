@@ -75,6 +75,9 @@
       });
       return InvitationSet.__super__.save.apply(this, arguments);
     };
+    InvitationSet.prototype.remove = function(item) {
+      return this.items.remove(item);
+    };
     return InvitationSet;
   })();
   root.UserListView = (function() {
@@ -151,7 +154,7 @@
       this.add_item = __bind(this.add_item, this);;      InvitationView.__super__.constructor.apply(this, arguments);
       this.users = users;
       $("#" + this.id).replaceWith(this.el);
-      this.template = _.template('<h2>Invite users</h2>\n<div id = "invitation_items"></div>\n<a class = "button" href = "#" class = "add_item">Invite another person</a>\n<br/>\n<a class = "button" href = "#" class = "save">Send invitations</a>');
+      this.template = _.template('<h2>Invite users</h2>\n<div id = "invitation_items" style = "margin-bottom: 20px"></div>\n\n<a class = "button add_item" href = "#">Add another person</a>\n<br/><br/><br/>\n<a class = "button save" href = "#">Send invitations</a>');
       this.render();
       this.invitations = new InvitationSet;
       this.invitations.bind("add", this.add_item);
