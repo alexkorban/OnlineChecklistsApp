@@ -74,17 +74,21 @@
   root.Checklists = new ChecklistCollection;
   root.ChecklistListView = (function() {
     __extends(ChecklistListView, Backbone.View);
+    ChecklistListView.prototype.tagName = "div";
+    ChecklistListView.prototype.id = "content";
     ChecklistListView.prototype.events = {
-      "click .remove": "on_remove",
-      "dblclick li": "on_doubleclick"
+      "click .delete": "on_delete",
+      "dblclick li": "on_doubleclick",
+      "click .confirm_delete": "on_confirm_delete",
+      "click .cancel_delete": "on_cancel_delete"
     };
     function ChecklistListView() {
       ChecklistListView.__super__.constructor.apply(this, arguments);
-      this.parent = $("#content");
       Checklists.refresh(Checklists.select(function(model) {
         return model.id != null;
       }));
-      this.template = _.template('<% if (flash != null) { %>\n  <div id = \'flash\' class = \'notice\'><div><%= flash %></div></div>\n<% } %>\n<ul class = "checklists">\n<% checklists.each(function(checklist) { %>\n<li class = "checklist" id = "<%= checklist.cid %>"><%= checklist.name() %>\n  <span class = "controls">\n    <a href="#checklists/<%= checklist.cid %>">Fill out</a> |\n    <a class = "secondary" href = "#checklists/<%= checklist.cid %>/edit">Edit</a> |\n    <a class = "secondary" id = "remove_<%= checklist.cid %>" class = "remove" href = "#">Delete</a>\n  </span>\n</li>\n<% }); %>\n</ul>\n<div style = "margin-top: 40px">\n  <a class = "button" href = "#create">Create new list</a>\n  <a class = "button" href = "#reports">View reports</a>\n  <% if (current_user.role == "admin") { %> <a class = "button" href = "#users">Invite users</a> <% } %>\n</div>');
+      this.template = _.template('<% if (flash != null) { %>\n  <div id = \'flash\' class = \'notice\'><div><%= flash %></div></div>\n<% } %>\n<ul class = "checklists">\n<% checklists.each(function(checklist) { %>\n<li class = "checklist" id = "<%= checklist.cid %>"><%= checklist.name() %>\n  <span class = "controls">\n    <a href="#checklists/<%= checklist.cid %>">Fill out</a> |\n    <a class = "secondary" href = "#checklists/<%= checklist.cid %>/edit">Edit</a> |\n    <a class = "secondary delete" id = "delete_<%= checklist.cid %>" href = "#">Delete</a>\n  </span>\n</li>\n<% }); %>\n</ul>\n<div style = "margin-top: 40px">\n  <a class = "button" href = "#create">Create new list</a>\n  <a class = "button" href = "#reports">View reports</a>\n  <% if (current_user.role == "admin") { %> <a class = "button" href = "#users">Invite users</a> <% } %>\n</div>');
+      $("#" + this.id).replaceWith(this.el);
       this.render();
     }
     ChecklistListView.prototype.render = function() {
@@ -93,19 +97,37 @@
         flash: window.app.get_flash()
       }));
       $("#heading").html("Checklists");
-      return this.parent.html("").append(this.el);
+      return this.controls_contents = {};
     };
     ChecklistListView.prototype.on_doubleclick = function(e) {
-      console.log(e.target.id);
       return window.location.hash = "#checklists/" + e.target.id;
     };
-    ChecklistListView.prototype.on_remove = function(e) {
+    ChecklistListView.prototype.on_delete = function(e) {
+      var cid, controls;
+      console.log("on_delete");
+      cid = e.target.id.substr(7);
+      console.log(cid);
+      controls = this.$(e.target).closest(".controls");
+      console.log(controls);
+      this.controls_contents[cid] = controls.html();
+      controls.html("Please confirm <b>deletion</b>:\n<a class = 'confirm_delete' id = 'confirm_delete_" + cid + "' href = '#'>Confirm</a> or\n<a class = 'cancel_delete' id = 'cancel_delete_" + cid + "' href = '#'>Cancel</a>");
+      return e.preventDefault();
+    };
+    ChecklistListView.prototype.on_confirm_delete = function(e) {
       var checklist;
-      console.log("cid = ", e.target.id.substr(7));
-      checklist = Checklists.getByCid(e.target.id.substr(7));
+      checklist = Checklists.getByCid(e.target.id.substr(15));
       checklist.destroy();
       Checklists.remove(checklist);
       this.render();
+      e.preventDefault();
+      return e.stopPropagation();
+    };
+    ChecklistListView.prototype.on_cancel_delete = function(e) {
+      var controls;
+      controls = this.$(e.target).closest(".controls");
+      console.log(this.controls_contents);
+      console.log(e.target.id.substr(14));
+      controls.html(this.controls_contents[e.target.id.substr(14)]);
       e.preventDefault();
       return e.stopPropagation();
     };
@@ -113,13 +135,15 @@
   })();
   root.ChecklistView = (function() {
     __extends(ChecklistView, Backbone.View);
+    ChecklistView.prototype.tagName = "div";
+    ChecklistView.prototype.id = "content";
     ChecklistView.prototype.events = {
       "click .complete": "on_complete"
     };
     function ChecklistView() {
       ChecklistView.__super__.constructor.apply(this, arguments);
-      this.parent = $("#content");
-      this.template = _.template('For: <input name = "for" type = "text" />\n<ul>\n<% items.each(function(item) { %>\n<li><%= item.content() %></li>\n<% }); %>\n</ul>\n<a href = "#checklists" class = "button complete">Complete!</a>');
+      this.template = _.template('For: <input name = "for" type = "text" />\n<ul>\n<% items.each(function(item) { %>\n<li><%= item.content() %></li>\n<% }); %>\n</ul>\n<a href = "#checklists" class = "button complete">Complete!</a>\n<span style = "margin-left: 20px; margin-right: 10px">or</span>  <a href = "#checklists">Cancel</a>');
+      $("#" + this.id).replaceWith(this.el);
       this.model.items.fetch({
         success: __bind(function() {
           return this.render();
@@ -130,8 +154,7 @@
       $(this.el).html(this.template({
         items: this.model.items
       }));
-      $("#heading").html(this.model.name());
-      return this.parent.html("").append(this.el);
+      return $("#heading").html(this.model.name());
     };
     ChecklistView.prototype.on_complete = function(e) {
       var entry;
@@ -181,15 +204,15 @@
       "click .add_item": "on_add_item"
     };
     EditChecklistView.prototype.tagName = "div";
-    EditChecklistView.prototype.id = "edit";
+    EditChecklistView.prototype.id = "content";
     function EditChecklistView() {
       this.add_items = __bind(this.add_items, this);;
       this.add_item = __bind(this.add_item, this);;      EditChecklistView.__super__.constructor.apply(this, arguments);
-      this.parent = $("#content");
       this.template = _.template('Checklist: <input type = "text" class = "checklist_name" value = "<%= name %>" /><br/><br/>\n<ul>\n</ul>\n<ul><li><a class = "button add_item" href = "#">Add step</a></li></ul>\n<br/>\n<br/>\n<a class = "button save" href = "#checklists">Save checklist</a>\n<span style = "margin-left: 20px; margin-right: 10px">or</span>  <a href = "#checklists">Cancel</a>');
       this.model.items.bind("add", this.add_item);
       this.model.items.bind("remove", this.remove_item);
       this.model.items.bind("refresh", this.add_items);
+      $("#" + this.id).replaceWith(this.el);
       this.render();
       this.item_el = $(this.el).find("ul:first");
       if (this.model.id != null) {
@@ -202,11 +225,13 @@
       this.model.set({
         "name": this.$(".checklist_name").val()
       });
-      return this.model.save({}, {
+      this.model.save({}, {
         success: __bind(function(model, response) {
-          return this.model.set_items_url();
+          this.model.set_items_url();
+          return window.location.hash = $(e.target).attr("href");
         }, this)
       });
+      return e.preventDefault();
     };
     EditChecklistView.prototype.on_add_item = function(e) {
       this.model.items.add();
@@ -218,8 +243,7 @@
         name: this.model.name(),
         items: this.model.items
       }));
-      $("#heading").html("Create checklist");
-      return $(this.parent).html("").append(this.el);
+      return $("#heading").html("Create checklist");
     };
     EditChecklistView.prototype.add_item = function(item) {
       var view;

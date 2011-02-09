@@ -76,17 +76,21 @@ root.Checklists = new ChecklistCollection
 
 
 class root.ChecklistListView extends Backbone.View
+  tagName: "div"
+  id: "content"
+
   events: {
-    "click .remove": "on_remove"
+    "click .delete": "on_delete"
     "dblclick li": "on_doubleclick"
+    "click .confirm_delete": "on_confirm_delete"
+    "click .cancel_delete": "on_cancel_delete"
   }
+
   constructor: ->
     super
-    @parent = $("#content")
 
     # get rid of any leftover unsaved checklists
     Checklists.refresh(Checklists.select (model) -> model.id?)
-
 
     @template = _.template('''
       <% if (flash != null) { %>
@@ -98,7 +102,7 @@ class root.ChecklistListView extends Backbone.View
         <span class = "controls">
           <a href="#checklists/<%= checklist.cid %>">Fill out</a> |
           <a class = "secondary" href = "#checklists/<%= checklist.cid %>/edit">Edit</a> |
-          <a class = "secondary" id = "remove_<%= checklist.cid %>" class = "remove" href = "#">Delete</a>
+          <a class = "secondary delete" id = "delete_<%= checklist.cid %>" href = "#">Delete</a>
         </span>
       </li>
       <% }); %>
@@ -110,40 +114,65 @@ class root.ChecklistListView extends Backbone.View
       </div>
       ''')
 
+    $("#" + @id).replaceWith(@el)
+
     @render()
 
 
   render: ->
     $(@el).html(@template({checklists : Checklists, flash: window.app.get_flash()}))
     $("#heading").html("Checklists")
-    @parent.html("").append(@el)
+    @controls_contents = {}
+    #$(".delete").live("click", (e) => @on_delete(e))
 
 
   on_doubleclick: (e) ->
-    console.log e.target.id
     window.location.hash = "#checklists/#{e.target.id}"
 
 
-  on_remove: (e) ->
-    console.log "cid = ", e.target.id.substr(7)
-    checklist = Checklists.getByCid(e.target.id.substr(7))
+  on_delete: (e) ->
+    console.log "on_delete"
+    cid = e.target.id.substr(7)
+    console.log cid
+    controls = @$(e.target).closest(".controls")
+    console.log controls
+    @controls_contents[cid] = controls.html()
+    controls.html("""
+      Please confirm <b>deletion</b>:
+      <a class = 'confirm_delete' id = 'confirm_delete_#{cid}' href = '#'>Confirm</a> or
+      <a class = 'cancel_delete' id = 'cancel_delete_#{cid}' href = '#'>Cancel</a>
+      """)
+    e.preventDefault()
+
+
+  on_confirm_delete: (e) ->
+    checklist = Checklists.getByCid(e.target.id.substr(15))
     checklist.destroy()
     Checklists.remove(checklist)
     @render()
+    #@delegateEvents(@events)
     e.preventDefault()
     e.stopPropagation()
 
 
+  on_cancel_delete: (e) ->
+    controls = @$(e.target).closest(".controls")
+    console.log @controls_contents
+    console.log e.target.id.substr(14)
+    controls.html(@controls_contents[e.target.id.substr(14)])
+    e.preventDefault()
+    e.stopPropagation()
 
 
 class root.ChecklistView extends Backbone.View
+  tagName: "div"
+  id: "content"
+
   events: {
     "click .complete": "on_complete"
   }
   constructor: ->
     super
-
-    @parent = $("#content")
 
     @template = _.template('''
       For: <input name = "for" type = "text" />
@@ -153,7 +182,10 @@ class root.ChecklistView extends Backbone.View
       <% }); %>
       </ul>
       <a href = "#checklists" class = "button complete">Complete!</a>
+      <span style = "margin-left: 20px; margin-right: 10px">or</span>  <a href = "#checklists">Cancel</a>
       ''')
+
+    $("#" + @id).replaceWith(@el)
 
     @model.items.fetch {success: =>
       @render()
@@ -163,7 +195,6 @@ class root.ChecklistView extends Backbone.View
   render: ->
     $(@el).html(@template({items : @model.items}))
     $("#heading").html(@model.name())
-    @parent.html("").append(@el)
 
 
   on_complete: (e) ->
@@ -208,12 +239,10 @@ class root.EditChecklistView extends Backbone.View
     "click .add_item": "on_add_item"
   }
   tagName: "div"
-  id: "edit"
+  id: "content"
 
   constructor: ->
     super
-
-    @parent = $("#content")
 
     @template = _.template('''
       Checklist: <input type = "text" class = "checklist_name" value = "<%= name %>" /><br/><br/>
@@ -230,6 +259,7 @@ class root.EditChecklistView extends Backbone.View
     @model.items.bind "remove", @remove_item
     @model.items.bind "refresh", @add_items
 
+    $("#" + @id).replaceWith(@el)
     @render()
     @item_el = $(@el).find("ul:first")
 
@@ -250,8 +280,9 @@ class root.EditChecklistView extends Backbone.View
     @model.save({}, success: (model, response) =>
       @model.set_items_url()
       #@model.set {id: response.id}
+      window.location.hash = $(e.target).attr("href")
     )
-
+    e.preventDefault()
 
   on_add_item: (e) ->
     @model.items.add()
@@ -262,7 +293,6 @@ class root.EditChecklistView extends Backbone.View
   render: ->
     $(@el).html(@template({name: @model.name(), items : @model.items}))
     $("#heading").html("Create checklist")
-    $(@parent).html("").append @el
 
 
   add_item: (item) =>
