@@ -6,17 +6,19 @@
 
     = javascript_include_tag "http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"
     = javascript_include_tag "underscore-min"
-    = javascript_include_tag Rails.env == "production" ? "backbone-min" : "backbone"
-    = javascript_include_tag "http://www.google.com/jsapi"
-    = javascript_include_tag "users"
-    = javascript_include_tag "checklists"
-    = javascript_include_tag "reports"
-    = javascript_include_tag "application"
+
+    - if controller.controller_name == "checklists"
+      = javascript_include_tag Rails.env == "production" ? "backbone-min" : "backbone"
+      = javascript_include_tag "http://www.google.com/jsapi"
+      = javascript_include_tag "users"
+      = javascript_include_tag "checklists"
+      = javascript_include_tag "reports"
+      = javascript_include_tag "application"
 
     = stylesheet_link_tag "checklists"
 
     :javascript
-      var current_user = #{current_user.to_json(:only => [:id, :name, :email])};
+      var current_user = #{current_user.to_json(:only => [:id, :name, :email, :role])};
 
   %body
     #header
