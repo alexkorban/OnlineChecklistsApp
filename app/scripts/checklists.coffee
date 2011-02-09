@@ -78,24 +78,36 @@ root.Checklists = new ChecklistCollection
 class root.ChecklistListView extends Backbone.View
   events: {
     "click .remove": "on_remove"
+    "dblclick li": "on_doubleclick"
   }
   constructor: ->
     super
     @parent = $("#content")
 
+    # get rid of any leftover unsaved checklists
+    Checklists.refresh(Checklists.select (model) -> model.id?)
+
+
     @template = _.template('''
       <% if (flash != null) { %>
         <div id = 'flash' class = 'notice'><div><%= flash %></div></div>
       <% } %>
-      <ul>
+      <ul class = "checklists">
       <% checklists.each(function(checklist) { %>
-      <li><a href="#checklists/<%= checklist.cid %>"><%= checklist.name() %></a>
-        (<a href = "#checklists/<%= checklist.cid %>/edit">Edit</a> | <a id = "remove_<%= checklist.cid %>" class = "remove" href = "#">X</a>)</li>
+      <li class = "checklist" id = "<%= checklist.cid %>"><%= checklist.name() %>
+        <span class = "controls">
+          <a href="#checklists/<%= checklist.cid %>">Fill out</a> |
+          <a class = "secondary" href = "#checklists/<%= checklist.cid %>/edit">Edit</a> |
+          <a class = "secondary" id = "remove_<%= checklist.cid %>" class = "remove" href = "#">Delete</a>
+        </span>
+      </li>
       <% }); %>
       </ul>
-      <a class = "button" href = "#create">Create new list</a>
-      <a class = "button" href = "#reports">View reports</a>
-      <% if (current_user.role == "admin") { %> <a class = "button" href = "#users">Invite users</a> <% } %>
+      <div style = "margin-top: 40px">
+        <a class = "button" href = "#create">Create new list</a>
+        <a class = "button" href = "#reports">View reports</a>
+        <% if (current_user.role == "admin") { %> <a class = "button" href = "#users">Invite users</a> <% } %>
+      </div>
       ''')
 
     @render()
@@ -105,6 +117,11 @@ class root.ChecklistListView extends Backbone.View
     $(@el).html(@template({checklists : Checklists, flash: window.app.get_flash()}))
     $("#heading").html("Checklists")
     @parent.html("").append(@el)
+
+
+  on_doubleclick: (e) ->
+    console.log e.target.id
+    window.location.hash = "#checklists/#{e.target.id}"
 
 
   on_remove: (e) ->
@@ -189,7 +206,6 @@ class root.EditChecklistView extends Backbone.View
   events: {
     "click .save": "on_save"
     "click .add_item": "on_add_item"
-    "change .checklist_name": "on_change"
   }
   tagName: "div"
   id: "edit"
@@ -229,8 +245,9 @@ class root.EditChecklistView extends Backbone.View
 
 
   on_save: (e) ->
+    @model.set {"name": @$(".checklist_name").val()}
+
     @model.save({}, success: (model, response) =>
-      console.log "checklist id after save: ", @model.id
       @model.set_items_url()
       #@model.set {id: response.id}
     )
@@ -261,6 +278,3 @@ class root.EditChecklistView extends Backbone.View
   remove_item: (item) ->
     item.view.remove()
 
-
-  on_change: (e) ->
-    @model.set {"name": $(e.target).val()}

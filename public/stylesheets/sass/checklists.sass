@@ -5,6 +5,7 @@ html, body
   padding: 0
   font-family: Helvetica, Arial, sans-serif
   font-size: 14px
+  color: #363636
 
 h1
   margin: 10px
@@ -49,6 +50,7 @@ a
 
   #nav
     padding: 5px
+    padding-top: 14px
     text-align: right
     width: auto
     margin: 0
@@ -66,17 +68,56 @@ a
         font-weight: bold
         color: #ffffff
         float: left
-        margin-top: 10px
         font-size: 16px
         border-bottom: none
         .capital
           color: #e2effc
 
+  #heading
+    margin-top: 5px
+
 #main
   min-height: 200px
-  padding-top: 15px
+  padding:
+    top: 15px
+    left: 20px
   background: white url("/images/bg-container.gif") repeat-x 0% 0%
   border-top: 1px solid white
+
+#content
+  ul.checklists
+    width: 90%
+    padding-left: 0
+    list-style: none
+    font-size: 20px
+    li
+      padding: 10px
+      .controls
+        display: inline-block
+        float: right
+        color: #c0c0c0
+        padding-left: 100px
+        a
+          color: #9fb2d2
+          border-bottom-color: #9fb2d2
+        .secondary
+          font-size: 14px
+      &:hover
+        border: 1px solid #92c5ef
+        background-color: #f7fdff
+        border-radius: 5px
+        -moz-border-radius: 5px
+        -webkit-border-radius: 5px
+        .controls
+          color: #363636
+          a
+            color: #3c62a1
+            border-bottom-color: #3c62a1
+
+
+
+
+
 
 // UI elements
 

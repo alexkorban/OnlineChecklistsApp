@@ -75,12 +75,16 @@
   root.ChecklistListView = (function() {
     __extends(ChecklistListView, Backbone.View);
     ChecklistListView.prototype.events = {
-      "click .remove": "on_remove"
+      "click .remove": "on_remove",
+      "dblclick li": "on_doubleclick"
     };
     function ChecklistListView() {
       ChecklistListView.__super__.constructor.apply(this, arguments);
       this.parent = $("#content");
-      this.template = _.template('<% if (flash != null) { %>\n  <div id = \'flash\' class = \'notice\'><div><%= flash %></div></div>\n<% } %>\n<ul>\n<% checklists.each(function(checklist) { %>\n<li><a href="#checklists/<%= checklist.cid %>"><%= checklist.name() %></a>\n  (<a href = "#checklists/<%= checklist.cid %>/edit">Edit</a> | <a id = "remove_<%= checklist.cid %>" class = "remove" href = "#">X</a>)</li>\n<% }); %>\n</ul>\n<a class = "button" href = "#create">Create new list</a>\n<a class = "button" href = "#reports">View reports</a>\n<% if (current_user.role == "admin") { %> <a class = "button" href = "#users">Invite users</a> <% } %>');
+      Checklists.refresh(Checklists.select(function(model) {
+        return model.id != null;
+      }));
+      this.template = _.template('<% if (flash != null) { %>\n  <div id = \'flash\' class = \'notice\'><div><%= flash %></div></div>\n<% } %>\n<ul class = "checklists">\n<% checklists.each(function(checklist) { %>\n<li class = "checklist" id = "<%= checklist.cid %>"><%= checklist.name() %>\n  <span class = "controls">\n    <a href="#checklists/<%= checklist.cid %>">Fill out</a> |\n    <a class = "secondary" href = "#checklists/<%= checklist.cid %>/edit">Edit</a> |\n    <a class = "secondary" id = "remove_<%= checklist.cid %>" class = "remove" href = "#">Delete</a>\n  </span>\n</li>\n<% }); %>\n</ul>\n<div style = "margin-top: 40px">\n  <a class = "button" href = "#create">Create new list</a>\n  <a class = "button" href = "#reports">View reports</a>\n  <% if (current_user.role == "admin") { %> <a class = "button" href = "#users">Invite users</a> <% } %>\n</div>');
       this.render();
     }
     ChecklistListView.prototype.render = function() {
@@ -90,6 +94,10 @@
       }));
       $("#heading").html("Checklists");
       return this.parent.html("").append(this.el);
+    };
+    ChecklistListView.prototype.on_doubleclick = function(e) {
+      console.log(e.target.id);
+      return window.location.hash = "#checklists/" + e.target.id;
     };
     ChecklistListView.prototype.on_remove = function(e) {
       var checklist;
@@ -170,8 +178,7 @@
     __extends(EditChecklistView, Backbone.View);
     EditChecklistView.prototype.events = {
       "click .save": "on_save",
-      "click .add_item": "on_add_item",
-      "change .checklist_name": "on_change"
+      "click .add_item": "on_add_item"
     };
     EditChecklistView.prototype.tagName = "div";
     EditChecklistView.prototype.id = "edit";
@@ -192,9 +199,11 @@
       }
     }
     EditChecklistView.prototype.on_save = function(e) {
+      this.model.set({
+        "name": this.$(".checklist_name").val()
+      });
       return this.model.save({}, {
         success: __bind(function(model, response) {
-          console.log("checklist id after save: ", this.model.id);
           return this.model.set_items_url();
         }, this)
       });
@@ -226,11 +235,6 @@
     };
     EditChecklistView.prototype.remove_item = function(item) {
       return item.view.remove();
-    };
-    EditChecklistView.prototype.on_change = function(e) {
-      return this.model.set({
-        "name": $(e.target).val()
-      });
     };
     return EditChecklistView;
   })();

@@ -63,11 +63,11 @@ class AppController extends Backbone.Controller
   create: ->
     c = new Checklist
     Checklists.add(c)
-    @view = new EditChecklistView { model : c }
+    @view = new EditChecklistView { model: c }
 
 
   edit: (cid) ->
-    @view = new EditChecklistView { model : Checklists.getByCid(cid) }
+    @view = new EditChecklistView { model: Checklists.getByCid(cid) }
 
 
   users: ->
