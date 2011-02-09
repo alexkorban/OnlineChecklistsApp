@@ -85,28 +85,48 @@
     UserListView.prototype.id = "user_list";
     UserListView.prototype.tagName = "div";
     UserListView.prototype.events = {
-      "click .remove": "on_remove"
+      "click .delete": "on_delete",
+      "click .confirm_delete": "on_confirm_delete",
+      "click .cancel_delete": "on_cancel_delete"
     };
     function UserListView(users) {
       this.render = __bind(this.render, this);;      UserListView.__super__.constructor.apply(this, arguments);
-      this.template = _.template('<ul>\n<% users.each(function(user) { %>\n<li><%= user.name() %> (<%= user.email() %>)\n  <% if (user.email() != current_user.email) { %>(<a id = "remove_<%= user.cid %>" class = "remove" href = "#">X</a>)<% } %></li>\n<% }); %>\n</ul>');
+      this.template = _.template('<h2>Existing users</h2>\n<div class = "users" style = "width: 60%">\n  <% users.each(function(user) { %>\n    <div class = "user">\n      <h3><%= user.name() ? user.name() : "&lt;no name&gt;" %></h3>\n      <%= user.email() %>\n      <% if (user.email() != current_user.email) { %>\n        <div class = "controls" style = "float:right">\n          <a id = "delete_<%= user.cid %>" class = "delete" href = "#">Delete</a>\n        </div>\n      <% } else { %>\n        <br/><br/>This is you. You can\'t delete yourself. If you need to cancel your subscription, you can do it in the <a href = "/users/edit">Settings</a>.\n      <% } %>\n    </div>\n  <% }); %>\n</div>');
       $("#" + this.id).replaceWith(this.el);
       this.users = users;
       this.render();
     }
     UserListView.prototype.render = function() {
-      return $(this.el).html(this.template({
+      $(this.el).html(this.template({
         users: this.users
       }));
+      return this.controls_contents = {};
     };
-    UserListView.prototype.on_remove = function(e) {
+    UserListView.prototype.on_delete = function(e) {
+      var cid, controls;
+      console.log("on_delete");
+      cid = e.target.id.substr(7);
+      console.log(cid);
+      controls = this.$(e.target).closest(".controls");
+      console.log(controls);
+      this.controls_contents[cid] = controls.html();
+      controls.html("Please confirm <b>deletion</b>:\n<a class = 'confirm_delete' id = 'confirm_delete_" + cid + "' href = '#'>Confirm</a> or\n<a class = 'cancel_delete' id = 'cancel_delete_" + cid + "' href = '#'>Cancel</a>");
+      return e.preventDefault();
+    };
+    UserListView.prototype.on_confirm_delete = function(e) {
       var user;
-      console.log("in on_remove");
-      e.target.id.match("^remove_(.+)");
+      e.target.id.match("^confirm_delete_(.+)");
       user = this.users.getByCid(RegExp.$1);
       user.destroy();
       this.users.remove(user);
       return e.preventDefault();
+    };
+    UserListView.prototype.on_cancel_delete = function(e) {
+      var controls;
+      controls = this.$(e.target).closest(".controls");
+      controls.html(this.controls_contents[e.target.id.substr(14)]);
+      e.preventDefault();
+      return e.stopPropagation();
     };
     return UserListView;
   })();
@@ -154,7 +174,7 @@
       this.add_item = __bind(this.add_item, this);;      InvitationView.__super__.constructor.apply(this, arguments);
       this.users = users;
       $("#" + this.id).replaceWith(this.el);
-      this.template = _.template('<h2>Invite users</h2>\n<div id = "invitation_items" style = "margin-bottom: 20px"></div>\n\n<a class = "button add_item" href = "#">Add another person</a>\n<br/><br/><br/>\n<a class = "button save" href = "#">Send invitations</a>');
+      this.template = _.template('<h2>Invite users</h2>\n<div id = "invitation_items" style = "margin-bottom: 20px"></div>\n\n<a class = "button add_item" href = "#">Add another invitation</a>\n<br/><br/><br/>\n<a class = "button save" href = "#">Send invitations</a>');
       this.render();
       this.invitations = new InvitationSet;
       this.invitations.bind("add", this.add_item);
@@ -199,12 +219,13 @@
     __extends(UserPageView, Backbone.View);
     UserPageView.prototype.tagName = "div";
     UserPageView.prototype.id = "content";
-    function UserPageView() {
+    function UserPageView(args) {
       UserPageView.__super__.constructor.apply(this, arguments);
       this.template = _.template('<div id = "invitations"></div>\n<div id = "user_list"></div>');
       $("#" + this.id).replaceWith(this.el);
       this.render();
-      this.users = new UserCollection;
+      this.users = args.users;
+      console.log(this.users);
       this.user_list_view = new UserListView(this.users);
       this.invitation_view = new InvitationView(this.users);
       this.users.bind("refresh", this.user_list_view.render);

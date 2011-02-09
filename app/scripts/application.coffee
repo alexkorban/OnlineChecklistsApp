@@ -71,7 +71,7 @@ class AppController extends Backbone.Controller
 
 
   users: ->
-    @view = new UserPageView { users: @users }
+    @view = new UserPageView { users: Users }
 
 
   reports: ->

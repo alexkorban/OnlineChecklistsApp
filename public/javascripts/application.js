@@ -78,7 +78,7 @@
     };
     AppController.prototype.users = function() {
       return this.view = new UserPageView({
-        users: this.users
+        users: Users
       });
     };
     AppController.prototype.reports = function() {

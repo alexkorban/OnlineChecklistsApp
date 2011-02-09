@@ -76,19 +76,31 @@ class root.UserListView extends Backbone.View
   id: "user_list"
   tagName: "div"
   events: {
-    "click .remove": "on_remove"
+    "click .delete": "on_delete"
+    "click .confirm_delete": "on_confirm_delete"
+    "click .cancel_delete": "on_cancel_delete"
   }
 
   constructor: (users) ->
     super
 
     @template = _.template('''
-      <ul>
-      <% users.each(function(user) { %>
-      <li><%= user.name() %> (<%= user.email() %>)
-        <% if (user.email() != current_user.email) { %>(<a id = "remove_<%= user.cid %>" class = "remove" href = "#">X</a>)<% } %></li>
-      <% }); %>
-      </ul>
+      <h2>Existing users</h2>
+      <div class = "users" style = "width: 60%">
+        <% users.each(function(user) { %>
+          <div class = "user">
+            <h3><%= user.name() ? user.name() : "&lt;no name&gt;" %></h3>
+            <%= user.email() %>
+            <% if (user.email() != current_user.email) { %>
+              <div class = "controls" style = "float:right">
+                <a id = "delete_<%= user.cid %>" class = "delete" href = "#">Delete</a>
+              </div>
+            <% } else { %>
+              <br/><br/>This is you. You can't delete yourself. If you need to cancel your subscription, you can do it in the <a href = "/users/edit">Settings</a>.
+            <% } %>
+          </div>
+        <% }); %>
+      </div>
       ''')
 
     $("#" + @id).replaceWith(@el)
@@ -99,15 +111,36 @@ class root.UserListView extends Backbone.View
 
   render: =>
     $(@el).html(@template({users: @users}))
+    @controls_contents = {}
+
+  on_delete: (e) ->
+    console.log "on_delete"
+    cid = e.target.id.substr(7)
+    console.log cid
+    controls = @$(e.target).closest(".controls")
+    console.log controls
+    @controls_contents[cid] = controls.html()
+    controls.html("""
+      Please confirm <b>deletion</b>:
+      <a class = 'confirm_delete' id = 'confirm_delete_#{cid}' href = '#'>Confirm</a> or
+      <a class = 'cancel_delete' id = 'cancel_delete_#{cid}' href = '#'>Cancel</a>
+      """)
+    e.preventDefault()
 
 
-  on_remove: (e) ->
-    console.log("in on_remove")
-    e.target.id.match("^remove_(.+)")
+  on_confirm_delete: (e) ->
+    e.target.id.match("^confirm_delete_(.+)")
     user = @users.getByCid(RegExp.$1)
     user.destroy()
     @users.remove(user)
     e.preventDefault()
+
+
+  on_cancel_delete: (e) ->
+    controls = @$(e.target).closest(".controls")
+    controls.html(@controls_contents[e.target.id.substr(14)])
+    e.preventDefault()
+    e.stopPropagation()
 
 
 
@@ -163,7 +196,7 @@ class root.InvitationView extends Backbone.View
       <h2>Invite users</h2>
       <div id = "invitation_items" style = "margin-bottom: 20px"></div>
 
-      <a class = "button add_item" href = "#">Add another person</a>
+      <a class = "button add_item" href = "#">Add another invitation</a>
       <br/><br/><br/>
       <a class = "button save" href = "#">Send invitations</a>
       ''')
@@ -215,7 +248,7 @@ class root.UserPageView extends Backbone.View
   tagName: "div"
   id: "content"
 
-  constructor: ->
+  constructor: (args) ->
     super
     @template = _.template('''
       <div id = "invitations"></div>
@@ -223,7 +256,8 @@ class root.UserPageView extends Backbone.View
       ''')
     $("#" + @id).replaceWith(@el)
     @render()
-    @users = new UserCollection
+    @users = args.users
+    console.log @users
     @user_list_view = new UserListView(@users)
     @invitation_view = new InvitationView(@users)
     @users.bind("refresh", @user_list_view.render)

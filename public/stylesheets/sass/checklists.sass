@@ -85,38 +85,54 @@ a
   border-top: 1px solid white
 
 #content
+  .controls
+    display: inline-block
+    float: right
+    color: #c0c0c0
+    padding-left: 100px
+    a
+      color: #9fb2d2
+      border-bottom-color: #9fb2d2
+    .secondary
+      font-size: 14px
+
   ul.checklists
     width: 90%
     padding-left: 0
     list-style: none
     font-size: 20px
-    li
+    li.checklist
       padding: 10px
-      .controls
-        display: inline-block
-        float: right
-        color: #c0c0c0
-        padding-left: 100px
-        a
-          color: #9fb2d2
-          border-bottom-color: #9fb2d2
-        .secondary
-          font-size: 14px
       &:hover
         border: 1px solid #92c5ef
         background-color: #f7fdff
         border-radius: 5px
         -moz-border-radius: 5px
         -webkit-border-radius: 5px
-        .controls
-          color: #363636
-          a
-            color: #3c62a1
-            border-bottom-color: #3c62a1
+
+  div.users
+    padding-bottom: 50px
+    div.user
+      padding: 10px
+      &:hover
+        border: 1px solid #92c5ef
+        background-color: #f7fdff
+        border-radius: 5px
+        -moz-border-radius: 5px
+        -webkit-border-radius: 5px
+      h3
+        margin-top: 0
+
+  .checklist:hover, .user:hover
+    .controls
+      color: #363636
+      a
+        color: #3c62a1
+        border-bottom-color: #3c62a1
 
 
-
-
+  #user_list
+    padding-top: 40px
 
 
 // UI elements
