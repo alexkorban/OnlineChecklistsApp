@@ -230,7 +230,6 @@ class TimelineChart extends Backbone.View
     })
 
 
-
 class root.ChartView extends Backbone.View
   tagName: "div"
   id: "content"
@@ -247,19 +246,27 @@ class root.ChartView extends Backbone.View
     @checklists = args.checklists
     @users = args.users
     @checklist_id = args.checklist_id
+    @totals = args.totals
     @all = "- All -"
 
     @checklist_dropdown = new ChecklistDropdown({id: "checklists", checklists: @checklists})
     @checklist_id = @checklists.at(0).id if !@checklist_id?
+    @totals = @totals.at(0).id if !@totals?
 
     $("#" + @id).replaceWith(@el)
 
     @template = _.template('''
-      <div class = "controls">
+      <div class = "report_controls">
         Checklist:
         <select id = "checklists"></select>
+        Totals:
+        <select id = "totals" class = "filter">
+          <option value = "daily">Daily</option>
+          <option value = "weekly">Weekly</option>
+          <option value = "monthly">Monthly</option>
+        </select>
       </div>
-      <div style = "text-align: top">
+      <div style = "text-align: top; margin-top: 20px">
         <div id = "timeline_chart" style='width: 700px; height: 400px; display: inline-block'></div>
         <div id = "user_list" style  = "display: inline-block; min-height: 400px">
           <input type = "checkbox" class = "user_checkbox" value = "0" id = "checkbox_0" checked = "checked" /><label for="checkbox_0"><%= all %></label><br/>
@@ -309,22 +316,25 @@ class root.ChartView extends Backbone.View
     else
       @$("#timeline_chart").html("<b>No data available</b>")
     @$("#checklists").val(@checklist_id)
+    @$("#totals").val(@totals)
 
 
   link: ->
     link = "charts"
     link += "/u0"
     link += "/c#{@checklist_id}"
+    link += "/t#{@totals}"
     link
 
 
   counts_url: ->
-    "/entries/counts?checklist_id=#{@checklist_id}"
+    "/entries/counts?checklist_id=#{@checklist_id}&totals=#{@totals}"
 
 
   on_change_filter: (e) ->
     #@user_id = $(e.target).val() if e.target.id is "users"
     @checklist_id = $(e.target).val() if e.target.id is "checklists"
+    @totals = $(e.target).val() if e.target.id is "totals"
     window.location.hash = @link()
     e.preventDefault()
 

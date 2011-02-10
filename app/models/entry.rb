@@ -3,9 +3,13 @@ class Entry < ActiveRecord::Base
   scope :for_checklist, lambda { |checklist_id| where("checklist_id = ?", checklist_id) }
   scope :for_user, lambda { |user_id| where("user_id = ?", user_id) }
   scope :within_one_year, lambda { |today| where("created_at > ?", today - 1.year)}
+  scope :within_one_month, lambda { |today| where("created_at > ?", today - 1.month) }
   scope :monthly_counts, :select => "count(id), extract(month from date_trunc('month', created_at)) as month,
          extract(year from date_trunc('month', created_at)) as year, user_id",  :group => "date_trunc('month', created_at), user_id",
         :order => "date_trunc('month', created_at), user_id"
+  scope :daily_counts, :select => "count(id), date_trunc('day', created_at) as date, user_id",
+        :group => "date_trunc('day', created_at), user_id",
+        :order => "date_trunc('day', created_at), user_id"
 
 #  select extract(month from date_trunc('month', created_at)),
 #         extract(year from date_trunc('month', created_at)), count(*) from entries group by date_trunc('month', created_at);
@@ -51,8 +55,12 @@ class Entry < ActiveRecord::Base
     }
   end
 
-  # counts must be the result of monthly_counts scope
-  def self.transpose_counts(counts, users)
+  def self.get_monthly_counts(account, checklist_id)
+    entries = account.entries.within_one_year(Date.today)
+    entries = entries.for_checklist(checklist_id) if checklist_id > 0
+
+    user_ids = account.users.select("id").order("id")
+    counts = entries.monthly_counts
 
     counts.group_by {|row|
 
@@ -60,17 +68,37 @@ class Entry < ActiveRecord::Base
 
     }.map {|date, counts|
 
-      user_counts = get_user_counts(counts, users)
+      user_counts = get_user_counts(counts, user_ids)
       [Date.new(date.last.to_i, date.first.to_i, 1).end_of_month] + user_counts + [counts.inject(0) { |sum, count| sum += count[:count].to_i; sum }]
 
     }
   end
 
+  def self.get_daily_counts(account, checklist_id)
+    entries = account.entries.within_one_month(Date.today)
+    entries = entries.for_checklist(checklist_id) if checklist_id > 0
+
+    user_ids = account.users.select("id").order("id")
+    counts = entries.daily_counts
+
+    counts.group_by { |row|
+
+      row.date
+
+    }.map { |date, counts|
+
+      user_counts = get_user_counts(counts, user_ids)
+      [date] + user_counts + [counts.inject(0) { |sum, count| sum += count[:count].to_i; sum }]
+
+    }
+  end
+
+  # produces an array of counts for each user id, inserting zero if there is no count present in input counts
   # users must be sorted by id
-  def self.get_user_counts(counts, users)
-    counts_by_id = counts.inject({}) {|hash, count| hash[count[:user_id]] = count[:count]; hash}
-    users.map {|u|
-      counts_by_id.include?(u.id) ? counts_by_id[u.id].to_i : 0
+  def self.get_user_counts(counts, user_ids)
+    counts_by_user_id = counts.inject({}) {|hash, count| hash[count[:user_id]] = count[:count]; hash}
+    user_ids.map {|u|
+      counts_by_user_id.include?(u.id) ? counts_by_user_id[u.id].to_i : 0
     }
   end
 end

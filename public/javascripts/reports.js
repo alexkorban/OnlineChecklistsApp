@@ -217,6 +217,7 @@
       this.checklists = args.checklists;
       this.users = args.users;
       this.checklist_id = args.checklist_id;
+      this.totals = args.totals;
       this.all = "- All -";
       this.checklist_dropdown = new ChecklistDropdown({
         id: "checklists",
@@ -225,8 +226,11 @@
       if (!(this.checklist_id != null)) {
         this.checklist_id = this.checklists.at(0).id;
       }
+      if (!(this.totals != null)) {
+        this.totals = this.totals.at(0).id;
+      }
       $("#" + this.id).replaceWith(this.el);
-      this.template = _.template('<div class = "controls">\n  Checklist:\n  <select id = "checklists"></select>\n</div>\n<div style = "text-align: top">\n  <div id = "timeline_chart" style=\'width: 700px; height: 400px; display: inline-block\'></div>\n  <div id = "user_list" style  = "display: inline-block; min-height: 400px">\n    <input type = "checkbox" class = "user_checkbox" value = "0" id = "checkbox_0" checked = "checked" /><label for="checkbox_0"><%= all %></label><br/>\n    <% _.each(users.models, function(user) { %>\n      <input type = "checkbox" class = "user_checkbox" id = "checkbox_<%= user.id %>" value = "<%= user.id %>" /><label for="checkbox_<%= user.id %>"><%= user.name() %></label><br/>\n    <% }); %>\n  </div>\n</div>\n<div id = "pie_chart">\n  <select class = "month">\n    <% months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]; %>\n    <% _.each(counts, function(count, index) { %>\n      <option value = "<%= index %>"\n        <% if (index == counts.length - 1) { %> selected = "selected" <% } %> >\n        <%= months[count[0].getMonth()] + \' \' + String(count[0].getYear() + 1900) %></option>\n    <% }); %>\n  </select>\n  <div id = "_pie_chart"></div>\n</div>');
+      this.template = _.template('<div class = "report_controls">\n  Checklist:\n  <select id = "checklists"></select>\n  Totals:\n  <select id = "totals" class = "filter">\n    <option value = "daily">Daily</option>\n    <option value = "weekly">Weekly</option>\n    <option value = "monthly">Monthly</option>\n  </select>\n</div>\n<div style = "text-align: top; margin-top: 20px">\n  <div id = "timeline_chart" style=\'width: 700px; height: 400px; display: inline-block\'></div>\n  <div id = "user_list" style  = "display: inline-block; min-height: 400px">\n    <input type = "checkbox" class = "user_checkbox" value = "0" id = "checkbox_0" checked = "checked" /><label for="checkbox_0"><%= all %></label><br/>\n    <% _.each(users.models, function(user) { %>\n      <input type = "checkbox" class = "user_checkbox" id = "checkbox_<%= user.id %>" value = "<%= user.id %>" /><label for="checkbox_<%= user.id %>"><%= user.name() %></label><br/>\n    <% }); %>\n  </div>\n</div>\n<div id = "pie_chart">\n  <select class = "month">\n    <% months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]; %>\n    <% _.each(counts, function(count, index) { %>\n      <option value = "<%= index %>"\n        <% if (index == counts.length - 1) { %> selected = "selected" <% } %> >\n        <%= months[count[0].getMonth()] + \' \' + String(count[0].getYear() + 1900) %></option>\n    <% }); %>\n  </select>\n  <div id = "_pie_chart"></div>\n</div>');
       $.getJSON(this.counts_url(), __bind(function(data, textStatus, xhr) {
         var item, _i, _len, _ref;
         this.counts = data.counts;
@@ -266,21 +270,26 @@
       } else {
         this.$("#timeline_chart").html("<b>No data available</b>");
       }
-      return this.$("#checklists").val(this.checklist_id);
+      this.$("#checklists").val(this.checklist_id);
+      return this.$("#totals").val(this.totals);
     };
     ChartView.prototype.link = function() {
       var link;
       link = "charts";
       link += "/u0";
       link += "/c" + this.checklist_id;
+      link += "/t" + this.totals;
       return link;
     };
     ChartView.prototype.counts_url = function() {
-      return "/entries/counts?checklist_id=" + this.checklist_id;
+      return "/entries/counts?checklist_id=" + this.checklist_id + "&totals=" + this.totals;
     };
     ChartView.prototype.on_change_filter = function(e) {
       if (e.target.id === "checklists") {
         this.checklist_id = $(e.target).val();
+      }
+      if (e.target.id === "totals") {
+        this.totals = $(e.target).val();
       }
       window.location.hash = this.link();
       return e.preventDefault();

@@ -34,15 +34,14 @@ class EntriesController < ApplicationController
 
   def counts
     checklist_id = params[:checklist_id] ? params[:checklist_id].to_i : 0
+    grouping = params[:totals] == "daily" ? :daily : :monthly
 
-    entries = current_account.entries.within_one_year(Date.today)
-    entries = entries.for_checklist(checklist_id) if checklist_id > 0
+    counts = grouping == :monthly ? Entry.get_monthly_counts(current_account, checklist_id) : Entry.get_daily_counts(current_account, checklist_id)
 
-    counts = entries.monthly_counts
     logger.info "COUNTS: ", counts.inspect
     user_ids = current_account.users.select("id").order("id")
     respond_to {|format|
-      format.json { render json: {user_ids: user_ids.map(&:id) + [0], counts: Entry.transpose_counts(counts, user_ids)}, status: :ok }
+      format.json { render json: {user_ids: user_ids.map(&:id) + [0], counts: counts}, status: :ok }
     }
   end
 end
