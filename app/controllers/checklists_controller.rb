@@ -52,8 +52,13 @@ class ChecklistsController < ApplicationController
   end
 
   def destroy
-    checklist = checklist = current_account.checklists.find(params[:id])
-    checklist.destroy
+    checklist = current_account.checklists.find(params[:id])
+    if checklist.entries.count > 0    # only delete the checklist if it doesn't have any associated entries; otherwise only deactivate
+      checklist.active = false
+      checklist.save
+    else
+      checklist.destroy
+    end
     respond_to { |format|
       format.json { render :json => {}, :status => :ok }
     }

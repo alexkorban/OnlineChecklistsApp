@@ -80,6 +80,19 @@ a {
     border-bottom-color: #9fb2d2; }
   #content .controls .secondary {
     font-size: 14px; }
+#content .report_controls {
+  text-align: center; }
+  #content .report_controls .prev_week {
+    float: left; }
+    #content .report_controls .prev_week img {
+      vertical-align: middle;
+      padding-right: 5px; }
+  #content .report_controls .next_week {
+    float: right;
+    margin-right: 20px; }
+    #content .report_controls .next_week img {
+      vertical-align: middle;
+      padding-left: 5px; }
 #content ul.checklists {
   width: 90%;
   padding-left: 0;
@@ -112,6 +125,18 @@ a {
     border-bottom-color: #3c62a1; }
 #content #user_list {
   padding-top: 40px; }
+#content table.timeline_entries tr:hover td {
+  background-color: #d6eff7; }
+#content table.timeline_entries tr th {
+  text-align: left;
+  border-bottom: 1px solid #f0f0f0;
+  padding-left: 10px;
+  padding-right: 50px; }
+#content table.timeline_entries tr td {
+  padding-left: 10px;
+  padding-right: 50px; }
+  #content table.timeline_entries tr td.first {
+    border-left: none; }
 
 #flash {
   background-color: #ffcc66;
@@ -134,12 +159,6 @@ a {
 
 .center {
   text-align: center; }
-
-.prev_week {
-  float: left; }
-
-.next_week {
-  float: right; }
 
 .button, input[type=submit], button {
   padding: 5px;

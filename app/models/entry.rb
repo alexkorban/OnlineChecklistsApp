@@ -22,6 +22,9 @@ class Entry < ActiveRecord::Base
   end
 
   def checklist_name
+    if checklist.nil?
+      logger.info "Checklist id: #{checklist_id}"
+    end
     checklist.name
   end
 
@@ -35,6 +38,9 @@ class Entry < ActiveRecord::Base
       entry.created_at.to_date
 
     }.inject({}) {|hash, entries_for_date|
+
+      logger.info "Entries for date"
+      logger.info entries_for_date.inspect
 
       # Format keys (which are dates) for display, and filter out unnecessary attributes from the entries
       # the result is still a hash of entry arrays with formatted dates as keys

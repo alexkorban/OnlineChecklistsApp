@@ -74,26 +74,48 @@ class root.TimelineView extends Backbone.View
     $("#" + @id).replaceWith(@el)
 
     @template = _.template('''
-      <div class = "controls">
-        <a href = "#<%= prev_week_link %>" class = "prev_week">Prev week</a>
+      <div class = "report_controls">
+        <div class = "prev_week">
+          <img src = "/images/left_32.png" />
+          <a href = "#<%= prev_week_link %>">Prev week</a>
+        </div>
         <% if (next_week_link != null) { %>
-          <a href = "#<%= next_week_link %>" class = "next_week">Next week</a>
+          <div class = "next_week">
+            <a href = "#<%= next_week_link %>">Next week</a>
+            <img src = "/images/right_32.png" />
+          </div>
         <% } %>
-        User:
-        <select id = "users" class = "filter">
-          <option value = "0"><%= all %></option>
-          <% users.each(function(user) { %>
-            <option value = "<%= user.id %>"><%= user.name() == null || user.name().length == 0 ? user.email() : user.name() %></option>
-          <% }); %>
-        </select>
+        <div style = "display: inline-block; padding-right: 50px">
+          User:
+          <select id = "users" class = "filter">
+            <option value = "0"><%= all %></option>
+            <% users.each(function(user) { %>
+              <option value = "<%= user.id %>"><%= user.name() == null || user.name().length == 0 ? user.email() : user.name() %></option>
+            <% }); %>
+          </select>
+        </div>
         Checklist:
         <select id = "checklists"></select>
       </div>
       <% _.each(entries_by_day, function(entries, day) { %>
         <h2><%= day %></h2>
-        <% _.each(entries, function(entry) { %>
-          <%= entry["for"] %> <%= entry.user_name %> <%= entry.display_time %><br/>
-        <% }); %>
+        <table class = "timeline_entries">
+          <tr>
+            <th>Checklist</th>
+            <th>User</th>
+            <th>Completed at</th>
+            <th>Completed for</th>
+          </tr>
+
+          <% _.each(entries, function(entry) { %>
+            <tr>
+              <td class = "first"><%= entry.checklist_name %></td>
+              <td><%= entry.user_name %></td>
+              <td><%= entry.display_time %></td>
+              <td><%= entry.for %></td>
+            </tr>
+          <% }); %>
+        </table>
       <% }); %>
     ''')
 

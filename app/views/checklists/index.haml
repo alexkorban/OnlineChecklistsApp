@@ -1,5 +1,4 @@
 :javascript
-  console.log( "Users in index: ", #{@users.to_json(:only => User::JSON_FIELDS)})
   this.Users.refresh(#{@users.to_json(:only => User::JSON_FIELDS)});
   this.Checklists.refresh(#{@checklists.to_json});
 

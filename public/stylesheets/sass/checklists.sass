@@ -96,6 +96,21 @@ a
     .secondary
       font-size: 14px
 
+  .report_controls
+    text-align: center
+    .prev_week
+      float: left
+      img
+        vertical-align: middle
+        padding-right: 5px
+
+    .next_week
+      float: right
+      margin-right: 20px
+      img
+        vertical-align: middle
+        padding-left: 5px
+
   ul.checklists
     width: 90%
     padding-left: 0
@@ -134,6 +149,26 @@ a
   #user_list
     padding-top: 40px
 
+  table.timeline_entries
+    tr
+      &:hover
+        td
+          background-color: #d6eff7
+      th
+        text-align: left
+        border-bottom: 1px solid #f0f0f0
+        padding:
+          left: 10px
+          right: 50px
+
+      td
+        padding:
+          left: 10px
+          right: 50px
+        //border-left: 1px solid #f0f0f0
+        &.first
+          border-left: none
+
 
 // UI elements
 
@@ -158,12 +193,6 @@ a
 
 .center
   text-align: center
-
-.prev_week
-  float: left
-
-.next_week
-  float: right
 
 .button, input[type=submit], button
   padding: 5px
