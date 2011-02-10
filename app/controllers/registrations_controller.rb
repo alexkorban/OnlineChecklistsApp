@@ -3,8 +3,9 @@ class RegistrationsController < Devise::RegistrationsController
 
   def index
     @users = current_account.users.order("name")
+
     respond_to { |format|
-      format.json { render :json => @users, :status => :ok}
+      format.json { render :json => @users.to_json(:only => User::JSON_FIELDS), :status => :ok}
     }
   end
 

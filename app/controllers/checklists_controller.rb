@@ -3,8 +3,8 @@ class ChecklistsController < ApplicationController
   # - provides a starting point for the whole application in response to an HTML request
   # - returns a list of checklists in response to a JSON request
   def index
-    @checklists = current_account.checklists.all
-    @users = current_account.users.all
+    @checklists = current_account.checklists.order("name")
+    @users = current_account.users.order("name")
 
     respond_to { |format|
       format.json { render :json => @checklists }

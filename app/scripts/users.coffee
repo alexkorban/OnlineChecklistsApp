@@ -13,8 +13,9 @@ class User extends Backbone.Model
     @get "name"
 
 
-  is_current: ->
-    @get "is_current"
+  is_invited: ->
+    @get("invitation_token") != null
+
 
 
 class UserCollection extends Backbone.Collection
@@ -97,6 +98,9 @@ class root.UserListView extends Backbone.View
               </div>
             <% } else { %>
               <br/><br/>This is you. You can't delete yourself. If you need to cancel your subscription, you can do it in the <a href = "/users/edit">Settings</a>.
+            <% } %>
+            <% if (user.is_invited()) { %>
+              <br/><br/>Invitation sent, waiting for the user to set password.
             <% } %>
           </div>
         <% }); %>

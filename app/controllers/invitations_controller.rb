@@ -13,7 +13,7 @@ class InvitationsController < Devise::InvitationsController
     }
 
     respond_to {|format|
-      format.json {errors.empty? ? render(json: current_account.users.all) : render(json: {errors: errors.flatten}, status: :not_acceptable)}
+      format.json {errors.empty? ? render(json: current_account.users.order("name").to_json(:only => User::JSON_FIELDS)) : render(json: {errors: errors.flatten}, status: :not_acceptable)}
     }
 #    self.resource = resource_class.invite!(params)    # our client passes the attributes directly instead of wrapping them in :user
 #

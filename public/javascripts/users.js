@@ -20,8 +20,8 @@
     User.prototype.name = function() {
       return this.get("name");
     };
-    User.prototype.is_current = function() {
-      return this.get("is_current");
+    User.prototype.is_invited = function() {
+      return this.get("invitation_token") !== null;
     };
     return User;
   })();
@@ -91,7 +91,7 @@
     };
     function UserListView(users) {
       this.render = __bind(this.render, this);;      UserListView.__super__.constructor.apply(this, arguments);
-      this.template = _.template('<h2>Existing users</h2>\n<div class = "users" style = "width: 60%">\n  <% users.each(function(user) { %>\n    <div class = "user">\n      <h3><%= user.name() ? user.name() : "&lt;no name&gt;" %></h3>\n      <%= user.email() %>\n      <% if (user.email() != current_user.email) { %>\n        <div class = "controls" style = "float:right">\n          <a id = "delete_<%= user.cid %>" class = "delete" href = "#">Delete</a>\n        </div>\n      <% } else { %>\n        <br/><br/>This is you. You can\'t delete yourself. If you need to cancel your subscription, you can do it in the <a href = "/users/edit">Settings</a>.\n      <% } %>\n    </div>\n  <% }); %>\n</div>');
+      this.template = _.template('<h2>Existing users</h2>\n<div class = "users" style = "width: 60%">\n  <% users.each(function(user) { %>\n    <div class = "user">\n      <h3><%= user.name() ? user.name() : "&lt;no name&gt;" %></h3>\n      <%= user.email() %>\n      <% if (user.email() != current_user.email) { %>\n        <div class = "controls" style = "float:right">\n          <a id = "delete_<%= user.cid %>" class = "delete" href = "#">Delete</a>\n        </div>\n      <% } else { %>\n        <br/><br/>This is you. You can\'t delete yourself. If you need to cancel your subscription, you can do it in the <a href = "/users/edit">Settings</a>.\n      <% } %>\n      <% if (user.is_invited()) { %>\n        <br/><br/>Invitation sent, waiting for the user to set password.\n      <% } %>\n    </div>\n  <% }); %>\n</div>');
       $("#" + this.id).replaceWith(this.el);
       this.users = users;
       this.render();

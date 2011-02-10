@@ -14,6 +14,8 @@ class User < ActiveRecord::Base
   # Setup accessible (or protected) attributes for your model
   attr_accessible :email, :password, :password_confirmation, :remember_me, :name
 
+  JSON_FIELDS = [:id, :name, :email, :invitation_token]
+
   def active?
     # Comment out the below debug statement to view the properties of the returned self model values.
     # logger.debug self.to_yaml
