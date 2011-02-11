@@ -62,7 +62,7 @@ class Entry < ActiveRecord::Base
     user_ids = account.users.select("id").order("id")
     counts = entries.monthly_counts
 
-    counts.group_by {|row|
+    res = counts.group_by {|row|
 
       [row.month, row.year]
 
@@ -72,6 +72,9 @@ class Entry < ActiveRecord::Base
       [Date.new(date.last.to_i, date.first.to_i, 1).end_of_month] + user_counts + [counts.inject(0) { |sum, count| sum += count[:count].to_i; sum }]
 
     }
+    # prepend an extra batch of zero counts before the first month; this is to make the chart look nicer
+    res.insert(0, [(res[0].first - 1.month).end_of_month] + Array.new(user_ids.size + 1, 0)) if counts.size > 0
+    res
   end
 
   def self.get_daily_counts(account, checklist_id)
@@ -81,16 +84,19 @@ class Entry < ActiveRecord::Base
     user_ids = account.users.select("id").order("id")
     counts = entries.daily_counts
 
-    counts.group_by { |row|
+    res = counts.group_by { |row|
 
       row.date
 
     }.map { |date, counts|
 
       user_counts = get_user_counts(counts, user_ids)
-      [date] + user_counts + [counts.inject(0) { |sum, count| sum += count[:count].to_i; sum }]
+      [Date.parse(date)] + user_counts + [counts.inject(0) { |sum, count| sum += count[:count].to_i; sum }]
 
     }
+    # prepend an extra batch of zero counts before the first day; this is to make the chart look nicer
+    res.insert(0, [(res[0].first - 1.day)] + Array.new(user_ids.size + 1, 0)) if counts.size > 0
+    res
   end
 
   # produces an array of counts for each user id, inserting zero if there is no count present in input counts
