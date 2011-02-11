@@ -34,9 +34,23 @@ class EntriesController < ApplicationController
 
   def counts
     checklist_id = params[:checklist_id] ? params[:checklist_id].to_i : 0
-    grouping = params[:totals] == "daily" ? :daily : :monthly
+    grouping = case params[:totals]
+                when "daily"
+                  :daily
+                when "weekly"
+                  :weekly
+                else
+                  :monthly
+               end
 
-    counts = grouping == :monthly ? Entry.get_monthly_counts(current_account, checklist_id) : Entry.get_daily_counts(current_account, checklist_id)
+    counts = case grouping
+              when :daily
+                Entry.get_daily_counts(current_account, checklist_id)
+              when :weekly
+                Entry.get_weekly_counts(current_account, checklist_id)
+              when :monthly
+                Entry.get_monthly_counts(current_account, checklist_id)
+             end
 
     logger.info "COUNTS: ", counts.inspect
     user_ids = current_account.users.select("id").order("id")

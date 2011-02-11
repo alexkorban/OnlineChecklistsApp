@@ -265,6 +265,7 @@ class root.ChartView extends Backbone.View
           <option value = "weekly">Weekly</option>
           <option value = "monthly">Monthly</option>
         </select>
+        <span class = "daily">(daily counts are shown for the last month only)</span>
       </div>
       <div style = "text-align: top; margin-top: 20px">
         <div id = "timeline_chart" style='width: 700px; height: 400px; display: inline-block'></div>
@@ -334,7 +335,9 @@ class root.ChartView extends Backbone.View
   on_change_filter: (e) ->
     #@user_id = $(e.target).val() if e.target.id is "users"
     @checklist_id = $(e.target).val() if e.target.id is "checklists"
-    @totals = $(e.target).val() if e.target.id is "totals"
+    if e.target.id is "totals"
+      @totals = $(e.target).val()
+      @$(".daily").toggle(@totals == "daily")
     window.location.hash = @link()
     e.preventDefault()
 
