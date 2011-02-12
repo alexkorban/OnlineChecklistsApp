@@ -40,7 +40,7 @@ class AppController extends Backbone.Controller
     "timeline": "timeline"
     "timeline/:week_offset/u:user_id/c:checklist_id": "timeline"
     "charts": "charts"
-    "charts/u:user_ids/c:checklist_id/t:totals": "charts"
+    "charts/u:user_ids/c:checklist_id/g:group_by": "charts"
 
   constructor: ->
     super
@@ -82,10 +82,10 @@ class AppController extends Backbone.Controller
     @view = new TimelineView({week_offset: week_offset, users: Users, checklists: Checklists, user_id: user_id, checklist_id: checklist_id})
 
 
-  charts: (user_ids, checklist_id, totals)->
+  charts: (user_ids, checklist_id, group_by)->
     checklist_id = Checklists.at(0).id if !checklist_id?
-    totals = "daily" if !totals?
-    @view = new ChartView({user_ids: user_ids, checklist_id: checklist_id, totals: totals, users: Users, checklists: Checklists})
+    group_by = "day" if !group_by?
+    @view = new ChartView({user_ids: user_ids, checklist_id: checklist_id, group_by: group_by, users: Users, checklists: Checklists})
 
 
 #

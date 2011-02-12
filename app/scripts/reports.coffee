@@ -246,12 +246,12 @@ class root.ChartView extends Backbone.View
     @checklists = args.checklists
     @users = args.users
     @checklist_id = args.checklist_id
-    @totals = args.totals
+    @group_by = args.group_by
     @all = "- All -"
 
     @checklist_dropdown = new ChecklistDropdown({id: "checklists", checklists: @checklists})
     @checklist_id = @checklists.at(0).id if !@checklist_id?
-    @totals = @totals.at(0).id if !@totals?
+    @group_by = "day" if !@group_by?
 
     $("#" + @id).replaceWith(@el)
 
@@ -259,13 +259,13 @@ class root.ChartView extends Backbone.View
       <div class = "report_controls">
         Checklist:
         <select id = "checklists"></select>
-        Totals:
-        <select id = "totals" class = "filter">
-          <option value = "daily">Daily</option>
-          <option value = "weekly">Weekly</option>
-          <option value = "monthly">Monthly</option>
+        <span style = "padding-left: 40px">Totals:</span>
+        <select id = "group_by" class = "filter">
+          <option value = "day">Daily</option>
+          <option value = "week">Weekly</option>
+          <option value = "month">Monthly</option>
         </select>
-        <span class = "daily">(daily counts are shown for the last month only)</span>
+        <span class = "daily">(daily counts are only available for the last 30 days)</span>
       </div>
       <div style = "text-align: top; margin-top: 20px">
         <div id = "timeline_chart" style='width: 700px; height: 400px; display: inline-block'></div>
@@ -317,27 +317,28 @@ class root.ChartView extends Backbone.View
     else
       @$("#timeline_chart").html("<b>No data available</b>")
     @$("#checklists").val(@checklist_id)
-    @$("#totals").val(@totals)
+    @$("#group_by").val(@group_by)
+    @$(".daily").hide() if @group_by != "day"
 
 
   link: ->
     link = "charts"
     link += "/u0"
     link += "/c#{@checklist_id}"
-    link += "/t#{@totals}"
+    link += "/g#{@group_by}"
     link
 
 
   counts_url: ->
-    "/entries/counts?checklist_id=#{@checklist_id}&totals=#{@totals}"
+    "/entries/counts?checklist_id=#{@checklist_id}&group_by=#{@group_by}"
 
 
   on_change_filter: (e) ->
     #@user_id = $(e.target).val() if e.target.id is "users"
     @checklist_id = $(e.target).val() if e.target.id is "checklists"
-    if e.target.id is "totals"
-      @totals = $(e.target).val()
-      @$(".daily").toggle(@totals == "daily")
+    if e.target.id is "group_by"
+      @group_by = $(e.target).val()
+
     window.location.hash = @link()
     e.preventDefault()
 

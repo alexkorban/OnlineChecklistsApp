@@ -4,24 +4,12 @@ class Entry < ActiveRecord::Base
   scope :for_user, lambda { |user_id| where("user_id = ?", user_id) }
   scope :within_one_year, lambda { |today| where("created_at > ?", today - 1.year)}
   scope :within_one_month, lambda { |today| where("created_at > ?", today - 1.month) }
-#  scope :monthly_counts, :select => "count(id), extract(month from date_trunc('month', created_at)) as month,
-#         extract(year from date_trunc('month', created_at)) as year, user_id",  :group => "date_trunc('month', created_at), user_id",
-#        :order => "date_trunc('month', created_at), user_id"
 
-  scope :monthly_counts, :select => "count(id), date_trunc('month', created_at) as date, user_id",
-        :group => "date_trunc('month', created_at), user_id",
-        :order => "date_trunc('month', created_at), user_id"
-
-  scope :daily_counts, :select => "count(id), date_trunc('day', created_at) as date, user_id",
-        :group => "date_trunc('day', created_at), user_id",
-        :order => "date_trunc('day', created_at), user_id"
-
-  scope :weekly_counts, :select => "count(id), date_trunc('week', created_at) as date, user_id",
-        :group => "date_trunc('week', created_at), user_id",
-        :order => "date_trunc('week', created_at), user_id"
-
-#  select extract(month from date_trunc('month', created_at)),
-#         extract(year from date_trunc('month', created_at)), count(*) from entries group by date_trunc('month', created_at);
+  def self.grouped_counts(group_by)
+    select("count(id), date_trunc('#{group_by}', created_at) as date, user_id").
+      group("date_trunc('#{group_by}', created_at), user_id").
+      order("date_trunc('#{group_by}', created_at), user_id")
+  end
 
   belongs_to :checklist
   belongs_to :user
@@ -64,69 +52,25 @@ class Entry < ActiveRecord::Base
     }
   end
 
-  def self.get_monthly_counts(account, checklist_id)
-    entries = account.entries.within_one_year(Date.today)
+  def self.get_counts(account, checklist_id, group_by)
+    entries = account.entries.send(group_by == :day ? :within_one_month : :within_one_year, Date.today)
     entries = entries.for_checklist(checklist_id) if checklist_id > 0
 
     user_ids = account.users.select("id").order("id")
-    counts = entries.monthly_counts
+    counts = entries.grouped_counts(group_by.to_s)
 
-    res = counts.group_by {|row|
+    res = counts.group_by { |row|
 
       row.date
 
-    }.map {|date, counts|
+    }.map { |date, counts|
 
       user_counts = get_user_counts(counts, user_ids)
-      [Date.parse(date).end_of_month] + user_counts + [counts.inject(0) { |sum, count| sum += count[:count].to_i; sum }]
+      [get_end_of_period(group_by, Date.parse(date))] + user_counts + [counts.inject(0) { |sum, count| sum += count[:count].to_i; sum }]
 
     }
     # prepend an extra batch of zero counts before the first month; this is to make the chart look nicer
-    res.insert(0, [(res[0].first - 1.month).end_of_month] + Array.new(user_ids.size + 1, 0)) if counts.size > 0
-    res
-  end
-
-  def self.get_weekly_counts(account, checklist_id)
-    entries = account.entries.within_one_year(Date.today)
-    entries = entries.for_checklist(checklist_id) if checklist_id > 0
-
-    user_ids = account.users.select("id").order("id")
-    counts = entries.weekly_counts
-
-    res = counts.group_by { |row|
-
-      row.date
-
-    }.map { |date, counts|
-
-      user_counts = get_user_counts(counts, user_ids)
-      [Date.parse(date).end_of_week] + user_counts + [counts.inject(0) { |sum, count| sum += count[:count].to_i; sum }]
-
-    }
-    # prepend an extra batch of zero counts before the first week; this is to make the chart look nicer
-    res.insert(0, [(res[0].first - 1.week).end_of_week] + Array.new(user_ids.size + 1, 0)) if counts.size > 0
-    res
-  end
-
-  def self.get_daily_counts(account, checklist_id)
-    entries = account.entries.within_one_month(Date.today)
-    entries = entries.for_checklist(checklist_id) if checklist_id > 0
-
-    user_ids = account.users.select("id").order("id")
-    counts = entries.daily_counts
-
-    res = counts.group_by { |row|
-
-      row.date
-
-    }.map { |date, counts|
-
-      user_counts = get_user_counts(counts, user_ids)
-      [Date.parse(date)] + user_counts + [counts.inject(0) { |sum, count| sum += count[:count].to_i; sum }]
-
-    }
-    # prepend an extra batch of zero counts before the first day; this is to make the chart look nicer
-    res.insert(0, [(res[0].first - 1.day)] + Array.new(user_ids.size + 1, 0)) if counts.size > 0
+    res.insert(0, [get_end_of_period(group_by, res[0].first - 1.send(group_by))] + Array.new(user_ids.size + 1, 0)) if counts.size > 0
     res
   end
 
@@ -137,5 +81,13 @@ class Entry < ActiveRecord::Base
     user_ids.map {|u|
       counts_by_user_id.include?(u.id) ? counts_by_user_id[u.id].to_i : 0
     }
+  end
+
+  def self.get_end_of_period(group_by, date)
+    case group_by
+      when :day then date
+      when :week then date.end_of_week
+      when :month then date.end_of_month
+    end
   end
 end
