@@ -14,7 +14,7 @@ class EntriesController < ApplicationController
     from = d.beginning_of_week
     to = d.end_of_week
 
-    entries = current_account.entries.between_dates(from, to).includes(:checklist)#.order("created_at")
+    entries = current_account.entries.between_dates(from, to).includes(:checklist).order("created_at")
 
     checklist_id = params[:checklist_id] ? params[:checklist_id].to_i : 0
     entries = entries.for_checklist(checklist_id) if checklist_id > 0

@@ -109,7 +109,7 @@ class root.ChecklistListView extends Backbone.View
       </ul>
       <div style = "margin-top: 40px">
         <a class = "button" href = "#create">Create new list</a>
-        <a class = "button" href = "#reports">View reports</a>
+        <a class = "button" href = "#timeline">View reports</a>
         <% if (current_user.role == "admin") { %> <a class = "button" href = "#users">Invite users</a> <% } %>
       </div>
       ''')

@@ -5,30 +5,6 @@ class Report extends Backbone.Model
     super
 
 
-class root.ReportPageView extends Backbone.View
-  id: "content"
-  tagName: "div"
-
-
-  constructor: ->
-    super
-
-    $("#" + @id).replaceWith(@el)
-
-    @template = _.template('''
-      <ul>
-        <li><a href = "#timeline">Timeline</a></li>
-        <li><a href = "#charts">Charts</a></li>
-      </ul>
-    ''')
-
-    @render()
-
-
-  render: ->
-    $(@el).html(@template())
-    $("#heading").html("Reports")
-
 class ChecklistDropdown extends Backbone.View
   tagName: "select"
 
@@ -76,13 +52,13 @@ class root.TimelineView extends Backbone.View
     @template = _.template('''
       <div class = "report_controls">
         <div class = "prev_week">
-          <img src = "/images/left_32.png" />
+          <a href = "#<%= prev_week_link %>" style = "border: none"><img src = "/images/left_32.png" /></a>
           <a href = "#<%= prev_week_link %>">Prev week</a>
         </div>
         <% if (next_week_link != null) { %>
           <div class = "next_week">
             <a href = "#<%= next_week_link %>">Next week</a>
-            <img src = "/images/right_32.png" />
+            <a href = "#<%= next_week_link %>" style = "border: none"><img src = "/images/right_32.png" /></a>
           </div>
         <% } %>
         <div style = "display: inline-block; padding-right: 50px">
@@ -96,9 +72,10 @@ class root.TimelineView extends Backbone.View
         </div>
         Checklist:
         <select id = "checklists"></select>
+        <a class = "button" style = "margin-left: 40px" href = "#charts">Chart view</a>
       </div>
-      <% _.each(entries_by_day, function(entries, day) { %>
-        <h2><%= day %></h2>
+      <% _.each(entries_by_day, function(day_entry) { %>
+        <h2><%= day_entry[0] %></h2>
         <table class = "timeline_entries">
           <tr>
             <th>Checklist</th>
@@ -107,7 +84,7 @@ class root.TimelineView extends Backbone.View
             <th>Completed for</th>
           </tr>
 
-          <% _.each(entries, function(entry) { %>
+          <% _.each(day_entry[1], function(entry) { %>
             <tr>
               <td class = "first"><%= entry.checklist_name %></td>
               <td><%= entry.user_name %></td>
@@ -264,17 +241,22 @@ class root.ChartView extends Backbone.View
           <option value = "week">Weekly</option>
           <option value = "month">Monthly</option>
         </select>
-        <span class = "daily">(daily counts are only available for the last 30 days)</span>
+        <a class = "button" style = "margin-left: 40px" href = "#timeline">Timeline view</a>
       </div>
-      <div style = "text-align: top; margin-top: 20px">
-        <div id = "timeline_chart" style='width: 700px; height: 400px; display: inline-block'></div>
-        <div id = "user_list" style  = "display: inline-block; min-height: 400px">
-          <input type = "checkbox" class = "user_checkbox" value = "0" id = "checkbox_0" checked = "checked" /><label for="checkbox_0"><%= all %></label><br/>
-          <% _.each(users.models, function(user) { %>
-            <input type = "checkbox" class = "user_checkbox" id = "checkbox_<%= user.id %>" value = "<%= user.id %>" /><label for="checkbox_<%= user.id %>"><%= user.name() %></label><br/>
-          <% }); %>
-        </div>
-      </div>
+      <div class = "daily" style = "padding-top: 20px">Note: daily counts are only available for the last 30 days</divS>
+      <table style = "margin-top: 20px">
+        <tr>
+          <td>
+            <div id = "timeline_chart" style='width: 700px; height: 400px; display: inline-block'></div>
+          </td>
+          <td style = "padding-left: 20px; vertical-align: top">
+            <input type = "checkbox" class = "user_checkbox" value = "0" id = "checkbox_0" checked = "checked" /><label for="checkbox_0">All users</label><br/>
+            <% _.each(users.models, function(user) { %>
+              <input type = "checkbox" class = "user_checkbox" id = "checkbox_<%= user.id %>" value = "<%= user.id %>" /><label for="checkbox_<%= user.id %>"><%= user.name() %></label><br/>
+            <% }); %>
+          </td>
+        </tr>
+      </table>
     ''')
 
     $.getJSON @counts_url(), (data, textStatus, xhr) =>

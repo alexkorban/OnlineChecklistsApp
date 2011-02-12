@@ -16,22 +16,6 @@
     }
     return Report;
   })();
-  root.ReportPageView = (function() {
-    __extends(ReportPageView, Backbone.View);
-    ReportPageView.prototype.id = "content";
-    ReportPageView.prototype.tagName = "div";
-    function ReportPageView() {
-      ReportPageView.__super__.constructor.apply(this, arguments);
-      $("#" + this.id).replaceWith(this.el);
-      this.template = _.template('<ul>\n  <li><a href = "#timeline">Timeline</a></li>\n  <li><a href = "#charts">Charts</a></li>\n</ul>');
-      this.render();
-    }
-    ReportPageView.prototype.render = function() {
-      $(this.el).html(this.template());
-      return $("#heading").html("Reports");
-    };
-    return ReportPageView;
-  })();
   ChecklistDropdown = (function() {
     __extends(ChecklistDropdown, Backbone.View);
     ChecklistDropdown.prototype.tagName = "select";
@@ -66,7 +50,7 @@
       this.checklist_id = args.checklist_id != null ? args.checklist_id : 0;
       this.all = "- All -";
       $("#" + this.id).replaceWith(this.el);
-      this.template = _.template('<div class = "report_controls">\n  <div class = "prev_week">\n    <img src = "/images/left_32.png" />\n    <a href = "#<%= prev_week_link %>">Prev week</a>\n  </div>\n  <% if (next_week_link != null) { %>\n    <div class = "next_week">\n      <a href = "#<%= next_week_link %>">Next week</a>\n      <img src = "/images/right_32.png" />\n    </div>\n  <% } %>\n  <div style = "display: inline-block; padding-right: 50px">\n    User:\n    <select id = "users" class = "filter">\n      <option value = "0"><%= all %></option>\n      <% users.each(function(user) { %>\n        <option value = "<%= user.id %>"><%= user.name() == null || user.name().length == 0 ? user.email() : user.name() %></option>\n      <% }); %>\n    </select>\n  </div>\n  Checklist:\n  <select id = "checklists"></select>\n</div>\n<% _.each(entries_by_day, function(entries, day) { %>\n  <h2><%= day %></h2>\n  <table class = "timeline_entries">\n    <tr>\n      <th>Checklist</th>\n      <th>User</th>\n      <th>Completed at</th>\n      <th>Completed for</th>\n    </tr>\n\n    <% _.each(entries, function(entry) { %>\n      <tr>\n        <td class = "first"><%= entry.checklist_name %></td>\n        <td><%= entry.user_name %></td>\n        <td><%= entry.display_time %></td>\n        <td><%= entry.for %></td>\n      </tr>\n    <% }); %>\n  </table>\n<% }); %>');
+      this.template = _.template('<div class = "report_controls">\n  <div class = "prev_week">\n    <a href = "#<%= prev_week_link %>" style = "border: none"><img src = "/images/left_32.png" /></a>\n    <a href = "#<%= prev_week_link %>">Prev week</a>\n  </div>\n  <% if (next_week_link != null) { %>\n    <div class = "next_week">\n      <a href = "#<%= next_week_link %>">Next week</a>\n      <a href = "#<%= next_week_link %>" style = "border: none"><img src = "/images/right_32.png" /></a>\n    </div>\n  <% } %>\n  <div style = "display: inline-block; padding-right: 50px">\n    User:\n    <select id = "users" class = "filter">\n      <option value = "0"><%= all %></option>\n      <% users.each(function(user) { %>\n        <option value = "<%= user.id %>"><%= user.name() == null || user.name().length == 0 ? user.email() : user.name() %></option>\n      <% }); %>\n    </select>\n  </div>\n  Checklist:\n  <select id = "checklists"></select>\n  <a class = "button" style = "margin-left: 40px" href = "#charts">Chart view</a>\n</div>\n<% _.each(entries_by_day, function(day_entry) { %>\n  <h2><%= day_entry[0] %></h2>\n  <table class = "timeline_entries">\n    <tr>\n      <th>Checklist</th>\n      <th>User</th>\n      <th>Completed at</th>\n      <th>Completed for</th>\n    </tr>\n\n    <% _.each(day_entry[1], function(entry) { %>\n      <tr>\n        <td class = "first"><%= entry.checklist_name %></td>\n        <td><%= entry.user_name %></td>\n        <td><%= entry.display_time %></td>\n        <td><%= entry.for %></td>\n      </tr>\n    <% }); %>\n  </table>\n<% }); %>');
       this.checklist_dropdown = new ChecklistDropdown({
         id: "checklists",
         checklists: this.checklists,
@@ -229,7 +213,7 @@
         this.group_by = "day";
       }
       $("#" + this.id).replaceWith(this.el);
-      this.template = _.template('<div class = "report_controls">\n  Checklist:\n  <select id = "checklists"></select>\n  <span style = "padding-left: 40px">Totals:</span>\n  <select id = "group_by" class = "filter">\n    <option value = "day">Daily</option>\n    <option value = "week">Weekly</option>\n    <option value = "month">Monthly</option>\n  </select>\n  <span class = "daily">(daily counts are only available for the last 30 days)</span>\n</div>\n<div style = "text-align: top; margin-top: 20px">\n  <div id = "timeline_chart" style=\'width: 700px; height: 400px; display: inline-block\'></div>\n  <div id = "user_list" style  = "display: inline-block; min-height: 400px">\n    <input type = "checkbox" class = "user_checkbox" value = "0" id = "checkbox_0" checked = "checked" /><label for="checkbox_0"><%= all %></label><br/>\n    <% _.each(users.models, function(user) { %>\n      <input type = "checkbox" class = "user_checkbox" id = "checkbox_<%= user.id %>" value = "<%= user.id %>" /><label for="checkbox_<%= user.id %>"><%= user.name() %></label><br/>\n    <% }); %>\n  </div>\n</div>');
+      this.template = _.template('<div class = "report_controls">\n  Checklist:\n  <select id = "checklists"></select>\n  <span style = "padding-left: 40px">Totals:</span>\n  <select id = "group_by" class = "filter">\n    <option value = "day">Daily</option>\n    <option value = "week">Weekly</option>\n    <option value = "month">Monthly</option>\n  </select>\n  <a class = "button" style = "margin-left: 40px" href = "#timeline">Timeline view</a>\n</div>\n<div class = "daily" style = "padding-top: 20px">Note: daily counts are only available for the last 30 days</divS>\n<table style = "margin-top: 20px">\n  <tr>\n    <td>\n      <div id = "timeline_chart" style=\'width: 700px; height: 400px; display: inline-block\'></div>\n    </td>\n    <td style = "padding-left: 20px; vertical-align: top">\n      <input type = "checkbox" class = "user_checkbox" value = "0" id = "checkbox_0" checked = "checked" /><label for="checkbox_0">All users</label><br/>\n      <% _.each(users.models, function(user) { %>\n        <input type = "checkbox" class = "user_checkbox" id = "checkbox_<%= user.id %>" value = "<%= user.id %>" /><label for="checkbox_<%= user.id %>"><%= user.name() %></label><br/>\n      <% }); %>\n    </td>\n  </tr>\n</table>');
       $.getJSON(this.counts_url(), __bind(function(data, textStatus, xhr) {
         var item, _i, _len, _ref;
         this.counts = data.counts;

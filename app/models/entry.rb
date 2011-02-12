@@ -38,17 +38,21 @@ class Entry < ActiveRecord::Base
 
       entry.created_at.to_date
 
-    }.inject({}) {|hash, entries_for_date|
+    }.inject([]) {|res, entries_for_date|
 
       logger.info "Entries for date"
       logger.info entries_for_date.inspect
 
       # Format keys (which are dates) for display, and filter out unnecessary attributes from the entries
       # the result is still a hash of entry arrays with formatted dates as keys
-      hash[entries_for_date.first.strftime("%A, %d %b %Y")] = entries_for_date.last.map { |e|
+      res.push([entries_for_date.first, entries_for_date.last.map { |e|
         {for: e.for, checklist_name: e.checklist_name, user_name: e.user_name, display_time: e.display_time}
-      }; hash
+      }]); res
 
+    }.sort {|a, b|
+      a.first <=> b.first
+    }.each {|entry|
+      entry[0] = entry[0].strftime("%A, %d %b %Y")
     }
   end
 

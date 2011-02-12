@@ -39,7 +39,6 @@
       "checklists/:cid": "show",
       "create": "create",
       "users": "users",
-      "reports": "reports",
       "timeline": "timeline",
       "timeline/:week_offset/u:user_id/c:checklist_id": "timeline",
       "charts": "charts",
@@ -80,9 +79,6 @@
       return this.view = new UserPageView({
         users: Users
       });
-    };
-    AppController.prototype.reports = function() {
-      return this.view = new ReportPageView;
     };
     AppController.prototype.timeline = function(week_offset, user_id, checklist_id) {
       return this.view = new TimelineView({
