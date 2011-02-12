@@ -235,7 +235,6 @@ class root.ChartView extends Backbone.View
   id: "content"
   events: {
     "change .filter": "on_change_filter"
-    "change .month" : "on_change_month"
     "change .user_checkbox" : "on_change_user_checkbox"
   }
 
@@ -276,17 +275,6 @@ class root.ChartView extends Backbone.View
           <% }); %>
         </div>
       </div>
-      <div id = "pie_chart">
-        <select class = "month">
-          <% months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]; %>
-          <% _.each(counts, function(count, index) { %>
-            <option value = "<%= index %>"
-              <% if (index == counts.length - 1) { %> selected = "selected" <% } %> >
-              <%= months[count[0].getMonth()] + ' ' + String(count[0].getYear() + 1900) %></option>
-          <% }); %>
-        </select>
-        <div id = "_pie_chart"></div>
-      </div>
     ''')
 
     $.getJSON @counts_url(), (data, textStatus, xhr) =>
@@ -299,7 +287,6 @@ class root.ChartView extends Backbone.View
         @user_ids = data.user_ids
 
         @timeline_chart = new TimelineChart({counts: @counts, users: @users, user_ids: @user_ids})
-        @pie_chart = new PieChart({users: @users, user_ids: @user_ids, counts: @counts[@counts.length - 1]})
 
       @render()
 
@@ -313,7 +300,6 @@ class root.ChartView extends Backbone.View
     @checklist_dropdown.render()
     if @counts.length > 0
       @timeline_chart.render()
-      @pie_chart.render()
     else
       @$("#timeline_chart").html("<b>No data available</b>")
     @$("#checklists").val(@checklist_id)
@@ -341,10 +327,6 @@ class root.ChartView extends Backbone.View
 
     window.location.hash = @link()
     e.preventDefault()
-
-  on_change_month: (e) ->
-    @pie_chart.counts = @counts[Number($(e.target).val())]
-    @pie_chart.render()
 
 
   on_change_user_checkbox: (e) ->

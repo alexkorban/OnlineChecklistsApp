@@ -208,7 +208,6 @@
     ChartView.prototype.id = "content";
     ChartView.prototype.events = {
       "change .filter": "on_change_filter",
-      "change .month": "on_change_month",
       "change .user_checkbox": "on_change_user_checkbox"
     };
     function ChartView(args) {
@@ -230,7 +229,7 @@
         this.group_by = "day";
       }
       $("#" + this.id).replaceWith(this.el);
-      this.template = _.template('<div class = "report_controls">\n  Checklist:\n  <select id = "checklists"></select>\n  <span style = "padding-left: 40px">Totals:</span>\n  <select id = "group_by" class = "filter">\n    <option value = "day">Daily</option>\n    <option value = "week">Weekly</option>\n    <option value = "month">Monthly</option>\n  </select>\n  <span class = "daily">(daily counts are only available for the last 30 days)</span>\n</div>\n<div style = "text-align: top; margin-top: 20px">\n  <div id = "timeline_chart" style=\'width: 700px; height: 400px; display: inline-block\'></div>\n  <div id = "user_list" style  = "display: inline-block; min-height: 400px">\n    <input type = "checkbox" class = "user_checkbox" value = "0" id = "checkbox_0" checked = "checked" /><label for="checkbox_0"><%= all %></label><br/>\n    <% _.each(users.models, function(user) { %>\n      <input type = "checkbox" class = "user_checkbox" id = "checkbox_<%= user.id %>" value = "<%= user.id %>" /><label for="checkbox_<%= user.id %>"><%= user.name() %></label><br/>\n    <% }); %>\n  </div>\n</div>\n<div id = "pie_chart">\n  <select class = "month">\n    <% months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]; %>\n    <% _.each(counts, function(count, index) { %>\n      <option value = "<%= index %>"\n        <% if (index == counts.length - 1) { %> selected = "selected" <% } %> >\n        <%= months[count[0].getMonth()] + \' \' + String(count[0].getYear() + 1900) %></option>\n    <% }); %>\n  </select>\n  <div id = "_pie_chart"></div>\n</div>');
+      this.template = _.template('<div class = "report_controls">\n  Checklist:\n  <select id = "checklists"></select>\n  <span style = "padding-left: 40px">Totals:</span>\n  <select id = "group_by" class = "filter">\n    <option value = "day">Daily</option>\n    <option value = "week">Weekly</option>\n    <option value = "month">Monthly</option>\n  </select>\n  <span class = "daily">(daily counts are only available for the last 30 days)</span>\n</div>\n<div style = "text-align: top; margin-top: 20px">\n  <div id = "timeline_chart" style=\'width: 700px; height: 400px; display: inline-block\'></div>\n  <div id = "user_list" style  = "display: inline-block; min-height: 400px">\n    <input type = "checkbox" class = "user_checkbox" value = "0" id = "checkbox_0" checked = "checked" /><label for="checkbox_0"><%= all %></label><br/>\n    <% _.each(users.models, function(user) { %>\n      <input type = "checkbox" class = "user_checkbox" id = "checkbox_<%= user.id %>" value = "<%= user.id %>" /><label for="checkbox_<%= user.id %>"><%= user.name() %></label><br/>\n    <% }); %>\n  </div>\n</div>');
       $.getJSON(this.counts_url(), __bind(function(data, textStatus, xhr) {
         var item, _i, _len, _ref;
         this.counts = data.counts;
@@ -245,11 +244,6 @@
             counts: this.counts,
             users: this.users,
             user_ids: this.user_ids
-          });
-          this.pie_chart = new PieChart({
-            users: this.users,
-            user_ids: this.user_ids,
-            counts: this.counts[this.counts.length - 1]
           });
         }
         return this.render();
@@ -266,7 +260,6 @@
       this.checklist_dropdown.render();
       if (this.counts.length > 0) {
         this.timeline_chart.render();
-        this.pie_chart.render();
       } else {
         this.$("#timeline_chart").html("<b>No data available</b>");
       }
@@ -296,10 +289,6 @@
       }
       window.location.hash = this.link();
       return e.preventDefault();
-    };
-    ChartView.prototype.on_change_month = function(e) {
-      this.pie_chart.counts = this.counts[Number($(e.target).val())];
-      return this.pie_chart.render();
     };
     ChartView.prototype.on_change_user_checkbox = function(e) {
       var index;
