@@ -183,7 +183,8 @@ class TimelineChart extends Backbone.View
     @counts = args.counts
     @users = args.users
     @user_ids = args.user_ids
-    @first_render = true
+    @colors = args.colors
+    @first_render = yes
 
     #$("#" + @id).replaceWith(@el)
 
@@ -195,15 +196,20 @@ class TimelineChart extends Backbone.View
       data = new google.visualization.DataTable()
       data.addColumn('date', 'Date')
       for id in @user_ids
-        data.addColumn('number', if id is 0 then "Total" else @users.get(id).name())
+        data.addColumn('number', if id is 0 then "All users" else @users.get(id).name())
       data.addRows(@counts)
 
       @chart = new google.visualization.AnnotatedTimeLine(document.getElementById(@id));
-      @chart.draw(data, {displayAnnotations: false});
+      @chart.draw(data, {
+        displayAnnotations: no
+        colors: @colors
+        displayZoomButtons: no
+        thickness: 2
+        });
       if @first_render
         for i in [0...@user_ids.length - 1]
           @chart.hideDataColumns(i)
-        @first_render = false
+        @first_render = no
     })
 
 
@@ -214,6 +220,12 @@ class root.ChartView extends Backbone.View
     "change .filter": "on_change_filter"
     "change .user_checkbox" : "on_change_user_checkbox"
   }
+  colors: [
+    "#669999", "#99CC00", "#330000", "#FF9900", "#996666"
+    "#990033", "#003399", "#9999CC", "#FFCC66", "#666600"
+    "#9933CC", "#996633", "#666633", "#009900", "#33CC99",
+    "#0099CC", "#333399", "#CC99CC", "#000099", "#66CCFF",
+  ]
 
   constructor: (args) ->
     super
@@ -250,13 +262,21 @@ class root.ChartView extends Backbone.View
             <div id = "timeline_chart" style='width: 700px; height: 400px; display: inline-block'></div>
           </td>
           <td style = "padding-left: 20px; vertical-align: top">
-            <input type = "checkbox" class = "user_checkbox" value = "0" id = "checkbox_0" checked = "checked" /><label for="checkbox_0">All users</label><br/>
-            <% _.each(users.models, function(user) { %>
-              <input type = "checkbox" class = "user_checkbox" id = "checkbox_<%= user.id %>" value = "<%= user.id %>" /><label for="checkbox_<%= user.id %>"><%= user.name() %></label><br/>
+            <input type = "checkbox" class = "user_checkbox" value = "0" id = "checkbox_0" checked = "checked" />
+            <label for="checkbox_0" style = "color: <%= colors[_.lastIndexOf(user_ids, 0)] %>">All users</label><br/>
+            <% _.each(users.models, function(user, index) { %>
+              <input type = "checkbox" class = "user_checkbox" id = "checkbox_<%= user.id %>" value = "<%= user.id %>" />
+              <label for="checkbox_<%= user.id %>" style = "color: <%= colors[_.lastIndexOf(user_ids, user.id)] %>"><%= user.name() %></label><br/>
             <% }); %>
           </td>
         </tr>
       </table>
+      <table>
+      <tr>
+      <% _.each(colors, function(color) { %>
+        <td style = "background-color: <%= color %>">&nbsp;</td>
+      <% }); %>
+      </tr></table>
     ''')
 
     $.getJSON @counts_url(), (data, textStatus, xhr) =>
@@ -268,7 +288,7 @@ class root.ChartView extends Backbone.View
 
         @user_ids = data.user_ids
 
-        @timeline_chart = new TimelineChart({counts: @counts, users: @users, user_ids: @user_ids})
+        @timeline_chart = new TimelineChart({counts: @counts, users: @users, user_ids: @user_ids, colors: @colors})
 
       @render()
 
@@ -277,7 +297,7 @@ class root.ChartView extends Backbone.View
 
 
   render: ->
-    $(@el).html(@template({checklists: @checklists, users: @users, counts: @counts, all: @all}))
+    $(@el).html(@template({checklists: @checklists, users: @users, user_ids: @user_ids, counts: @counts, all: @all, colors: @colors}))
     $("#heading").html("Reports &gt; Charts")
     @checklist_dropdown.render()
     if @counts.length > 0

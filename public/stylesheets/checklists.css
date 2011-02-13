@@ -85,12 +85,14 @@ a {
   #content .report_controls .prev_week {
     float: left; }
     #content .report_controls .prev_week img {
+      border: none;
       vertical-align: middle;
       padding-right: 5px; }
   #content .report_controls .next_week {
     float: right;
     margin-right: 20px; }
     #content .report_controls .next_week img {
+      border: none;
       vertical-align: middle;
       padding-left: 5px; }
 #content ul.checklists {

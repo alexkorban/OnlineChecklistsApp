@@ -156,6 +156,7 @@
       this.counts = args.counts;
       this.users = args.users;
       this.user_ids = args.user_ids;
+      this.colors = args.colors;
       this.first_render = true;
     }
     TimelineChart.prototype.render = function() {
@@ -168,12 +169,15 @@
           _ref = this.user_ids;
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             id = _ref[_i];
-            data.addColumn('number', id === 0 ? "Total" : this.users.get(id).name());
+            data.addColumn('number', id === 0 ? "All users" : this.users.get(id).name());
           }
           data.addRows(this.counts);
           this.chart = new google.visualization.AnnotatedTimeLine(document.getElementById(this.id));
           this.chart.draw(data, {
-            displayAnnotations: false
+            displayAnnotations: false,
+            colors: this.colors,
+            displayZoomButtons: false,
+            thickness: 2
           });
           if (this.first_render) {
             for (i = 0, _ref2 = this.user_ids.length - 1; (0 <= _ref2 ? i < _ref2 : i > _ref2); (0 <= _ref2 ? i += 1 : i -= 1)) {
@@ -194,6 +198,7 @@
       "change .filter": "on_change_filter",
       "change .user_checkbox": "on_change_user_checkbox"
     };
+    ChartView.prototype.colors = ["#669999", "#99CC00", "#330000", "#FF9900", "#996666", "#990033", "#003399", "#9999CC", "#FFCC66", "#666600", "#9933CC", "#996633", "#666633", "#009900", "#33CC99", "#0099CC", "#333399", "#CC99CC", "#000099", "#66CCFF"];
     function ChartView(args) {
       ChartView.__super__.constructor.apply(this, arguments);
       this.users = args.users;
@@ -213,7 +218,7 @@
         this.group_by = "day";
       }
       $("#" + this.id).replaceWith(this.el);
-      this.template = _.template('<div class = "report_controls">\n  Checklist:\n  <select id = "checklists"></select>\n  <span style = "padding-left: 40px">Totals:</span>\n  <select id = "group_by" class = "filter">\n    <option value = "day">Daily</option>\n    <option value = "week">Weekly</option>\n    <option value = "month">Monthly</option>\n  </select>\n  <a class = "button" style = "margin-left: 40px" href = "#timeline">Timeline view</a>\n</div>\n<div class = "daily" style = "padding-top: 20px">Note: daily counts are only available for the last 30 days</divS>\n<table style = "margin-top: 20px">\n  <tr>\n    <td>\n      <div id = "timeline_chart" style=\'width: 700px; height: 400px; display: inline-block\'></div>\n    </td>\n    <td style = "padding-left: 20px; vertical-align: top">\n      <input type = "checkbox" class = "user_checkbox" value = "0" id = "checkbox_0" checked = "checked" /><label for="checkbox_0">All users</label><br/>\n      <% _.each(users.models, function(user) { %>\n        <input type = "checkbox" class = "user_checkbox" id = "checkbox_<%= user.id %>" value = "<%= user.id %>" /><label for="checkbox_<%= user.id %>"><%= user.name() %></label><br/>\n      <% }); %>\n    </td>\n  </tr>\n</table>');
+      this.template = _.template('<div class = "report_controls">\n  Checklist:\n  <select id = "checklists"></select>\n  <span style = "padding-left: 40px">Totals:</span>\n  <select id = "group_by" class = "filter">\n    <option value = "day">Daily</option>\n    <option value = "week">Weekly</option>\n    <option value = "month">Monthly</option>\n  </select>\n  <a class = "button" style = "margin-left: 40px" href = "#timeline">Timeline view</a>\n</div>\n<div class = "daily" style = "padding-top: 20px">Note: daily counts are only available for the last 30 days</divS>\n<table style = "margin-top: 20px">\n  <tr>\n    <td>\n      <div id = "timeline_chart" style=\'width: 700px; height: 400px; display: inline-block\'></div>\n    </td>\n    <td style = "padding-left: 20px; vertical-align: top">\n      <input type = "checkbox" class = "user_checkbox" value = "0" id = "checkbox_0" checked = "checked" />\n      <label for="checkbox_0" style = "color: <%= colors[_.lastIndexOf(user_ids, 0)] %>">All users</label><br/>\n      <% _.each(users.models, function(user, index) { %>\n        <input type = "checkbox" class = "user_checkbox" id = "checkbox_<%= user.id %>" value = "<%= user.id %>" />\n        <label for="checkbox_<%= user.id %>" style = "color: <%= colors[_.lastIndexOf(user_ids, user.id)] %>"><%= user.name() %></label><br/>\n      <% }); %>\n    </td>\n  </tr>\n</table>\n<table>\n<tr>\n<% _.each(colors, function(color) { %>\n  <td style = "background-color: <%= color %>">&nbsp;</td>\n<% }); %>\n</tr></table>');
       $.getJSON(this.counts_url(), __bind(function(data, textStatus, xhr) {
         var item, _i, _len, _ref;
         this.counts = data.counts;
@@ -227,7 +232,8 @@
           this.timeline_chart = new TimelineChart({
             counts: this.counts,
             users: this.users,
-            user_ids: this.user_ids
+            user_ids: this.user_ids,
+            colors: this.colors
           });
         }
         return this.render();
@@ -237,8 +243,10 @@
       $(this.el).html(this.template({
         checklists: this.checklists,
         users: this.users,
+        user_ids: this.user_ids,
         counts: this.counts,
-        all: this.all
+        all: this.all,
+        colors: this.colors
       }));
       $("#heading").html("Reports &gt; Charts");
       this.checklist_dropdown.render();
