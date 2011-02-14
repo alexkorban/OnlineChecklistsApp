@@ -234,6 +234,11 @@ class root.ChecklistView extends Backbone.View
 
   on_click_item: (e) ->
     @$(e.target).toggleClass("checked")
+    if @$(".checklist_item").not(".checked").length == 0
+      @$("#completion_warning").show()
+    else
+      @$("#completion_warning").hide()
+
 
 
   on_keydown: (e) ->

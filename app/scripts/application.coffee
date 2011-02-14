@@ -91,35 +91,39 @@ $(document).ready ->
   window.app = new AppController()
   Backbone.history.start()
   $("body").keydown (e) ->
-    console.log e.keyCode
-    if e.keyCode == 13
-      if e.target.name == "for" # Enter pressed on the For text field
-        $(".checklist_item").not(".checked").first().toggleClass("selected")
-        $(e.target).blur()
-        e.preventDefault();
-      else      # Enter pressed somewhere else
-        if $("#completion_warning").is(":visible")
-          $(".complete").click()
-          return
+    if e.keyCode != 13   # something other than Enter pressed
+      return
+      # 38 is up, 40 is down
 
-        last_selected = $(".checklist_item.selected").last()
-        console.log "last_selected: ", last_selected
-        next = if last_selected.length > 0 then last_selected.next(".checklist_item") else $(".checklist_item:first")
-        console.log "next: ", next
-        last_selected.addClass("checked").removeClass("selected")
-        if next.length > 0    # we aren't on the last item
-          next.addClass("selected")
-          $("body").focus()
-          e.preventDefault()
-        else                  # we are on the last item
-          if $(".checklist_item").not(".checked").length == 0   # everything is checked
-            $("#completion_warning").show()
-            $("#incomplete_warning").hide()
-            e.preventDefault()
+    if $("#completion_warning").is(":visible")
+      # we can only get here if all items were complete at one point, so attempt to submit
+      # note that some items could have been subsequently unchecked with the mouse, so the submission may still fail
+      $(".complete").click()
+      return
 
-        # 38 is up, 40 is down
+    if e.target.name == "for" # Enter pressed on the For text field
+      $(".checklist_item").not(".checked").first().toggleClass("selected")
+      $(e.target).blur()
+      e.preventDefault();
+      return
 
-    # if we're in 'for', then select the first item
-    # if we've got a selected item, then toggle its checked class and move to the next item
+    # If we end up here, Enter was pressed somewhere other than the For text field
+
+    last_selected = $(".checklist_item.selected")
+
+    # next item to select (depending on whether something is already selected)
+    next = if last_selected.length > 0 then last_selected.next(".checklist_item").not(".checked") else $(".checklist_item").not(".checked").first()
+
+    last_selected.addClass("checked").removeClass("selected")
+    if next.length > 0    # we aren't on the last item
+      next.addClass("selected")
+      $("body").focus()
+      e.preventDefault()
+    else                  # we are on the last item
+      if $(".checklist_item").not(".checked").length == 0   # everything is checked
+        $("#completion_warning").show()
+        $("#incomplete_warning").hide()
+        e.preventDefault()
+
 
 

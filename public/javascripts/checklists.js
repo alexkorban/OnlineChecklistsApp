@@ -185,7 +185,12 @@
       return window.location.hash = "checklists";
     };
     ChecklistView.prototype.on_click_item = function(e) {
-      return this.$(e.target).toggleClass("checked");
+      this.$(e.target).toggleClass("checked");
+      if (this.$(".checklist_item").not(".checked").length === 0) {
+        return this.$("#completion_warning").show();
+      } else {
+        return this.$("#completion_warning").hide();
+      }
     };
     ChecklistView.prototype.on_keydown = function(e) {
       return console.log(e.keyCode);
