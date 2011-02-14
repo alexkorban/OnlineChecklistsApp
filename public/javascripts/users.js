@@ -78,6 +78,9 @@
     InvitationSet.prototype.remove = function(item) {
       return this.items.remove(item);
     };
+    InvitationSet.prototype.length = function() {
+      return this.items.length;
+    };
     return InvitationSet;
   })();
   root.UserListView = (function() {
@@ -94,7 +97,6 @@
       this.template = _.template('<h2>Existing users</h2>\n<div class = "users" style = "width: 60%">\n  <% users.each(function(user) { %>\n    <div class = "user">\n      <h3><%= user.name() ? user.name() : "&lt;no name&gt;" %></h3>\n      <%= user.email() %>\n      <% if (user.email() != current_user.email) { %>\n        <div class = "controls" style = "float:right">\n          <a id = "delete_<%= user.cid %>" class = "delete" href = "#">Delete</a>\n        </div>\n      <% } else { %>\n        <br/><br/>This is you. You can\'t delete yourself. If you need to cancel your subscription, you can do it in the <a href = "/users/edit">Settings</a>.\n      <% } %>\n      <% if (user.is_invited()) { %>\n        <br/><br/>Invitation sent, waiting for the user to set password.\n      <% } %>\n    </div>\n  <% }); %>\n</div>');
       $("#" + this.id).replaceWith(this.el);
       this.users = users;
-      this.render();
     }
     UserListView.prototype.render = function() {
       $(this.el).html(this.template({
@@ -171,19 +173,22 @@
     };
     function InvitationView(users) {
       this.remove_item = __bind(this.remove_item, this);;
-      this.add_item = __bind(this.add_item, this);;      InvitationView.__super__.constructor.apply(this, arguments);
+      this.add_item = __bind(this.add_item, this);;      var message;
+      InvitationView.__super__.constructor.apply(this, arguments);
       this.users = users;
       $("#" + this.id).replaceWith(this.el);
-      this.template = _.template('<h2>Invite users</h2>\n<div id = "invitation_items" style = "margin-bottom: 20px"></div>\n\n<a class = "button add_item" href = "#">Add another invitation</a>\n<br/><br/><br/>\n<a class = "button save" href = "#">Send invitations</a>');
-      this.render();
+      message = "You've reached the limits of your plan with <%= window.Plan.users %> users.\n<a href = \"/users/edit#plan\">Please consider upgrading to a larger plan</a>.";
+      this.template = _.template("<h2>Invite users</h2>\n<% if (Users.length >= Plan.users) { %>\n  <div class = \"message\">" + message + "</div>\n<% } else { %>\n  <div id = \"invitation_items\" style = \"margin-bottom: 20px\"></div>\n  <div class = \"message\" style = \"margin-bottom: 20px; display: none\">\n    You cannot invite more than " + (Plan.users - Users.length) + " users on your current plan.<br/>\n    <a href = \"/users/edit#plan\">Please consider upgrading to a larger plan</a> if you need more users.\n  </div>\n\n  <a class = \"button add_item\" href = \"#\">Add another invitation</a>\n  <br/><br/><br/>\n  <a class = \"button save\" href = \"#\">Send invitations</a>\n<% } %>");
+    }
+    InvitationView.prototype.render = function() {
+      console.log("rendering invitation view");
+      $(this.el).html(this.template());
+      this.item_el = $("#invitation_items");
+      console.log("adding invitation set");
       this.invitations = new InvitationSet;
       this.invitations.bind("add", this.add_item);
       this.invitations.bind("remove", this.remove_item);
-      this.invitations.add(new Invitation);
-    }
-    InvitationView.prototype.render = function() {
-      $(this.el).html(this.template());
-      return this.item_el = $("#invitation_items");
+      return this.invitations.add(new Invitation);
     };
     InvitationView.prototype.add_item = function(item) {
       var view;
@@ -198,9 +203,14 @@
       return item.view.remove();
     };
     InvitationView.prototype.on_add_item = function(e) {
-      this.invitations.add();
-      e.preventDefault();
-      return e.stopPropagation();
+      console.log("Total: ", Users.length + this.invitations.length());
+      console.log("Plan: ", Plan.users);
+      if (Users.length + this.invitations.length() >= Plan.users) {
+        this.$(".message").show();
+      } else {
+        this.invitations.add();
+      }
+      return e.preventDefault();
     };
     InvitationView.prototype.on_save = function(e) {
       this.invitations.save({}, {
@@ -220,20 +230,21 @@
     UserPageView.prototype.tagName = "div";
     UserPageView.prototype.id = "content";
     function UserPageView(args) {
-      UserPageView.__super__.constructor.apply(this, arguments);
-      this.template = _.template('<div id = "invitations"></div>\n<div id = "user_list"></div>');
+      this.render = __bind(this.render, this);;      UserPageView.__super__.constructor.apply(this, arguments);
+      this.template = _.template('<div id = "invitations"></div>\n<div id = "user_list"></div>\n<a class = "back" href = "javascript: history.back(1)">Back</a>');
       $("#" + this.id).replaceWith(this.el);
-      this.render();
       this.users = args.users;
-      console.log(this.users);
-      this.user_list_view = new UserListView(this.users);
-      this.invitation_view = new InvitationView(this.users);
-      this.users.bind("refresh", this.user_list_view.render);
-      this.users.bind("remove", this.user_list_view.render);
+      this.users.bind("refresh", this.render);
+      this.users.bind("remove", this.render);
+      this.render();
     }
     UserPageView.prototype.render = function() {
       $(this.el).html(this.template());
-      return $("#heading").html("Users");
+      $("#heading").html("Users");
+      this.user_list_view = new UserListView(this.users);
+      this.invitation_view = new InvitationView(this.users);
+      this.user_list_view.render();
+      return this.invitation_view.render();
     };
     return UserPageView;
   })();

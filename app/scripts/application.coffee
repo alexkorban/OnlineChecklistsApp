@@ -90,5 +90,36 @@ class AppController extends Backbone.Controller
 $(document).ready ->
   window.app = new AppController()
   Backbone.history.start()
+  $("body").keydown (e) ->
+    console.log e.keyCode
+    if e.keyCode == 13
+      if e.target.name == "for" # Enter pressed on the For text field
+        $(".checklist_item").not(".checked").first().toggleClass("selected")
+        $(e.target).blur()
+        e.preventDefault();
+      else      # Enter pressed somewhere else
+        if $("#completion_warning").is(":visible")
+          $(".complete").click()
+          return
+
+        last_selected = $(".checklist_item.selected").last()
+        console.log "last_selected: ", last_selected
+        next = if last_selected.length > 0 then last_selected.next(".checklist_item") else $(".checklist_item:first")
+        console.log "next: ", next
+        last_selected.addClass("checked").removeClass("selected")
+        if next.length > 0    # we aren't on the last item
+          next.addClass("selected")
+          $("body").focus()
+          e.preventDefault()
+        else                  # we are on the last item
+          if $(".checklist_item").not(".checked").length == 0   # everything is checked
+            $("#completion_warning").show()
+            $("#incomplete_warning").hide()
+            e.preventDefault()
+
+        # 38 is up, 40 is down
+
+    # if we're in 'for', then select the first item
+    # if we've got a selected item, then toggle its checked class and move to the next item
 
 

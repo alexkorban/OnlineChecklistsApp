@@ -77,6 +77,7 @@
     ChecklistListView.prototype.tagName = "div";
     ChecklistListView.prototype.id = "content";
     ChecklistListView.prototype.events = {
+      "click .create": "on_create",
       "click .delete": "on_delete",
       "dblclick li": "on_doubleclick",
       "click .confirm_delete": "on_confirm_delete",
@@ -87,7 +88,7 @@
       Checklists.refresh(Checklists.select(function(model) {
         return model.id != null;
       }));
-      this.template = _.template('<% if (flash != null) { %>\n  <div id = \'flash\' class = \'notice\'><div><%= flash %></div></div>\n<% } %>\n<ul class = "checklists">\n<% checklists.each(function(checklist) { %>\n<li class = "checklist" id = "<%= checklist.cid %>"><%= checklist.name() %>\n  <span class = "controls">\n    <a href="#checklists/<%= checklist.cid %>">Fill out</a> |\n    <a class = "secondary" href = "#checklists/<%= checklist.cid %>/edit">Edit</a> |\n    <a class = "secondary delete" id = "delete_<%= checklist.cid %>" href = "#">Delete</a>\n  </span>\n</li>\n<% }); %>\n</ul>\n<div style = "margin-top: 40px">\n  <a class = "button" href = "#create">Create new list</a>\n  <a class = "button" href = "#timeline">View reports</a>\n  <% if (current_user.role == "admin") { %> <a class = "button" href = "#users">Invite users</a> <% } %>\n</div>');
+      this.template = _.template('<% if (flash != null) { %>\n  <div id = \'flash\' class = \'notice\'><div><%= flash %></div></div>\n<% } %>\n<ul class = "checklists">\n<% checklists.each(function(checklist) { %>\n<li class = "checklist" id = "<%= checklist.cid %>"><%= checklist.name() %>\n  <span class = "controls">\n    <a href="#checklists/<%= checklist.cid %>">Fill out</a> |\n    <a class = "secondary" href = "#checklists/<%= checklist.cid %>/edit">Edit</a> |\n    <a class = "secondary delete" id = "delete_<%= checklist.cid %>" href = "#">Delete</a>\n  </span>\n</li>\n<% }); %>\n</ul>\n<div class = "message" style = "display: none">\n  You\'ve reached the limit of your plan with <%= window.Plan.checklists %> checklists.\n  <% if (current_user.role == "admin") { %>\n    <a href = "/users/edit#plan">Please consider upgrading to a larger plan</a>.\n  <% } else { %>\n    Please ask the administrator of your account to upgrade to a larger plan.\n  <% } %>\n</div>\n<div style = "margin-top: 40px">\n  <a class = "create button" href = "#">Create new list</a>\n  <a class = "button" href = "#timeline">View reports</a>\n  <% if (current_user.role == "admin") { %> <a class = "button" href = "#users">Invite users</a> <% } %>\n</div>');
       $("#" + this.id).replaceWith(this.el);
       this.render();
     }
@@ -98,6 +99,14 @@
       }));
       $("#heading").html("Checklists");
       return this.controls_contents = {};
+    };
+    ChecklistListView.prototype.on_create = function(e) {
+      if (Checklists.length >= window.Plan.checklists) {
+        this.$(".message").show();
+      } else {
+        window.location.hash = "create";
+      }
+      return e.preventDefault();
     };
     ChecklistListView.prototype.on_doubleclick = function(e) {
       return window.location.hash = "#checklists/" + e.target.id;
@@ -138,11 +147,13 @@
     ChecklistView.prototype.tagName = "div";
     ChecklistView.prototype.id = "content";
     ChecklistView.prototype.events = {
-      "click .complete": "on_complete"
+      "click .complete": "on_complete",
+      "click .checklist_item": "on_click_item",
+      "focus input": "on_focus_input"
     };
     function ChecklistView() {
       ChecklistView.__super__.constructor.apply(this, arguments);
-      this.template = _.template('For: <input name = "for" type = "text" />\n<ul>\n<% items.each(function(item) { %>\n<li><%= item.content() %></li>\n<% }); %>\n</ul>\n<a href = "#checklists" class = "button complete">Complete!</a>\n<span style = "margin-left: 20px; margin-right: 10px">or</span>  <a href = "#checklists">Cancel</a>');
+      this.template = _.template('For: <input name = "for" type = "text" />\n<ul style = "margin-bottom: 40px; margin-top: 40px">\n<% items.each(function(item) { %>\n<li class = "checklist_item"><%= item.content() %><span class = "instructions">(press Enter to mark as done)</li>\n<% }); %>\n</ul>\n<div class = "message" id = "incomplete_warning" style = "display: none; margin-bottom: 20px">Please complete and check off all the items in the checklist first.</div>\n<div class = "message" id = "completion_warning" style = "display: none; margin-bottom: 20px">Press Enter to submit the checklist.</div>\n<button class = "complete">Complete!</button>\n<span style = "margin-left: 20px; margin-right: 10px">or</span>  <a href = "#checklists">Cancel</a>');
       $("#" + this.id).replaceWith(this.el);
       this.model.items.fetch({
         success: __bind(function() {
@@ -154,16 +165,33 @@
       $(this.el).html(this.template({
         items: this.model.items
       }));
-      return $("#heading").html(this.model.name());
+      $("#heading").html(this.model.name());
+      return this.$("input[name='for']").focus();
     };
     ChecklistView.prototype.on_complete = function(e) {
       var entry;
+      if (this.$(".checklist_item").not(".checked").length > 0) {
+        this.$("#incomplete_warning").show();
+        this.$("#completion_warning").hide();
+        e.preventDefault();
+        return;
+      }
       entry = new Entry({
         checklist_id: this.model.id,
         "for": this.$("input[name=for]").val()
       });
       entry.save();
-      return window.app.flash = "Completed checklist: " + (this.model.name());
+      window.app.flash = "Completed checklist: " + (this.model.name());
+      return window.location.hash = "checklists";
+    };
+    ChecklistView.prototype.on_click_item = function(e) {
+      return this.$(e.target).toggleClass("checked");
+    };
+    ChecklistView.prototype.on_keydown = function(e) {
+      return console.log(e.keyCode);
+    };
+    ChecklistView.prototype.on_focus_input = function(e) {
+      return this.$(".checklist_item").removeClass("selected");
     };
     return ChecklistView;
   })();

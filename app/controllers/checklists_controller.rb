@@ -4,7 +4,8 @@ class ChecklistsController < ApplicationController
   # - returns a list of checklists in response to a JSON request
   def index
     @checklists = current_account.checklists.order("name")
-    @users = current_account.users.order("name")
+    @users = current_account.users.active.order("name")
+    @plan = get_plan
 
     respond_to { |format|
       format.json { render :json => @checklists }
@@ -20,13 +21,20 @@ class ChecklistsController < ApplicationController
   end
 
   def create
-    checklist = current_account.checklists.create(:name => params[:name])
-    params[:items].each { |item|
-      checklist.items.create :content => item[:content]
-    }
+    errors = []
+    checklist = nil
+    if current_account.checklists.count >= get_plan[:checklists] # make sure the number of checklists doesn't exceed plan limits
+      errors << "Plan limit exceeded for checklists"
+    else
+      checklist = current_account.checklists.create(:name => params[:name])
+      params[:items].each { |item|
+        checklist.items.create :content => item[:content]
+      }
+      errors << checklist.errors if !checklist.errors.empty?
+    end
 
     respond_to { |format|
-      format.json { render :json => checklist, :status => :ok }
+      format.json { checklist ? render(:json => checklist, :status => :ok) : render(:json => {errors: errors.flatten}, :status => :not_acceptable) }
     }
   end
 

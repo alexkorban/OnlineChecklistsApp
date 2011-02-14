@@ -108,6 +108,38 @@
   })();
   $(document).ready(function() {
     window.app = new AppController();
-    return Backbone.history.start();
+    Backbone.history.start();
+    return $("body").keydown(function(e) {
+      var last_selected, next;
+      console.log(e.keyCode);
+      if (e.keyCode === 13) {
+        if (e.target.name === "for") {
+          $(".checklist_item").not(".checked").first().toggleClass("selected");
+          $(e.target).blur();
+          return e.preventDefault();
+        } else {
+          if ($("#completion_warning").is(":visible")) {
+            $(".complete").click();
+            return;
+          }
+          last_selected = $(".checklist_item.selected").last();
+          console.log("last_selected: ", last_selected);
+          next = last_selected.length > 0 ? last_selected.next(".checklist_item") : $(".checklist_item:first");
+          console.log("next: ", next);
+          last_selected.addClass("checked").removeClass("selected");
+          if (next.length > 0) {
+            next.addClass("selected");
+            $("body").focus();
+            return e.preventDefault();
+          } else {
+            if ($(".checklist_item").not(".checked").length === 0) {
+              $("#completion_warning").show();
+              $("#incomplete_warning").hide();
+              return e.preventDefault();
+            }
+          }
+        }
+      }
+    });
   });
 }).call(this);

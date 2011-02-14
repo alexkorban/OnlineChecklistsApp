@@ -27,7 +27,20 @@
     = f.password_field :current_password
   %p= f.submit "Update"
 - if current_user.role == "admin"
-  %h3 Cancel subscription
+  %h2#plan Plan and billing
+  %b Plan:
+  #{@plan[:name]}
+  %br
+  #{@plan[:users]} users
+  %br
+  #{@plan[:checklists]} checklists
+  %br
+  %br
+  %a(href = "#" class = "button") Change plan
+  %br
+  %br
+
+  %h2 Cancel subscription
   %p
     If you require your data, please get in touch with us at
     %a(href = "mailto:support@onlinechecklists.com") support@onlinechecklists.com
@@ -38,5 +51,5 @@
       %input(type = "hidden" name = "_method" value = "delete")
       %input(type = "submit" value = "Cancel subscription")
 
-= link_to "Back to checklists", :back
+%a(href = "javascript: history.back(1)") Back
 

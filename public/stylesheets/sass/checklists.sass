@@ -127,6 +127,32 @@ a
         -moz-border-radius: 5px
         -webkit-border-radius: 5px
 
+  li.checklist_item
+    font-size: 20px
+    margin-bottom: 10px
+    width: 50%
+    list-style-image: url('/images/unchecked.png')
+    .instructions
+      float: right
+      color: #c0c0c0
+      display: none
+      font-size: 12px
+      line-height: 22px
+      padding-right: 10px
+    &.selected
+      border: 1px solid #92c5ef
+      background-color: #f7fdff
+      border-radius: 5px
+      padding: 10px
+      -moz-border-radius: 5px
+      -webkit-border-radius: 5px
+      .instructions
+        display: inline
+
+
+    &.checked
+      list-style-image: url('/images/checked.png')
+
   div.users
     padding-bottom: 50px
     div.user
@@ -192,6 +218,10 @@ a
     -moz-border-radius: 4px
     -webkit-border-radius: 4px
     padding: 10px
+
+.message
+  color: #da9201
+  font-weight: bold
 
 .center
   text-align: center

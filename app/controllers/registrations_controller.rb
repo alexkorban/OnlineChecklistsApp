@@ -2,7 +2,7 @@ class RegistrationsController < Devise::RegistrationsController
   layout :registrations_layout
 
   def index
-    @users = current_account.users.order("name")
+    @users = current_account.users.active.order("name")
 
     respond_to { |format|
       format.json { render :json => @users.to_json(:only => User::JSON_FIELDS), :status => :ok}
@@ -66,6 +66,11 @@ class RegistrationsController < Devise::RegistrationsController
       flash.now[:plan] = params[resource_name][:plan]
       render_with_scope :new
     end
+  end
+
+  def edit
+    @plan = get_plan
+    super
   end
 
   protected

@@ -23,6 +23,10 @@ class User < ActiveRecord::Base
     super && active && account.active
   end
 
+  def self.active
+    where active: true
+  end
+
   def safe_name
     name.nil? || name.empty? ? email : name
   end

@@ -1,6 +1,6 @@
 :javascript
   this.Users.refresh(#{@users.to_json(:only => User::JSON_FIELDS)});
   this.Checklists.refresh(#{@checklists.to_json});
-
+  this.Plan = #{@plan.to_json};
 #content
 

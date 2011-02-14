@@ -80,6 +80,7 @@ class root.ChecklistListView extends Backbone.View
   id: "content"
 
   events: {
+    "click .create": "on_create"
     "click .delete": "on_delete"
     "dblclick li": "on_doubleclick"
     "click .confirm_delete": "on_confirm_delete"
@@ -107,8 +108,16 @@ class root.ChecklistListView extends Backbone.View
       </li>
       <% }); %>
       </ul>
+      <div class = "message" style = "display: none">
+        You've reached the limit of your plan with <%= window.Plan.checklists %> checklists.
+        <% if (current_user.role == "admin") { %>
+          <a href = "/users/edit#plan">Please consider upgrading to a larger plan</a>.
+        <% } else { %>
+          Please ask the administrator of your account to upgrade to a larger plan.
+        <% } %>
+      </div>
       <div style = "margin-top: 40px">
-        <a class = "button" href = "#create">Create new list</a>
+        <a class = "create button" href = "#">Create new list</a>
         <a class = "button" href = "#timeline">View reports</a>
         <% if (current_user.role == "admin") { %> <a class = "button" href = "#users">Invite users</a> <% } %>
       </div>
@@ -125,6 +134,13 @@ class root.ChecklistListView extends Backbone.View
     @controls_contents = {}
     #$(".delete").live("click", (e) => @on_delete(e))
 
+
+  on_create: (e) ->
+    if (Checklists.length >= window.Plan.checklists)
+      @$(".message").show()
+    else
+      window.location.hash = "create"
+    e.preventDefault()
 
   on_doubleclick: (e) ->
     window.location.hash = "#checklists/#{e.target.id}"
@@ -170,18 +186,24 @@ class root.ChecklistView extends Backbone.View
 
   events: {
     "click .complete": "on_complete"
+    "click .checklist_item": "on_click_item"
+    "focus input": "on_focus_input"
+    #"keydown input": "on_keydown"
+    #"keydown li": "on_keydown"
   }
   constructor: ->
     super
 
     @template = _.template('''
       For: <input name = "for" type = "text" />
-      <ul>
+      <ul style = "margin-bottom: 40px; margin-top: 40px">
       <% items.each(function(item) { %>
-      <li><%= item.content() %></li>
+      <li class = "checklist_item"><%= item.content() %><span class = "instructions">(press Enter to mark as done)</li>
       <% }); %>
       </ul>
-      <a href = "#checklists" class = "button complete">Complete!</a>
+      <div class = "message" id = "incomplete_warning" style = "display: none; margin-bottom: 20px">Please complete and check off all the items in the checklist first.</div>
+      <div class = "message" id = "completion_warning" style = "display: none; margin-bottom: 20px">Press Enter to submit the checklist.</div>
+      <button class = "complete">Complete!</button>
       <span style = "margin-left: 20px; margin-right: 10px">or</span>  <a href = "#checklists">Cancel</a>
       ''')
 
@@ -195,13 +217,31 @@ class root.ChecklistView extends Backbone.View
   render: ->
     $(@el).html(@template({items : @model.items}))
     $("#heading").html(@model.name())
+    @$("input[name='for']").focus()
 
 
   on_complete: (e) ->
+    if @$(".checklist_item").not(".checked").length > 0
+      @$("#incomplete_warning").show()
+      @$("#completion_warning").hide()
+      e.preventDefault()
+      return
     entry = new Entry({checklist_id: @model.id, for: @$("input[name=for]").val()})
     entry.save()
     window.app.flash = "Completed checklist: #{@model.name()}"
+    window.location.hash = "checklists"
 
+
+  on_click_item: (e) ->
+    @$(e.target).toggleClass("checked")
+
+
+  on_keydown: (e) ->
+    console.log e.keyCode
+
+
+  on_focus_input: (e) ->
+    @$(".checklist_item").removeClass("selected")
 
 class root.EditItemView extends Backbone.View
   model: Item

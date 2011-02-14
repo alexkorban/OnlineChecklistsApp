@@ -73,6 +73,10 @@ class InvitationSet extends Backbone.Model
     @items.remove(item)
 
 
+  length: ->
+    @items.length
+
+
 class root.UserListView extends Backbone.View
   id: "user_list"
   tagName: "div"
@@ -110,7 +114,6 @@ class root.UserListView extends Backbone.View
     $("#" + @id).replaceWith(@el)
 
     @users = users
-    @render()
 
 
   render: =>
@@ -196,26 +199,39 @@ class root.InvitationView extends Backbone.View
     @users = users
     $("#" + @id).replaceWith(@el)
 
-    @template = _.template('''
+    message = """
+          You've reached the limits of your plan with <%= window.Plan.users %> users.
+          <a href = "/users/edit#plan">Please consider upgrading to a larger plan</a>.
+        """
+
+    @template = _.template("""
       <h2>Invite users</h2>
-      <div id = "invitation_items" style = "margin-bottom: 20px"></div>
+      <% if (Users.length >= Plan.users) { %>
+        <div class = "message">#{message}</div>
+      <% } else { %>
+        <div id = "invitation_items" style = "margin-bottom: 20px"></div>
+        <div class = "message" style = "margin-bottom: 20px; display: none">
+          You cannot invite more than #{Plan.users - Users.length} users on your current plan.<br/>
+          <a href = "/users/edit#plan">Please consider upgrading to a larger plan</a> if you need more users.
+        </div>
 
-      <a class = "button add_item" href = "#">Add another invitation</a>
-      <br/><br/><br/>
-      <a class = "button save" href = "#">Send invitations</a>
-      ''')
+        <a class = "button add_item" href = "#">Add another invitation</a>
+        <br/><br/><br/>
+        <a class = "button save" href = "#">Send invitations</a>
+      <% } %>
+      """)
 
-    @render()
 
+
+  render: ->
+    console.log "rendering invitation view"
+    $(@el).html(@template())
+    @item_el = $("#invitation_items")
+    console.log "adding invitation set"
     @invitations = new InvitationSet
     @invitations.bind "add", @add_item
     @invitations.bind "remove", @remove_item
     @invitations.add(new Invitation)
-
-
-  render: ->
-    $(@el).html(@template())
-    @item_el = $("#invitation_items")
 
 
   add_item: (item) =>
@@ -229,9 +245,13 @@ class root.InvitationView extends Backbone.View
 
 
   on_add_item: (e) ->
-    @invitations.add()
+    console.log "Total: ", Users.length + @invitations.length()
+    console.log "Plan: ", Plan.users
+    if Users.length + @invitations.length() >= Plan.users
+      @$(".message").show()
+    else
+      @invitations.add()
     e.preventDefault()
-    e.stopPropagation()
 
 
   on_save: (e) ->
@@ -251,22 +271,25 @@ class root.InvitationView extends Backbone.View
 class root.UserPageView extends Backbone.View
   tagName: "div"
   id: "content"
+  #events: {"click .back": history.back(1)}
 
   constructor: (args) ->
     super
     @template = _.template('''
       <div id = "invitations"></div>
       <div id = "user_list"></div>
+      <a class = "back" href = "javascript: history.back(1)">Back</a>
       ''')
     $("#" + @id).replaceWith(@el)
-    @render()
     @users = args.users
-    console.log @users
-    @user_list_view = new UserListView(@users)
-    @invitation_view = new InvitationView(@users)
-    @users.bind("refresh", @user_list_view.render)
-    @users.bind("remove", @user_list_view.render)
+    @users.bind("refresh", @render)
+    @users.bind("remove", @render)
+    @render()
 
-  render: ->
+  render: =>
     $(@el).html(@template())
     $("#heading").html("Users")
+    @user_list_view = new UserListView(@users)
+    @invitation_view = new InvitationView(@users)
+    @user_list_view.render()
+    @invitation_view.render()
