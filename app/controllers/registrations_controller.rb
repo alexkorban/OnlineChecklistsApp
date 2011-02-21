@@ -76,7 +76,7 @@ class RegistrationsController < Devise::RegistrationsController
   protected
 
   def registrations_layout
-    ["edit", "update"].include?(action_name) ? "application" : nil
+    ["edit", "new"].include?(action_name) ? "application" : nil
   end
 
 end

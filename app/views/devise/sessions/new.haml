@@ -3,7 +3,10 @@
 
 .center
   = form_for(resource, :as => resource_name, :url => session_path(resource_name)) do |f|
-    = render_messages(:alert)
+    /= render_messages(:alert)
+    - if flash[:alert]
+      #flash(style = "margin-left: 0") #{flash[:alert]}
+
     = devise_error_messages!
     %div
       = f.label :email
