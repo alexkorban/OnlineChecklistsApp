@@ -13,8 +13,8 @@ development:
   encoding: unicode
   database: OnlineChecklistsApp_development
   pool: 5
-  username: discordia
-  password: discordia
+  username: alex
+  password: alex
 
   # Connect on a TCP socket. Omitted by default since the client uses a
   # domain socket that doesn't need configuration. Windows does not have
@@ -39,13 +39,13 @@ test:
   encoding: unicode
   database: OnlineChecklistsApp_test
   pool: 5
-  username: OnlineChecklistsApp
-  password:
+  username: alex
+  password: alex
 
 production:
   adapter: postgresql
   encoding: unicode
   database: OnlineChecklistsApp_production
   pool: 5
-  username: OnlineChecklistsApp
-  password:
+  username: alex
+  password: alex
