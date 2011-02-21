@@ -194,6 +194,7 @@ class root.ChecklistView extends Backbone.View
     "click .complete": "on_complete"
     "click .checklist_item": "on_click_item"
     "focus input": "on_focus_input"
+    "blur input": "on_blur_input"
     #"keydown input": "on_keydown"
     #"keydown li": "on_keydown"
   }
@@ -201,10 +202,13 @@ class root.ChecklistView extends Backbone.View
     super
 
     @template = _.template('''
-      For: <input name = "for" type = "text" />
+      <div class = "input_field">
+        For: <input name = "for" type = "text" />
+        <span class = "instructions">(press Enter to continue)</span>
+      </div>
       <ul style = "margin-bottom: 40px; margin-top: 40px">
       <% items.each(function(item) { %>
-      <li class = "checklist_item"><%= item.content() %><span class = "instructions">(press Enter to mark as done)</li>
+      <li class = "checklist_item"><%= item.content() %><span class = "instructions">(press Enter to mark as done)</span></li>
       <% }); %>
       </ul>
       <div class = "message" id = "incomplete_warning" style = "display: none; margin-bottom: 20px">Please complete and check off all the items in the checklist first.</div>
@@ -253,6 +257,12 @@ class root.ChecklistView extends Backbone.View
 
   on_focus_input: (e) ->
     @$(".checklist_item").removeClass("selected")
+    @$(".input_field .instructions").show()
+
+
+  on_blur_input: (e) ->
+    @$(".input_field .instructions").hide()
+
 
 class root.EditItemView extends Backbone.View
   model: Item

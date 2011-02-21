@@ -149,11 +149,12 @@
     ChecklistView.prototype.events = {
       "click .complete": "on_complete",
       "click .checklist_item": "on_click_item",
-      "focus input": "on_focus_input"
+      "focus input": "on_focus_input",
+      "blur input": "on_blur_input"
     };
     function ChecklistView() {
       ChecklistView.__super__.constructor.apply(this, arguments);
-      this.template = _.template('For: <input name = "for" type = "text" />\n<ul style = "margin-bottom: 40px; margin-top: 40px">\n<% items.each(function(item) { %>\n<li class = "checklist_item"><%= item.content() %><span class = "instructions">(press Enter to mark as done)</li>\n<% }); %>\n</ul>\n<div class = "message" id = "incomplete_warning" style = "display: none; margin-bottom: 20px">Please complete and check off all the items in the checklist first.</div>\n<div class = "message" id = "completion_warning" style = "display: none; margin-bottom: 20px">Press Enter to submit the checklist.</div>\n<button class = "complete">Complete!</button>\n<span style = "margin-left: 20px; margin-right: 10px">or</span>  <a href = "#checklists">Cancel</a>');
+      this.template = _.template('<div class = "input_field">\n  For: <input name = "for" type = "text" />\n  <span class = "instructions">(press Enter to continue)</span>\n</div>\n<ul style = "margin-bottom: 40px; margin-top: 40px">\n<% items.each(function(item) { %>\n<li class = "checklist_item"><%= item.content() %><span class = "instructions">(press Enter to mark as done)</span></li>\n<% }); %>\n</ul>\n<div class = "message" id = "incomplete_warning" style = "display: none; margin-bottom: 20px">Please complete and check off all the items in the checklist first.</div>\n<div class = "message" id = "completion_warning" style = "display: none; margin-bottom: 20px">Press Enter to submit the checklist.</div>\n<button class = "complete">Complete!</button>\n<span style = "margin-left: 20px; margin-right: 10px">or</span>  <a href = "#checklists">Cancel</a>');
       $("#" + this.id).replaceWith(this.el);
       this.model.items.fetch({
         success: __bind(function() {
@@ -196,7 +197,11 @@
       return console.log(e.keyCode);
     };
     ChecklistView.prototype.on_focus_input = function(e) {
-      return this.$(".checklist_item").removeClass("selected");
+      this.$(".checklist_item").removeClass("selected");
+      return this.$(".input_field .instructions").show();
+    };
+    ChecklistView.prototype.on_blur_input = function(e) {
+      return this.$(".input_field .instructions").hide();
     };
     return ChecklistView;
   })();
