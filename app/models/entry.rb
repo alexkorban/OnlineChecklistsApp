@@ -60,29 +60,30 @@ class Entry < ActiveRecord::Base
     entries = account.entries.send(group_by == :day ? :within_one_month : :within_one_year, Date.today)
     entries = entries.for_checklist(checklist_id) if checklist_id > 0
 
-    user_ids = account.users.select("id").order("id")
-    counts = entries.grouped_counts(group_by.to_s)
+    users = account.users.select("id, name, email").order("id")
+    db_counts = entries.grouped_counts(group_by.to_s)
 
-    res = counts.group_by { |row|
+    counts = db_counts.group_by { |row|
 
       row.date
 
     }.map { |date, counts|
 
-      user_counts = get_user_counts(counts, user_ids)
-      [get_end_of_period(group_by, Date.parse(date))] + user_counts + [counts.inject(0) { |sum, count| sum += count[:count].to_i; sum }]
+      user_counts = get_user_counts(counts, users)
+      [get_end_of_period(group_by, Date.parse(date))] + [counts.inject(0) { |sum, count| sum += count[:count].to_i; sum }] + user_counts
 
     }
     # prepend an extra batch of zero counts before the first month; this is to make the chart look nicer
-    res.insert(0, [get_end_of_period(group_by, res[0].first - 1.send(group_by))] + Array.new(user_ids.size + 1, 0)) if counts.size > 0
-    res
+    counts.insert(0, [get_end_of_period(group_by, counts[0].first - 1.send(group_by))] + Array.new(users.size + 1, 0)) if counts.size > 0
+
+    {users: [{id: 0, name: 'All users'}] + users.map { |u| {id: u.id, name: u.safe_name} }, counts: counts}
   end
 
   # produces an array of counts for each user id, inserting zero if there is no count present in input counts
   # users must be sorted by id
-  def self.get_user_counts(counts, user_ids)
+  def self.get_user_counts(counts, users)
     counts_by_user_id = counts.inject({}) {|hash, count| hash[count[:user_id]] = count[:count]; hash}
-    user_ids.map {|u|
+    users.map {|u|
       counts_by_user_id.include?(u.id) ? counts_by_user_id[u.id].to_i : 0
     }
   end

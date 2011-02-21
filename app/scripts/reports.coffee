@@ -50,50 +50,66 @@ class root.TimelineView extends Backbone.View
     $("#" + @id).replaceWith(@el)
 
     @template = _.template('''
-      <div class = "report_controls">
-        <div class = "prev_week">
-          <a href = "#<%= prev_week_link %>" style = "border: none"><img src = "/images/left_32.png" /></a>
-          <a href = "#<%= prev_week_link %>">Prev week</a>
-        </div>
-        <% if (next_week_link != null) { %>
-          <div class = "next_week">
-            <a href = "#<%= next_week_link %>">Next week</a>
-            <a href = "#<%= next_week_link %>" style = "border: none"><img src = "/images/right_32.png" /></a>
+      <% if (current_account.has_entries) { %>
+        <div class = "report_controls">
+          <div class = "prev_week">
+            <a href = "#<%= prev_week_link %>" style = "border: none"><img src = "/images/left_32.png" /></a>
+            <a href = "#<%= prev_week_link %>">Prev week</a>
           </div>
-        <% } %>
-        <div style = "display: inline-block; padding-right: 50px">
-          User:
-          <select id = "users" class = "filter">
-            <option value = "0"><%= all %></option>
-            <% users.each(function(user) { %>
-              <option value = "<%= user.id %>"><%= user.name() == null || user.name().length == 0 ? user.email() : user.name() %></option>
-            <% }); %>
-          </select>
+          <% if (next_week_link != null) { %>
+            <div class = "next_week">
+              <a href = "#<%= next_week_link %>">Next week</a>
+              <a href = "#<%= next_week_link %>" style = "border: none"><img src = "/images/right_32.png" /></a>
+            </div>
+          <% } %>
+          <div style = "display: inline-block; padding-right: 50px">
+            User:
+            <select id = "users" class = "filter">
+              <option value = "0"><%= all %></option>
+              <% users.each(function(user) { %>
+                <option value = "<%= user.id %>"><%= user.name() == null || user.name().length == 0 ? user.email() : user.name() %></option>
+              <% }); %>
+            </select>
+          </div>
+          Checklist:
+          <select id = "checklists"></select>
+          <a class = "button" style = "margin-left: 40px" href = "#charts">Chart view</a>
         </div>
-        Checklist:
-        <select id = "checklists"></select>
-        <a class = "button" style = "margin-left: 40px" href = "#charts">Chart view</a>
-      </div>
-      <% _.each(entries_by_day, function(day_entry) { %>
-        <h2><%= day_entry[0] %></h2>
-        <table class = "timeline_entries">
-          <tr>
-            <th>Checklist</th>
-            <th>User</th>
-            <th>Completed at</th>
-            <th>Completed for</th>
-          </tr>
-
-          <% _.each(day_entry[1], function(entry) { %>
+        <% if (entries_by_day.length == 0) { %>
+          <h2>No entries for this week</h2>
+        <% } %>
+        <% _.each(entries_by_day, function(day_entry) { %>
+          <h2><%= day_entry[0] %></h2>
+          <table class = "timeline_entries">
             <tr>
-              <td class = "first"><%= entry.checklist_name %></td>
-              <td><%= entry.user_name %></td>
-              <td><%= entry.display_time %></td>
-              <td><%= entry.for %></td>
+              <th>Checklist</th>
+              <th>User</th>
+              <th>Completed at</th>
+              <th>Completed for</th>
             </tr>
-          <% }); %>
-        </table>
-      <% }); %>
+
+            <% _.each(day_entry[1], function(entry) { %>
+              <tr>
+                <td class = "first"><%= entry.checklist_name %></td>
+                <td><%= entry.user_name %></td>
+                <td><%= entry.display_time %></td>
+                <td><%= entry.for %></td>
+              </tr>
+            <% }); %>
+          </table>
+        <% }); %>
+      <% } else { %>
+        You'll need to
+        <% if (checklists.length == 0) { %>
+          <a href = "#checklists">define some checklists</a> and get people to fill them out
+        <% } else { %>
+          define some checklists and <a href = "#checklists">get people to fill them out</a>
+        <% } %>
+        to get reports and charts like this:<br/><br/>
+        <img src = "/images/timeline-sample.png" /><br/>
+        <img src = "/images/chart-sample.png" /><br/>
+
+      <% } %>
     ''')
 
     @checklist_dropdown = new ChecklistDropdown({id: "checklists", checklists: @checklists, allow_all: yes})
@@ -155,10 +171,6 @@ class PieChart extends Backbone.View
     super
     @counts = args.counts
     @users = args.users
-    @user_ids = args.user_ids
-
-    #$("#" + @id).replaceWith(@el)
-
 
 
   render: =>
@@ -166,8 +178,8 @@ class PieChart extends Backbone.View
       data = new google.visualization.DataTable()
       data.addColumn('string', 'Task')
       data.addColumn('number', 'Hours per Day')
-      for i in [0...@user_ids.length - 1]
-        data.addRow([(if @user_ids[i] is 0 then "Total" else @users.get(@user_ids[i]).name()), @counts[i + 1]])
+      for i in [0...@users.length - 1]
+        data.addRow([(if @users[i][0] is 0 then "Total" else @users[i][1]), @counts[i + 1]])
       # Instantiate and draw our chart, passing in some options.
       @chart = new google.visualization.PieChart(document.getElementById('_' + @id))
       @chart.draw(data, {width: 400, height: 240, is3D: true, title: 'My Daily Activities'})
@@ -182,7 +194,6 @@ class TimelineChart extends Backbone.View
     super
     @counts = args.counts
     @users = args.users
-    @user_ids = args.user_ids
     @colors = args.colors
     @first_render = yes
 
@@ -195,8 +206,8 @@ class TimelineChart extends Backbone.View
     google.load('visualization', '1', {'packages':['annotatedtimeline'], callback: =>
       data = new google.visualization.DataTable()
       data.addColumn('date', 'Date')
-      for id in @user_ids
-        data.addColumn('number', if id is 0 then "All users" else @users.get(id).name())
+      for user in @users
+        data.addColumn('number', user.name)
       data.addRows(@counts)
 
       @chart = new google.visualization.AnnotatedTimeLine(document.getElementById(@id));
@@ -207,7 +218,7 @@ class TimelineChart extends Backbone.View
         thickness: 2
         });
       if @first_render
-        for i in [0...@user_ids.length - 1]
+        for i in [1...@users.length]    # the first data column (all users) is left visible
           @chart.hideDataColumns(i)
         @first_render = no
     })
@@ -232,7 +243,6 @@ class root.ChartView extends Backbone.View
 
     @users = args.users
     @checklists = args.checklists
-    @users = args.users
     @checklist_id = args.checklist_id
     @group_by = args.group_by
     @all = "- All -"
@@ -262,11 +272,13 @@ class root.ChartView extends Backbone.View
             <div id = "timeline_chart" style='width: 700px; height: 400px; display: inline-block'></div>
           </td>
           <td style = "padding-left: 20px; vertical-align: top">
-            <input type = "checkbox" class = "user_checkbox" value = "0" id = "checkbox_0" checked = "checked" />
-            <label for="checkbox_0" style = "color: <%= colors[_.lastIndexOf(user_ids, 0)] %>">All users</label><br/>
-            <% _.each(users.models, function(user, index) { %>
-              <input type = "checkbox" class = "user_checkbox" id = "checkbox_<%= user.id %>" value = "<%= user.id %>" />
-              <label for="checkbox_<%= user.id %>" style = "color: <%= colors[_.lastIndexOf(user_ids, user.id)] %>"><%= user.name() %></label><br/>
+            <% console.log("Users: ", users); %>
+            <% _.each(users, function(user, index) { %>
+              <% console.log("User: ", user); %>
+              <input type = "checkbox" class = "user_checkbox" id = "checkbox_<%= user.id %>" value = "<%= user.id %>"
+               <% if (user.id == 0) { %> checked = "checked" <% } %>
+              />
+              <label for="checkbox_<%= user.id %>" style = "color: <%= colors[_.lastIndexOf(users, user)] %>"><%= user.name %></label><br/>
             <% }); %>
           </td>
         </tr>
@@ -281,14 +293,13 @@ class root.ChartView extends Backbone.View
 
     $.getJSON @counts_url(), (data, textStatus, xhr) =>
       @counts = data.counts #@type_cast(data.counts)
+      @count_users = data.users
 
       if @counts.length > 0
         for item in @counts
           item[0] = new Date(item[0])
 
-        @user_ids = data.user_ids
-
-        @timeline_chart = new TimelineChart({counts: @counts, users: @users, user_ids: @user_ids, colors: @colors})
+        @timeline_chart = new TimelineChart({counts: @counts, users: @count_users, colors: @colors})
 
       @render()
 
@@ -297,7 +308,7 @@ class root.ChartView extends Backbone.View
 
 
   render: ->
-    $(@el).html(@template({checklists: @checklists, users: @users, user_ids: @user_ids, counts: @counts, all: @all, colors: @colors}))
+    $(@el).html(@template({checklists: @checklists, users: @count_users, counts: @counts, all: @all, colors: @colors}))
     $("#heading").html("Reports &gt; Charts")
     @checklist_dropdown.render()
     if @counts.length > 0
@@ -311,7 +322,6 @@ class root.ChartView extends Backbone.View
 
   link: ->
     link = "charts"
-    link += "/u0"
     link += "/c#{@checklist_id}"
     link += "/g#{@group_by}"
     link
@@ -332,9 +342,12 @@ class root.ChartView extends Backbone.View
 
 
   on_change_user_checkbox: (e) ->
-    index = _.lastIndexOf(@user_ids, Number($(e.target).val()))
-    if $(e.target).is(":checked")
-      @timeline_chart.chart.showDataColumns(index)
-    else
-      @timeline_chart.chart.hideDataColumns(index)
-#    for checkbox in @$(".user_checkbox:checked")
+    _.each @count_users, (user, index) =>
+      if user.id == Number($(e.target).val())
+        if $(e.target).is(":checked")
+          console.log "showing column", index
+          @timeline_chart.chart.showDataColumns(index)
+        else
+          console.log "hiding column", index
+          @timeline_chart.chart.hideDataColumns(index)
+

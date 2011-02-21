@@ -42,7 +42,7 @@
       "timeline": "timeline",
       "timeline/:week_offset/u:user_id/c:checklist_id": "timeline",
       "charts": "charts",
-      "charts/u:user_ids/c:checklist_id/g:group_by": "charts"
+      "charts/c:checklist_id/g:group_by": "charts"
     };
     function AppController() {
       AppController.__super__.constructor.apply(this, arguments);
@@ -89,7 +89,7 @@
         checklist_id: checklist_id
       });
     };
-    AppController.prototype.charts = function(user_ids, checklist_id, group_by) {
+    AppController.prototype.charts = function(checklist_id, group_by) {
       if (!(checklist_id != null)) {
         checklist_id = Checklists.at(0).id;
       }
@@ -97,7 +97,6 @@
         group_by = "day";
       }
       return this.view = new ChartView({
-        user_ids: user_ids,
         checklist_id: checklist_id,
         group_by: group_by,
         users: Users,

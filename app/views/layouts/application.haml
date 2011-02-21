@@ -19,6 +19,7 @@
 
     :javascript
       var current_user = #{current_user.to_json(:only => [:id, :name, :email, :role])};
+      var current_account = #{current_user.account.to_json(:only => [:created_at], :methods => [:has_entries])};
 
   %body
     #header

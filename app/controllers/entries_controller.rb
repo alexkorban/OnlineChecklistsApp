@@ -43,9 +43,8 @@ class EntriesController < ApplicationController
     counts = Entry.get_counts(current_account, checklist_id, group_by)
 
     logger.info "COUNTS: ", counts.inspect
-    user_ids = current_account.users.select("id").order("id")
     respond_to {|format|
-      format.json { render json: {user_ids: user_ids.map(&:id) + [0], counts: counts}, status: :ok }
+      format.json { render json: counts, status: :ok }
     }
   end
 end

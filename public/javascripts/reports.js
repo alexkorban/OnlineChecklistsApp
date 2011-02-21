@@ -50,7 +50,7 @@
       this.checklist_id = args.checklist_id != null ? args.checklist_id : 0;
       this.all = "- All -";
       $("#" + this.id).replaceWith(this.el);
-      this.template = _.template('<div class = "report_controls">\n  <div class = "prev_week">\n    <a href = "#<%= prev_week_link %>" style = "border: none"><img src = "/images/left_32.png" /></a>\n    <a href = "#<%= prev_week_link %>">Prev week</a>\n  </div>\n  <% if (next_week_link != null) { %>\n    <div class = "next_week">\n      <a href = "#<%= next_week_link %>">Next week</a>\n      <a href = "#<%= next_week_link %>" style = "border: none"><img src = "/images/right_32.png" /></a>\n    </div>\n  <% } %>\n  <div style = "display: inline-block; padding-right: 50px">\n    User:\n    <select id = "users" class = "filter">\n      <option value = "0"><%= all %></option>\n      <% users.each(function(user) { %>\n        <option value = "<%= user.id %>"><%= user.name() == null || user.name().length == 0 ? user.email() : user.name() %></option>\n      <% }); %>\n    </select>\n  </div>\n  Checklist:\n  <select id = "checklists"></select>\n  <a class = "button" style = "margin-left: 40px" href = "#charts">Chart view</a>\n</div>\n<% _.each(entries_by_day, function(day_entry) { %>\n  <h2><%= day_entry[0] %></h2>\n  <table class = "timeline_entries">\n    <tr>\n      <th>Checklist</th>\n      <th>User</th>\n      <th>Completed at</th>\n      <th>Completed for</th>\n    </tr>\n\n    <% _.each(day_entry[1], function(entry) { %>\n      <tr>\n        <td class = "first"><%= entry.checklist_name %></td>\n        <td><%= entry.user_name %></td>\n        <td><%= entry.display_time %></td>\n        <td><%= entry.for %></td>\n      </tr>\n    <% }); %>\n  </table>\n<% }); %>');
+      this.template = _.template('<% if (current_account.has_entries) { %>\n  <div class = "report_controls">\n    <div class = "prev_week">\n      <a href = "#<%= prev_week_link %>" style = "border: none"><img src = "/images/left_32.png" /></a>\n      <a href = "#<%= prev_week_link %>">Prev week</a>\n    </div>\n    <% if (next_week_link != null) { %>\n      <div class = "next_week">\n        <a href = "#<%= next_week_link %>">Next week</a>\n        <a href = "#<%= next_week_link %>" style = "border: none"><img src = "/images/right_32.png" /></a>\n      </div>\n    <% } %>\n    <div style = "display: inline-block; padding-right: 50px">\n      User:\n      <select id = "users" class = "filter">\n        <option value = "0"><%= all %></option>\n        <% users.each(function(user) { %>\n          <option value = "<%= user.id %>"><%= user.name() == null || user.name().length == 0 ? user.email() : user.name() %></option>\n        <% }); %>\n      </select>\n    </div>\n    Checklist:\n    <select id = "checklists"></select>\n    <a class = "button" style = "margin-left: 40px" href = "#charts">Chart view</a>\n  </div>\n  <% if (entries_by_day.length == 0) { %>\n    <h2>No entries for this week</h2>\n  <% } %>\n  <% _.each(entries_by_day, function(day_entry) { %>\n    <h2><%= day_entry[0] %></h2>\n    <table class = "timeline_entries">\n      <tr>\n        <th>Checklist</th>\n        <th>User</th>\n        <th>Completed at</th>\n        <th>Completed for</th>\n      </tr>\n\n      <% _.each(day_entry[1], function(entry) { %>\n        <tr>\n          <td class = "first"><%= entry.checklist_name %></td>\n          <td><%= entry.user_name %></td>\n          <td><%= entry.display_time %></td>\n          <td><%= entry.for %></td>\n        </tr>\n      <% }); %>\n    </table>\n  <% }); %>\n<% } else { %>\n  You\'ll need to\n  <% if (checklists.length == 0) { %>\n    <a href = "#checklists">define some checklists</a> and get people to fill them out\n  <% } else { %>\n    define some checklists and <a href = "#checklists">get people to fill them out</a>\n  <% } %>\n  to get reports and charts like this:<br/><br/>\n  <img src = "/images/timeline-sample.png" /><br/>\n  <img src = "/images/chart-sample.png" /><br/>\n\n<% } %>');
       this.checklist_dropdown = new ChecklistDropdown({
         id: "checklists",
         checklists: this.checklists,
@@ -122,7 +122,6 @@
       this.render = __bind(this.render, this);;      PieChart.__super__.constructor.apply(this, arguments);
       this.counts = args.counts;
       this.users = args.users;
-      this.user_ids = args.user_ids;
     }
     PieChart.prototype.render = function() {
       return google.load('visualization', '1', {
@@ -132,8 +131,8 @@
           data = new google.visualization.DataTable();
           data.addColumn('string', 'Task');
           data.addColumn('number', 'Hours per Day');
-          for (i = 0, _ref = this.user_ids.length - 1; (0 <= _ref ? i < _ref : i > _ref); (0 <= _ref ? i += 1 : i -= 1)) {
-            data.addRow([(this.user_ids[i] === 0 ? "Total" : this.users.get(this.user_ids[i]).name()), this.counts[i + 1]]);
+          for (i = 0, _ref = this.users.length - 1; (0 <= _ref ? i < _ref : i > _ref); (0 <= _ref ? i += 1 : i -= 1)) {
+            data.addRow([(this.users[i][0] === 0 ? "Total" : this.users[i][1]), this.counts[i + 1]]);
           }
           this.chart = new google.visualization.PieChart(document.getElementById('_' + this.id));
           return this.chart.draw(data, {
@@ -155,7 +154,6 @@
       this.render = __bind(this.render, this);;      TimelineChart.__super__.constructor.apply(this, arguments);
       this.counts = args.counts;
       this.users = args.users;
-      this.user_ids = args.user_ids;
       this.colors = args.colors;
       this.first_render = true;
     }
@@ -163,13 +161,13 @@
       return google.load('visualization', '1', {
         'packages': ['annotatedtimeline'],
         callback: __bind(function() {
-          var data, i, id, _i, _len, _ref, _ref2;
+          var data, i, user, _i, _len, _ref, _ref2;
           data = new google.visualization.DataTable();
           data.addColumn('date', 'Date');
-          _ref = this.user_ids;
+          _ref = this.users;
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            id = _ref[_i];
-            data.addColumn('number', id === 0 ? "All users" : this.users.get(id).name());
+            user = _ref[_i];
+            data.addColumn('number', user.name);
           }
           data.addRows(this.counts);
           this.chart = new google.visualization.AnnotatedTimeLine(document.getElementById(this.id));
@@ -180,7 +178,7 @@
             thickness: 2
           });
           if (this.first_render) {
-            for (i = 0, _ref2 = this.user_ids.length - 1; (0 <= _ref2 ? i < _ref2 : i > _ref2); (0 <= _ref2 ? i += 1 : i -= 1)) {
+            for (i = 1, _ref2 = this.users.length; (1 <= _ref2 ? i < _ref2 : i > _ref2); (1 <= _ref2 ? i += 1 : i -= 1)) {
               this.chart.hideDataColumns(i);
             }
             return this.first_render = false;
@@ -203,7 +201,6 @@
       ChartView.__super__.constructor.apply(this, arguments);
       this.users = args.users;
       this.checklists = args.checklists;
-      this.users = args.users;
       this.checklist_id = args.checklist_id;
       this.group_by = args.group_by;
       this.all = "- All -";
@@ -218,21 +215,20 @@
         this.group_by = "day";
       }
       $("#" + this.id).replaceWith(this.el);
-      this.template = _.template('<div class = "report_controls">\n  Checklist:\n  <select id = "checklists"></select>\n  <span style = "padding-left: 40px">Totals:</span>\n  <select id = "group_by" class = "filter">\n    <option value = "day">Daily</option>\n    <option value = "week">Weekly</option>\n    <option value = "month">Monthly</option>\n  </select>\n  <a class = "button" style = "margin-left: 40px" href = "#timeline">Timeline view</a>\n</div>\n<div class = "daily" style = "padding-top: 20px">Note: daily counts are only available for the last 30 days</divS>\n<table style = "margin-top: 20px">\n  <tr>\n    <td>\n      <div id = "timeline_chart" style=\'width: 700px; height: 400px; display: inline-block\'></div>\n    </td>\n    <td style = "padding-left: 20px; vertical-align: top">\n      <input type = "checkbox" class = "user_checkbox" value = "0" id = "checkbox_0" checked = "checked" />\n      <label for="checkbox_0" style = "color: <%= colors[_.lastIndexOf(user_ids, 0)] %>">All users</label><br/>\n      <% _.each(users.models, function(user, index) { %>\n        <input type = "checkbox" class = "user_checkbox" id = "checkbox_<%= user.id %>" value = "<%= user.id %>" />\n        <label for="checkbox_<%= user.id %>" style = "color: <%= colors[_.lastIndexOf(user_ids, user.id)] %>"><%= user.name() %></label><br/>\n      <% }); %>\n    </td>\n  </tr>\n</table>\n<table>\n<tr>\n<% _.each(colors, function(color) { %>\n  <td style = "background-color: <%= color %>">&nbsp;</td>\n<% }); %>\n</tr></table>');
+      this.template = _.template('<div class = "report_controls">\n  Checklist:\n  <select id = "checklists"></select>\n  <span style = "padding-left: 40px">Totals:</span>\n  <select id = "group_by" class = "filter">\n    <option value = "day">Daily</option>\n    <option value = "week">Weekly</option>\n    <option value = "month">Monthly</option>\n  </select>\n  <a class = "button" style = "margin-left: 40px" href = "#timeline">Timeline view</a>\n</div>\n<div class = "daily" style = "padding-top: 20px">Note: daily counts are only available for the last 30 days</divS>\n<table style = "margin-top: 20px">\n  <tr>\n    <td>\n      <div id = "timeline_chart" style=\'width: 700px; height: 400px; display: inline-block\'></div>\n    </td>\n    <td style = "padding-left: 20px; vertical-align: top">\n      <% console.log("Users: ", users); %>\n      <% _.each(users, function(user, index) { %>\n        <% console.log("User: ", user); %>\n        <input type = "checkbox" class = "user_checkbox" id = "checkbox_<%= user.id %>" value = "<%= user.id %>"\n         <% if (user.id == 0) { %> checked = "checked" <% } %>\n        />\n        <label for="checkbox_<%= user.id %>" style = "color: <%= colors[_.lastIndexOf(users, user)] %>"><%= user.name %></label><br/>\n      <% }); %>\n    </td>\n  </tr>\n</table>\n<table>\n<tr>\n<% _.each(colors, function(color) { %>\n  <td style = "background-color: <%= color %>">&nbsp;</td>\n<% }); %>\n</tr></table>');
       $.getJSON(this.counts_url(), __bind(function(data, textStatus, xhr) {
         var item, _i, _len, _ref;
         this.counts = data.counts;
+        this.count_users = data.users;
         if (this.counts.length > 0) {
           _ref = this.counts;
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             item = _ref[_i];
             item[0] = new Date(item[0]);
           }
-          this.user_ids = data.user_ids;
           this.timeline_chart = new TimelineChart({
             counts: this.counts,
-            users: this.users,
-            user_ids: this.user_ids,
+            users: this.count_users,
             colors: this.colors
           });
         }
@@ -242,8 +238,7 @@
     ChartView.prototype.render = function() {
       $(this.el).html(this.template({
         checklists: this.checklists,
-        users: this.users,
-        user_ids: this.user_ids,
+        users: this.count_users,
         counts: this.counts,
         all: this.all,
         colors: this.colors
@@ -264,7 +259,6 @@
     ChartView.prototype.link = function() {
       var link;
       link = "charts";
-      link += "/u0";
       link += "/c" + this.checklist_id;
       link += "/g" + this.group_by;
       return link;
@@ -283,13 +277,17 @@
       return e.preventDefault();
     };
     ChartView.prototype.on_change_user_checkbox = function(e) {
-      var index;
-      index = _.lastIndexOf(this.user_ids, Number($(e.target).val()));
-      if ($(e.target).is(":checked")) {
-        return this.timeline_chart.chart.showDataColumns(index);
-      } else {
-        return this.timeline_chart.chart.hideDataColumns(index);
-      }
+      return _.each(this.count_users, __bind(function(user, index) {
+        if (user.id === Number($(e.target).val())) {
+          if ($(e.target).is(":checked")) {
+            console.log("showing column", index);
+            return this.timeline_chart.chart.showDataColumns(index);
+          } else {
+            console.log("hiding column", index);
+            return this.timeline_chart.chart.hideDataColumns(index);
+          }
+        }
+      }, this));
     };
     return ChartView;
   })();
