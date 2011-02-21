@@ -128,8 +128,8 @@ class root.UserListView extends Backbone.View
     console.log controls
     @controls_contents[cid] = controls.html()
     controls.html("""
-      Please confirm <b>deletion</b>:
-      <a class = 'confirm_delete' id = 'confirm_delete_#{cid}' href = '#'>Confirm</a> or
+      <b>Delete user?</b>
+      <a class = 'confirm_delete' id = 'confirm_delete_#{cid}' href = '#'>Delete</a> or
       <a class = 'cancel_delete' id = 'cancel_delete_#{cid}' href = '#'>Cancel</a>
       """)
     e.preventDefault()

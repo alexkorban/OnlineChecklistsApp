@@ -112,7 +112,7 @@
       controls = this.$(e.target).closest(".controls");
       console.log(controls);
       this.controls_contents[cid] = controls.html();
-      controls.html("Please confirm <b>deletion</b>:\n<a class = 'confirm_delete' id = 'confirm_delete_" + cid + "' href = '#'>Confirm</a> or\n<a class = 'cancel_delete' id = 'cancel_delete_" + cid + "' href = '#'>Cancel</a>");
+      controls.html("<b>Delete user?</b>\n<a class = 'confirm_delete' id = 'confirm_delete_" + cid + "' href = '#'>Delete</a> or\n<a class = 'cancel_delete' id = 'cancel_delete_" + cid + "' href = '#'>Cancel</a>");
       return e.preventDefault();
     };
     UserListView.prototype.on_confirm_delete = function(e) {
