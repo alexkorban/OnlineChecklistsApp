@@ -11,6 +11,8 @@ gem "spreedly", "1.3.4"
 group :development do
   gem 'hpricot'
   gem 'ruby_parser'
+  gem 'rb-inotify'
+  gem 'livereload'
 end
 
 # Use unicorn as the web server
