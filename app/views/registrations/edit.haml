@@ -51,10 +51,8 @@
   %br
   %br
   %h3 Change plan
-  You can change the plan at any time, provided the number of checklists and users you have is within the new plan limits.
-  %br
-  %br
-  Charges will be pro-rated accordingly. If you are changing to a smaller plan, you will receive store credit.
+  <span class = "message">Important</span>: OnlineChecklists is a product of Aotea Studios, so you will see charges
+  from <b>Aotea Studios</b> on your credit card statement.
   %br
   %br
   %table(style = "border-top: 1px dotted #c0c0c0")
@@ -68,12 +66,17 @@
           %br
           %br
           %a(class = "subscribe button" href = "#{plan[:url] ? plan[:url] : "javascript: show_over_limit_message('" + plan[:name] + "')"}") Subscribe
-
-
   .over_limit_message.message(style = "margin-top: 20px; display:none") You've got more users or checklists than this plan allows.
+  %br
+  %br
+  You can change your plan at any time, provided the number of checklists and users you have is within the new plan limits.
+  %br
+  %br
+  Charges will be pro-rated accordingly. If you are changing to a smaller plan, you will receive store credit.
+  %br
+  %br
 
-  %br
-  %br
+
   %h2 Cancel subscription
   %p
     If you require your data, please get in touch with us at
