@@ -41,6 +41,7 @@ module OnlineChecklistsApp
     # Configure sensitive parameters which will be filtered from the log file.
     config.filter_parameters += [:password]
 
+    config.generators.fixture_replacement :machinist
 
     config.action_mailer.delivery_method = :smtp
     config.action_mailer.perform_deliveries = true
@@ -56,7 +57,5 @@ module OnlineChecklistsApp
       :enable_starttls_auto => true
     }
 
-
-    Spreedly.configure("AoteaStudios-test", "***REMOVED***")
   end
 end

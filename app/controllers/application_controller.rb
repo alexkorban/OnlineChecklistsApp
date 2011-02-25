@@ -17,13 +17,6 @@ class ApplicationController < ActionController::Base
   end
 
   def get_plan
-    plan = case current_account.plan
-      when "basic" then {users: 5, checklists: 20}
-      when "professional" then {users: 15, checklists: 60}
-      when "premier" then {users: 50, checklists: 200}
-      else raise "Invalid plan passed to limits()"
-    end
-    plan[:name] = current_account.plan
-    plan
+    current_account.get_plan
   end
 end

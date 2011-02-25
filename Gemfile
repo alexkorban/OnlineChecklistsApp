@@ -6,13 +6,18 @@ gem "haml", "3.0.18"
 gem 'pg', "0.9.0"
 gem "devise", "1.1.5"
 gem "devise_invitable", "0.3.5"
-gem "spreedly", "1.3.4"
+gem "spreedly", "1.3.4", require: false   # don't require automatically because we need to require spreedly/mock in the test env
 
 group :development do
   gem 'hpricot'
   gem 'ruby_parser'
   gem 'rb-inotify'
   gem 'livereload'
+end
+
+group :test do
+  gem 'test-unit'
+  gem 'machinist', '>= 2.0.0.beta1'
 end
 
 # Use unicorn as the web server

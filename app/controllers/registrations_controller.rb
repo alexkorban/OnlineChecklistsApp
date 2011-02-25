@@ -2,7 +2,7 @@ class RegistrationsController < Devise::RegistrationsController
   layout :registrations_layout
 
   def index
-    @users = current_account.users.active.order("name")
+    @users = current_account.users.active.order("name") if current_user
 
     respond_to { |format|
       format.json { render :json => @users.to_json(:only => User::JSON_FIELDS), :status => :ok}
@@ -11,7 +11,7 @@ class RegistrationsController < Devise::RegistrationsController
 
   def new
     flash.now[:plan] = params[:plan]
-    flash.now[:plan] = "basic" if !["basic", "professional", "premier"].include? flash.now[:plan]
+    flash.now[:plan] = "trial" if !["basic", "professional", "premier"].include? flash.now[:plan]
     super
   end
 
@@ -25,8 +25,7 @@ class RegistrationsController < Devise::RegistrationsController
         format.json { render :json => {}, :status => :ok }
       }
     else              # deactivating the account
-      current_account.active = false
-      current_account.save
+      current_account.deactivate
       redirect_to destroy_user_session_path
     end
   end
@@ -36,19 +35,14 @@ class RegistrationsController < Devise::RegistrationsController
 
     begin
       Account.transaction {
+        plan = params[resource_name][:plan]
         acc = Account.new
-        acc.plan = params[resource_name][:plan]
         build_resource
         resource.role = "admin"
         acc.users << resource
         acc.save!
-
-        plans = Spreedly::SubscriptionPlan.all
-        trial_plan = plans.detect {|plan| plan.trial? && plan.name =~ /^#{acc.plan}/i }
-        subscriber = Spreedly::Subscriber.create!(resource.id, email: resource.email, screen_name: resource.name)
-
-        subscriber.activate_free_trial(trial_plan.id)
-
+        logger.info "Res name: #{resource_name}, plan: #{plan}"
+        acc.create_subscriber(plan)
         success = true
       }
     rescue ActiveRecord::RecordInvalid
@@ -70,6 +64,7 @@ class RegistrationsController < Devise::RegistrationsController
 
   def edit
     @plan = get_plan
+    @plans = current_account.get_plans
     super
   end
 

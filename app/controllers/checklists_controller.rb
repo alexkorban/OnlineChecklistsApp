@@ -3,6 +3,12 @@ class ChecklistsController < ApplicationController
   # - provides a starting point for the whole application in response to an HTML request
   # - returns a list of checklists in response to a JSON request
   def index
+    if current_account.trial_expired?
+      flash[:alert] = "Your trial has expired, please choose a paid plan and enter payment details."
+      redirect_to edit_user_registration_path
+      return
+    end
+
     @checklists = current_account.checklists.order("name")
     @users = current_account.users.active.order("name")
     @plan = get_plan

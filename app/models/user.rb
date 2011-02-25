@@ -14,8 +14,9 @@ class User < ActiveRecord::Base
   # Setup accessible (or protected) attributes for your model
   attr_accessible :email, :password, :password_confirmation, :remember_me, :name
 
-  JSON_FIELDS = [:id, :name, :email, :invitation_token]
+  JSON_FIELDS = [:id, :name, :email, :invitation_token, :role]
 
+  # this will be used during authentication by Devise
   def active?
     # Comment out the below debug statement to view the properties of the returned self model values.
     # logger.debug self.to_yaml
@@ -27,6 +28,7 @@ class User < ActiveRecord::Base
     where active: true
   end
 
+  # returns the user's name or email if name isn't present
   def safe_name
     name.nil? || name.empty? ? email : name
   end
