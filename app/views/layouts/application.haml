@@ -18,8 +18,8 @@
     = stylesheet_link_tag "checklists"
 
     :javascript
-      var current_user = #{current_user.to_json};
-      var current_account = #{current_user ? current_user.account.to_json : "null"};
+      var current_user = #{current_user.to_json(:only => User::JSON_FIELDS)};
+      var current_account = #{current_user ? current_user.account.to_json(:only => [:created_at], :methods => [:has_entries]) : "null"};
 
   %body
     #header
