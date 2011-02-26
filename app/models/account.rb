@@ -4,6 +4,8 @@ class Account < ActiveRecord::Base
   has_many :checklists, :autosave => true, :dependent => :destroy
   has_many :entries, :dependent => :destroy
 
+  # to have a bit more flexibility, we have a defined list of plans in the application, and pick out Spreedly plans that
+  # this list
   PLAN_NAMES = ["basic", "professional", "premier"]
 
   def has_entries
@@ -35,9 +37,20 @@ class Account < ActiveRecord::Base
     @subscriber = nil
   end
 
-  def trial_expired?
-    # Spreedly returns time in UTC and our default time zone is UTC
-    get_subscriber.on_trial && !get_subscriber.active
+  def on_trial?
+    get_subscriber.on_trial
+  end
+
+  def card_expires_before_next_auto_renew?
+    get_subscriber.card_expires_before_next_auto_renew
+  end
+
+  def in_grace_period?
+    get_subscriber.in_grace_period
+  end
+
+  def subscription_active?
+    get_subscriber.active
   end
 
   def get_subscriber
@@ -65,9 +78,9 @@ class Account < ActiveRecord::Base
       plan_hash = ActiveSupport::JSON.decode(plan.feature_level).symbolize_keys
       plan_hash[:name] = plan.name
       if checklists.count < plan_hash[:checklists] && users.count < plan_hash[:users]
-#        plan_hash[:url] = Spreedly::subscribe_url(self.id, plan.id, email: admin.email)
-#      else
-        plan_hash[:url] = nil
+        plan_hash[:url] = Spreedly::subscribe_url(self.id, plan.id, email: admin.email)
+      else
+        plan_hash[:url] = nil   # we don't want to allow the user to subscribe to the plan that would result in them going over limits
       end
       plans << plan_hash
     }
