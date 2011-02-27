@@ -58,6 +58,7 @@
   %table(style = "border-top: 1px dotted #c0c0c0")
     %tr
       - @plans.each do |plan|
+        - next if plan[:name] == @plan[:name]
         %td(style = "width: 200px")
           %h4= plan[:name]
           #{plan[:users]} users
