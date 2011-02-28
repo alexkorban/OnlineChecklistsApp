@@ -70,7 +70,8 @@ class AppController extends Backbone.Controller
 
 
   users: ->
-    @view = new UserPageView { users: Users }
+    if current_user.role is "admin"
+      @view = new UserPageView { users: Users }
 
 
   timeline: (week_offset, user_id, checklist_id) ->

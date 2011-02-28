@@ -76,9 +76,11 @@
       });
     };
     AppController.prototype.users = function() {
-      return this.view = new UserPageView({
-        users: Users
-      });
+      if (current_user.role === "admin") {
+        return this.view = new UserPageView({
+          users: Users
+        });
+      }
     };
     AppController.prototype.timeline = function(week_offset, user_id, checklist_id) {
       return this.view = new TimelineView({
