@@ -50,6 +50,15 @@ from <b>Aotea Studios</b> on your credit card statement.
         %br
         %a(class = "subscribe button" href = "#{plan[:url] ? plan[:url] : "javascript: show_over_limit_message('" + plan[:name] + "')"}") Subscribe
 .over_limit_message.message(style = "margin-top: 20px; display:none") You have more users or checklists than this plan allows.
+%br
+%input#agree_to_licence(type = "checkbox")
+
+%label(for = "agree_to_licence")
+  I have read and agreed to the terms of the
+%a#toggle_licence(href = "#") OnlineChecklists licence
+%br
+#licence(style = "border-left: 15px solid #e0e0e0; margin-left: 25px; padding-left: 20px; width: 60%")
+  = render :partial => "licence"
 
 %br
 %br
