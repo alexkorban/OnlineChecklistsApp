@@ -1,0 +1,3 @@
+.time_zone
+  = time_zone_select current_user.account, "time_zone", nil, default: current_user.account.time_zone, include_blank: include_blank
+  %a.button#set_time_zone(href = "#") Set time zone

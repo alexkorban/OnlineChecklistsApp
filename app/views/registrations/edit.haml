@@ -32,6 +32,10 @@
     %p= f.submit "Update"
 
 - if current_user.role == "admin"
+  %h2 Time zone
+  = render :partial => "checklists/time_zone_select", locals: {include_blank: false}
+  %br
+  %br
   %br
   %br
   %a.button(href = "/#users") Manage users

@@ -52,6 +52,11 @@ OnlineChecklistsApp::Application.routes.draw do
   # root :to => "welcome#index"
 
   resources :checklists
+
+  get 'time_zone', :to => "checklists#time_zone"
+  post 'time_zone', :to => "checklists#time_zone"
+
+
   resources :entries, :only => [:create, :index] do
     get 'counts', :on => :collection
   end

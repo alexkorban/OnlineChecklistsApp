@@ -21,6 +21,20 @@
       var current_user = #{current_user.to_json(:only => User::JSON_FIELDS)};
       var current_account = #{current_user ? current_user.account.to_json(:only => [:created_at], :methods => [:has_entries]) : "null"};
 
+      $(function() {
+        // using a global handler for Set time zone button because time zone can be set from two places:
+        // - the home page on first login
+        // - the settings page
+        $("#set_time_zone").live("click", function (e) {
+          $(this).html("Saving...");
+          self = this;
+          $.post("/time_zone", {time_zone: $(this).prev("select").val()}, function (data, textStatus, xhr) {
+            $(self).html("Set time zone");
+          });
+          e.preventDefault();
+        });
+      });
+
   %body
     #header
       #nav

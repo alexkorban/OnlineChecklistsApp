@@ -88,7 +88,7 @@ class AppController extends Backbone.Controller
 # Start the app
 #
 
-$(document).ready ->
+$ ->
   window.app = new AppController()
   Backbone.history.start()
   $("body").keydown (e) ->

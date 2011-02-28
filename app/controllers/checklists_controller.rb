@@ -90,4 +90,15 @@ class ChecklistsController < ApplicationController
       format.json { render :json => {}, :status => :ok }
     }
   end
+
+  def time_zone
+    if request.post?
+      logger.info "Timezone: #{params[:time_zone]}"
+      current_account.update_attributes time_zone: params[:time_zone]
+    end
+
+    respond_to { |format|
+      format.html { request.post? ? render(nothing: true) : render(:partial => "time_zone_select") }
+    }
+  end
 end

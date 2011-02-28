@@ -107,7 +107,7 @@
     };
     return AppController;
   })();
-  $(document).ready(function() {
+  $(function() {
     window.app = new AppController();
     Backbone.history.start();
     return $("body").keydown(function(e) {

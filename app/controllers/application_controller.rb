@@ -2,6 +2,7 @@ class ApplicationController < ActionController::Base
   protect_from_forgery
 
   before_filter :authenticate_user!
+  before_filter :set_time_zone
 
   SUPPORT_EMAIL = "support@onlinechecklists.com"
 
@@ -18,5 +19,9 @@ class ApplicationController < ActionController::Base
 
   def get_plan
     current_account.get_plan
+  end
+
+  def set_time_zone
+    Time.zone = current_account.time_zone
   end
 end
