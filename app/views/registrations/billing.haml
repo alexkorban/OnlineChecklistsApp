@@ -17,6 +17,15 @@
       $("#cancel_submit").show();
       e.preventDefault();
     });
+    $("#toggle_licence").click(function() {
+      $("#licence").toggle();
+    });
+    $(".subscribe").click(function(e) {
+      if ($("#agree_to_licence:checked").length == 0) {
+        $(".agree_to_licence_message").show();
+        e.preventDefault();
+      }
+    });
   });
   function show_over_limit_message(plan_name) {
     $(".over_limit_message").html("You have more users or checklists than the " + plan_name + " allows. Please choose another plan.").show();
@@ -48,16 +57,20 @@ from <b>Aotea Studios</b> on your credit card statement.
         #{plan[:checklists]} checklists
         %br
         %br
-        %a(class = "subscribe button" href = "#{plan[:url] ? plan[:url] : "javascript: show_over_limit_message('" + plan[:name] + "')"}") Subscribe
+        %a.subscribe.button(href = "#{plan[:url] ? plan[:url] : "javascript: show_over_limit_message('" + plan[:name] + "')"}") Subscribe
 .over_limit_message.message(style = "margin-top: 20px; display:none") You have more users or checklists than this plan allows.
+.agree_to_licence_message.message(style = "margin-top: 20px; display:none") Please tick the checkbox below to confirm you've read and agreed to the licence.
 %br
-%input#agree_to_licence(type = "checkbox")
+- if current_user.account.on_trial?
+  %input#agree_to_licence(type = "checkbox")
+- else
+  %input#agree_to_licence(type = "checkbox" checked = "checked")
 
 %label(for = "agree_to_licence")
   I have read and agreed to the terms of the
 %a#toggle_licence(href = "#") OnlineChecklists licence
 %br
-#licence(style = "border-left: 15px solid #e0e0e0; margin-left: 25px; padding-left: 20px; width: 60%")
+#licence(style = "display: none")
   = render :partial => "licence"
 
 %br
