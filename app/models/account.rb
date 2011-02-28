@@ -65,8 +65,8 @@ class Account < ActiveRecord::Base
   end
 
   def deactivate
-    current_account.update_attributes(active: false)
     get_subscriber.stop_auto_renew
+    update_attributes(active: false)
   end
 
   def get_plans

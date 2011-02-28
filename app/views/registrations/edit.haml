@@ -34,8 +34,19 @@
 - if current_user.role == "admin"
   :javascript
     $(function() {
-      $("a.subscribe").click(function() {
-
+      $("#cancel_submit").click(function(e) {
+        $(this).hide();
+        $("#confirm_cancel_prompt").show();
+        e.preventDefault();
+      });
+      $("#confirm_cancel").click(function(e) {
+        $("#cancel_subscription_form").submit();
+        e.preventDefault();
+      });
+      $("#cancel_cancel").click(function(e) {
+        $("#confirm_cancel_prompt").hide();
+        $("#cancel_submit").show();
+        e.preventDefault();
       });
     });
     function show_over_limit_message(plan_name) {
@@ -84,10 +95,17 @@
     %a(href = "mailto:support@onlinechecklists.com") support@onlinechecklists.com
     %br
     %br
-    %form(id = "cancel_subscription" action = "#{registration_path(resource_name)}" method = "post")
+    %form#cancel_subscription_form(action = "#{registration_path(resource_name)}" method = "post")
       %input(type = "hidden" name = "authenticity_token" value = "#{form_authenticity_token}")
       %input(type = "hidden" name = "_method" value = "delete")
-      %input(type = "submit" value = "Cancel subscription")
+      %a.button#cancel_submit(href = "#") Cancel subscription
+      #confirm_cancel_prompt(style = "display: none")
+        %b Confirm cancellation of your subscription?
+        %br
+        Neither you nor other users will be able to access checklists or reports anymore.
+        %a#confirm_cancel(href = "#") Confirm
+        or
+        %a#cancel_cancel(href = "#") Cancel
 
 %a(href = "javascript: history.back(1)") Back
 

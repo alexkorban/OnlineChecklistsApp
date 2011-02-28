@@ -28,7 +28,7 @@
           %a(href = "#{root_path}")
             <span class = "capital">O</span>nline<span class = "capital">C</span>hecklists
 
-        - if current_user
+        - if current_user && user_signed_in?
           #{current_user.safe_name}
           |
           = link_to "Settings", edit_user_registration_path

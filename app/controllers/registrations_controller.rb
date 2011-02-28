@@ -26,7 +26,10 @@ class RegistrationsController < Devise::RegistrationsController
       }
     else              # deactivating the account
       current_account.deactivate
-      redirect_to destroy_user_session_path
+      flash.now[:alert] = "We are sorry to see you go. If you have any feedback about OnlineChecklists, please write us "
+      #redirect_to destroy_user_session_path
+      sign_out current_user
+
     end
   end
 
@@ -71,7 +74,7 @@ class RegistrationsController < Devise::RegistrationsController
   protected
 
   def registrations_layout
-    ["edit", "new"].include?(action_name) ? "application" : nil
+    ["edit", "new", "destroy"].include?(action_name) ? "application" : nil
   end
 
 end
