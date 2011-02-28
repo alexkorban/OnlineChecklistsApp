@@ -19,7 +19,7 @@ en:
       invalid: 'Invalid email or password.'
       invalid_token: 'Invalid authentication token.'
       timeout: 'Your session has expired, please sign in again to continue.'
-      inactive: 'Your account hasn''t been activated yet.'
+      inactive: 'Your account is inactive. Please contact support if this is incorrect.'
     sessions:
       signed_in: 'Signed in successfully.'
       signed_out: 'You are signed out. Please come back soon!'
