@@ -1,0 +1,79 @@
+- content_for :heading do
+  Subscription
+
+:javascript
+  $(function() {
+    $("#cancel_submit").click(function(e) {
+      $(this).hide();
+      $("#confirm_cancel_prompt").show();
+      e.preventDefault();
+    });
+    $("#confirm_cancel").click(function(e) {
+      $("#cancel_subscription_form").submit();
+      e.preventDefault();
+    });
+    $("#cancel_cancel").click(function(e) {
+      $("#confirm_cancel_prompt").hide();
+      $("#cancel_submit").show();
+      e.preventDefault();
+    });
+  });
+  function show_over_limit_message(plan_name) {
+    $(".over_limit_message").html("You have more users or checklists than the " + plan_name + " allows. Please choose another plan.").show();
+  }
+
+%b Current plan:
+#{@plan[:name]}
+%br
+#{@plan[:users]} users
+%br
+#{@plan[:checklists]} checklists
+%br
+%br
+%h2 Change plan
+<span class = "message">Important</span>: OnlineChecklists is a product of Aotea Studios, so you will see charges
+from <b>Aotea Studios</b> on your credit card statement.
+%br
+%br
+%table(style = "border-top: 1px dotted #c0c0c0")
+  %tr
+    - @plans.each do |plan|
+      - next if plan[:name] == @plan[:name]
+      %td(style = "width: 200px")
+        %h3= plan[:name]
+        #{plan[:users]} users
+        %br
+        #{plan[:checklists]} checklists
+        %br
+        %br
+        %a(class = "subscribe button" href = "#{plan[:url] ? plan[:url] : "javascript: show_over_limit_message('" + plan[:name] + "')"}") Subscribe
+.over_limit_message.message(style = "margin-top: 20px; display:none") You've got more users or checklists than this plan allows.
+%br
+%br
+You can change your plan at any time, provided the number of checklists and users you have is within the new plan limits.
+%br
+%br
+Charges will be pro-rated accordingly. If you are changing to a smaller plan, you will receive store credit.
+%br
+%br
+
+
+%h2 Cancel subscription
+%p
+  If you require your data, please get in touch with us at
+  %a(href = "mailto:support@onlinechecklists.com") support@onlinechecklists.com
+  %br
+  %br
+  %form#cancel_subscription_form(action = "#{registration_path(resource_name)}" method = "post")
+    %input(type = "hidden" name = "authenticity_token" value = "#{form_authenticity_token}")
+    %input(type = "hidden" name = "_method" value = "delete")
+    %a.button#cancel_submit(href = "#") Cancel subscription
+    #confirm_cancel_prompt(style = "display: none")
+      %b Confirm cancellation of your subscription?
+      %br
+      Neither you nor other users will be able to access checklists or reports anymore.
+      %a#confirm_cancel(href = "#") Confirm
+      or
+      %a#cancel_cancel(href = "#") Cancel
+
+%a(href = "javascript: history.back(1)") Back

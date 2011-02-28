@@ -65,16 +65,20 @@ class RegistrationsController < Devise::RegistrationsController
     end
   end
 
-  def edit
+  def billing
+    if current_user.role != "admin"
+      redirect_to edit_user_registration_path
+      return
+    end
+
     @plan = get_plan
     @plans = current_account.get_plans
-    super
   end
 
   protected
 
   def registrations_layout
-    ["edit", "new", "destroy"].include?(action_name) ? "application" : nil
+    ["edit", "new", "destroy", "billing"].include?(action_name) ? "application" : nil
   end
 
 end

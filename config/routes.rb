@@ -61,6 +61,7 @@ OnlineChecklistsApp::Application.routes.draw do
   devise_for :users, controllers: {registrations: "registrations", invitations: "invitations"} do
     get "users", :to => "registrations#index"
     delete "users/:id", :to => "registrations#destroy"
+    get "billing", :to => "registrations#billing"
   end
 
 
