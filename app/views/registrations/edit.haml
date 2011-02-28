@@ -32,6 +32,12 @@
     %p= f.submit "Update"
 
 - if current_user.role == "admin"
+  %h2#plan Users
+  %a.button(href = "/#users") Manage users
+  %br
+  %br
+
+- if current_user.role == "admin"
   :javascript
     $(function() {
       $("#cancel_submit").click(function(e) {
@@ -53,6 +59,7 @@
       $(".over_limit_message").html("You've got more users or checklists than the " + plan_name + " allows. Please choose another plan.").show();
     }
   %h2#plan Plan and billing
+
   %b Current plan:
   #{@plan[:name]}
   %br
