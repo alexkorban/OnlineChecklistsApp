@@ -22,7 +22,7 @@ class ChecklistsController < ApplicationController
       return
     end
 
-    @checklists = current_account.checklists.order("name")
+    @checklists = current_account.checklists.active.order("name")
     @users = current_account.users.active.order("name")
     @plan = get_plan
 
@@ -33,7 +33,7 @@ class ChecklistsController < ApplicationController
   end
 
   def show
-    checklist = current_account.checklists.find(params[:id])
+    checklist = current_account.checklists.active.find(params[:id])
     respond_to { |format|
       format.json { render :json => checklist.items.order("id") }
     }
@@ -42,7 +42,7 @@ class ChecklistsController < ApplicationController
   def create
     errors = []
     checklist = nil
-    if current_account.checklists.count >= get_plan[:checklists] # make sure the number of checklists doesn't exceed plan limits
+    if current_account.checklists.active.count >= get_plan[:checklists] # make sure the number of checklists doesn't exceed plan limits
       errors << "Plan limit exceeded for checklists"
     else
       checklist = current_account.checklists.create(:name => params[:name])
@@ -58,7 +58,7 @@ class ChecklistsController < ApplicationController
   end
 
   def update
-    checklist = current_account.checklists.find(params[:id])
+    checklist = current_account.checklists.active.find(params[:id])
     checklist.name = params[:name]
     checklist.save
     checklist.item_ids = params[:items].map {|item| item[:id]}
@@ -79,7 +79,7 @@ class ChecklistsController < ApplicationController
   end
 
   def destroy
-    checklist = current_account.checklists.find(params[:id])
+    checklist = current_account.checklists.active.find(params[:id])
     if checklist.entries.count > 0    # only delete the checklist if it doesn't have any associated entries; otherwise only deactivate
       checklist.active = false
       checklist.save
