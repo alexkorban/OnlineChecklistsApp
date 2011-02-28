@@ -69,16 +69,33 @@ class Account < ActiveRecord::Base
     update_attributes(active: false)
   end
 
+  # this is taken from the Spreedly gem and modified to include subsciber token
+  def self.subscribe_url(id, plan, options={})
+    %w(screen_name email first_name last_name return_url).each do |option|
+      options[option.to_sym] &&= URI.escape(options[option.to_sym])
+    end
+
+    screen_name = options.delete(:screen_name)
+    token = options.delete(:token)
+
+    params = %w(email first_name last_name return_url).select { |e| options[e.to_sym] }.collect { |e| "#{e}=#{options[e.to_sym]}" }.join('&')
+
+    url = "https://spreedly.com/#{Spreedly.site_name}/subscribers/#{id}/#{token ? token + "/" : ""}subscribe/#{plan}"
+    url << "/#{screen_name}" if screen_name
+    url << '?' << params unless params == ''
+
+    url
+  end
+
   def get_plans
     spreedly_plans = Spreedly::SubscriptionPlan.all
     plans = []
-    admin = users.find_by_role("admin")
     PLAN_NAMES.each {|plan_name|
       plan = spreedly_plans.detect{|p| p.name =~ /#{plan_name}/i }
       plan_hash = ActiveSupport::JSON.decode(plan.feature_level).symbolize_keys
       plan_hash[:name] = plan.name
-      if checklists.count < plan_hash[:checklists] && users.count < plan_hash[:users]
-        plan_hash[:url] = Spreedly::subscribe_url(self.id, plan.id, email: admin.email)
+      if checklists.active.count <= plan_hash[:checklists] && users.active.count <= plan_hash[:users]
+        plan_hash[:url] = Account.subscribe_url(self.id, plan.id, token: get_subscriber.token)
       else
         plan_hash[:url] = nil   # we don't want to allow the user to subscribe to the plan that would result in them going over limits
       end

@@ -73,6 +73,7 @@ class RegistrationsController < Devise::RegistrationsController
 
     @plan = get_plan
     @plans = current_account.get_plans
+    @edit_subscription_url = Spreedly::edit_subscriber_url(current_account.get_subscriber.token, billing_url)
   end
 
   protected

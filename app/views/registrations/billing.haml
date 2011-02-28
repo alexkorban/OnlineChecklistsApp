@@ -30,6 +30,8 @@
 #{@plan[:checklists]} checklists
 %br
 %br
+%a(href = "#{@edit_subscription_url}") Subscription details and billing history
+
 %h2 Change plan
 <span class = "message">Important</span>: OnlineChecklists is a product of Aotea Studios, so you will see charges
 from <b>Aotea Studios</b> on your credit card statement.
@@ -75,5 +77,6 @@ Charges will be pro-rated accordingly. If you are changing to a smaller plan, yo
       %a#confirm_cancel(href = "#") Confirm
       or
       %a#cancel_cancel(href = "#") Cancel
+
 
 %a(href = "javascript: history.back(1)") Back
