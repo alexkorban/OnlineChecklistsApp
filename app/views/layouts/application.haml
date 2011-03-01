@@ -26,10 +26,10 @@
         // - the home page on first login
         // - the settings page
         $("#set_time_zone").live("click", function (e) {
+          current_account.time_zone = $(self).prev("select").val();
           $(this).html("Saving...");
           self = this;
           $.post("/time_zone", {time_zone: $(this).prev("select").val()}, function (data, textStatus, xhr) {
-            current_account.time_zone = $(self).prev("select").val();
             $(self).html("Set time zone");
 
             // redirect to another location via the location hash when the href attribute is set
