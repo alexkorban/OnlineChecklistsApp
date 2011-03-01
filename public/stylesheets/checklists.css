@@ -72,6 +72,13 @@ select {
   padding-left: 20px;
   background: white url("/images/bg-container.gif") repeat-x 0% 0%;
   border-top: 1px solid white; }
+  #main #buttons {
+    margin-bottom: 20px;
+    border-bottom: 1px dotted silver;
+    padding-left: 10px;
+    padding-bottom: 12px;
+    margin-left: -10px;
+    margin-right: 10px; }
 
 #content .controls {
   display: inline-block;

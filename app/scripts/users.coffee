@@ -265,9 +265,12 @@ class root.UserPageView extends Backbone.View
   constructor: (args) ->
     super
     @template = _.template('''
+      <div id = "buttons">
+        <a class = "button" href = "#checklists">Go to checklists</a>
+        <a class = "button" href = "/billing">Manage subscription</a>
+      </div>
       <div id = "invitations"></div>
       <div id = "user_list"></div>
-      <a class = "back" href = "javascript: history.back(1)">Back</a>
       ''')
     $("#" + @id).replaceWith(@el)
     @users = args.users

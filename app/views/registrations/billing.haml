@@ -31,6 +31,11 @@
     $(".over_limit_message").html("You have more users or checklists than the " + plan_name + " allows. Please choose another plan.").show();
   }
 
+
+#buttons
+  %a.button(href = "/") Go to checklists
+  %a.button(href = "#{edit_user_registration_path}") Go to settings
+
 %b Current plan:
 #{@plan[:name]}
 %br
@@ -102,4 +107,3 @@ Charges will be pro-rated accordingly. If you are changing to a smaller plan, yo
       %a#cancel_cancel(href = "#") Cancel
 
 
-%a(href = "javascript: history.back(1)") Back

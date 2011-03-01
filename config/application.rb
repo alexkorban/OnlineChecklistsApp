@@ -48,6 +48,14 @@ module OnlineChecklistsApp
     config.action_mailer.raise_delivery_errors = true
     config.action_mailer.default charset: "utf-8"
     config.action_mailer.register_template_extension('haml')
+#    config.action_mailer.smtp_settings = {
+#      :address => "smtp.sendgrid.net",
+#      :port => "587",
+#      :domain => "onlinechecklists.com",
+#      :authentication => :plain,
+#      :user_name => "alex@onlinechecklists.com",
+#      :password => "***REMOVED***"
+#    }
     config.action_mailer.smtp_settings = {
       :address => "smtp.gmail.com",
       :port => "587",

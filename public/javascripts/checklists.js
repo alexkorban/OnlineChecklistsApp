@@ -80,7 +80,6 @@
       TimeZoneView.__super__.constructor.apply(this, arguments);
       $("#" + this.id).replaceWith(this.el);
       $.get("/time_zone", __bind(function(data, textStatus, xhr) {
-        console.log(data);
         this.template = _.template("Please set the time zone you are in:<br/><br/>\n" + data + "\n<br/><br/>This is necessary to get accurate reports.");
         return this.render();
       }, this));
@@ -109,7 +108,7 @@
         return model.id != null;
       }));
       $("#" + this.id).replaceWith(this.el);
-      this.template = _.template('<% if (flash != null) { %>\n  <div id = \'flash\' class = \'notice\'><div><%= flash %></div></div>\n<% } %>\n<% if (checklists.length == 0) { %>\n  <div>\n    It\'s time to create some checklists because you don\'t have any!<br/><br/>Press the <b>Create checklist</b> button below to create one.\n    <img src = "/images/down_32.png" style = "display: block; margin-left: 50px; margin-top: 10px" />\n  </div>\n<% } %>\n<ul class = "checklists">\n<% checklists.each(function(checklist) { %>\n<li class = "checklist" id = "<%= checklist.cid %>"><%= checklist.name() %>\n  <span class = "controls">\n    <a href="#checklists/<%= checklist.cid %>">Fill out</a> |\n    <a class = "secondary" href = "#checklists/<%= checklist.cid %>/edit">Edit</a> |\n    <a class = "secondary delete" id = "delete_<%= checklist.cid %>" href = "#">Delete</a>\n  </span>\n</li>\n<% }); %>\n</ul>\n<div class = "message" style = "display: none">\n  You\'ve reached the limit of your plan with <%= window.Plan.checklists %> checklists.\n  <% if (current_user.role == "admin") { %>\n    <a href = "/users/edit#plan">Please consider upgrading to a larger plan</a>.\n  <% } else { %>\n    Please ask the administrator of your account to upgrade to a larger plan.\n  <% } %>\n</div>\n<div style = "margin-top: <%= checklists.length > 0 ? 40 : 0 %>px">\n  <a class = "create button" href = "#">Create checklist</a>\n  <a class = "button" href = "#timeline">View reports</a>\n  <% if (current_user.role == "admin") { %> <a class = "button" href = "#users">Invite users</a> <% } %>\n</div>');
+      this.template = _.template('<% if (flash != null) { %>\n  <div id = \'flash\' class = \'notice\'><div><%= flash %></div></div>\n<% } %>\n<div id = "buttons">\n  <a class = "create button" href = "#">Create checklist</a>\n  <a class = "button" href = "#timeline">View reports</a>\n  <% if (current_user.role == "admin") { %> <a class = "button" href = "#users">Invite users</a> <% } %>\n</div>\n<% if (checklists.length == 0) { %>\n  <div>\n    <img src = "/images/up_32.png" style = "display: block; margin-left: 50px; margin-top: 10px; margin-bottom: 10px" />\n    It\'s time to create some checklists because you don\'t have any!<br/><br/>Press the <b>Create checklist</b> button above to create one.\n  </div>\n<% } %>\n<ul class = "checklists">\n<% checklists.each(function(checklist) { %>\n<li class = "checklist" id = "<%= checklist.cid %>"><%= checklist.name() %>\n  <span class = "controls">\n    <a href="#checklists/<%= checklist.cid %>">Fill out</a> |\n    <a class = "secondary" href = "#checklists/<%= checklist.cid %>/edit">Edit</a> |\n    <a class = "secondary delete" id = "delete_<%= checklist.cid %>" href = "#">Delete</a>\n  </span>\n</li>\n<% }); %>\n</ul>\n<div class = "message" style = "display: none">\n  You\'ve reached the limit of your plan with <%= window.Plan.checklists %> checklists.\n  <% if (current_user.role == "admin") { %>\n    <a href = "/users/edit#plan">Please consider upgrading to a larger plan</a>.\n  <% } else { %>\n    Please ask the administrator of your account to upgrade to a larger plan.\n  <% } %>\n</div>');
       this.render();
     }
     ChecklistListView.prototype.render = function() {
@@ -133,11 +132,8 @@
     };
     ChecklistListView.prototype.on_delete = function(e) {
       var cid, controls;
-      console.log("on_delete");
       cid = e.target.id.substr(7);
-      console.log(cid);
       controls = this.$(e.target).closest(".controls");
-      console.log(controls);
       this.controls_contents[cid] = controls.html();
       controls.html("<b>Delete checklist?</b>\n<a class = 'confirm_delete' id = 'confirm_delete_" + cid + "' href = '#'>Delete</a> or\n<a class = 'cancel_delete' id = 'cancel_delete_" + cid + "' href = '#'>Cancel</a>");
       return e.preventDefault();
@@ -154,8 +150,6 @@
     ChecklistListView.prototype.on_cancel_delete = function(e) {
       var controls;
       controls = this.$(e.target).closest(".controls");
-      console.log(this.controls_contents);
-      console.log(e.target.id.substr(14));
       controls.html(this.controls_contents[e.target.id.substr(14)]);
       e.preventDefault();
       return e.stopPropagation();
@@ -212,9 +206,6 @@
       } else {
         return this.$("#completion_warning").hide();
       }
-    };
-    ChecklistView.prototype.on_keydown = function(e) {
-      return console.log(e.keyCode);
     };
     ChecklistView.prototype.on_focus_input = function(e) {
       this.$(".checklist_item").removeClass("selected");

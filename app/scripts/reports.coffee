@@ -50,6 +50,10 @@ class root.TimelineView extends Backbone.View
     $("#" + @id).replaceWith(@el)
 
     @template = _.template('''
+      <div id = "buttons">
+        <a class = "button" href = "#checklists">Go to checklists</a>
+        <a class = "button" href = "#charts">View charts</a>
+      </div>
       <div class = "report_controls">
         <div class = "prev_week">
           <a href = "#<%= prev_week_link %>" style = "border: none"><img src = "/images/left_32.png" /></a>
@@ -72,7 +76,6 @@ class root.TimelineView extends Backbone.View
         </div>
         Checklist:
         <select id = "checklists"></select>
-        <a class = "button" style = "margin-left: 40px" href = "#charts">Chart view</a>
       </div>
       <% if (entries_by_day.length == 0) { %>
         <h2>No entries for this week</h2>
@@ -259,6 +262,10 @@ class root.ChartView extends Backbone.View
     $("#" + @id).replaceWith(@el)
 
     @template = _.template('''
+      <div id = "buttons">
+        <a class = "button" href = "#checklists">Go to checklists</a>
+        <a class = "button" href = "#timeline">View timeline</a>
+      </div>
       <div class = "report_controls">
         Checklist:
         <select id = "checklists"></select>
@@ -268,7 +275,6 @@ class root.ChartView extends Backbone.View
           <option value = "week">Weekly</option>
           <option value = "month">Monthly</option>
         </select>
-        <a class = "button" style = "margin-left: 40px" href = "#timeline">Timeline view</a>
       </div>
       <div class = "daily" style = "padding-top: 20px">Note: daily counts are only available for the last 30 days</divS>
       <table style = "margin-top: 20px">
