@@ -79,6 +79,30 @@ select {
     padding-bottom: 12px;
     margin-left: -10px;
     margin-right: 10px; }
+    #main #buttons .button {
+      padding: 5px;
+      box-shadow: silver 1px 2px 4px;
+      -webkit-box-shadow: silver 1px 2px 4px;
+      -moz-box-shadow: silver 1px 2px 4px;
+      border: 1px solid;
+      border-radius: 5px;
+      -moz-border-radius: 5x;
+      -webkit-border-radius: 5px;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      text-align: center;
+      text-shadow: #395c09 0px 1px 0px;
+      background: #7cc319 url("/images/bg-button-pale.gif") repeat-x 0% 100%;
+      border-color: #90bf22; }
+      #main #buttons .button:hover {
+        background-position: left top; }
+      #main #buttons .button:active {
+        box-shadow: -1px -1px 4px silver;
+        -webkit-box-shadow: -1px -1px 4px silver;
+        -moz-box-shadow: -1px -1px 4px silver; }
+      #main #buttons .button:hover {
+        background-image: url("/images/bg-button-pale-over.gif"); }
 
 #content .controls {
   display: inline-block;
@@ -201,11 +225,10 @@ select {
 
 .button, input[type=submit], button {
   padding: 5px;
-  box-shadow: #548e06 1px 2px 4px;
-  -webkit-box-shadow: #548e06 1px 2px 4px;
-  -moz-box-shadow: #548e06 1px 2px 4px;
-  background: #7cc319 url("/images/bg-button.gif") repeat-x 0% 100%;
-  border: 1px solid #6aad0f;
+  box-shadow: silver 1px 2px 4px;
+  -webkit-box-shadow: silver 1px 2px 4px;
+  -moz-box-shadow: silver 1px 2px 4px;
+  border: 1px solid;
   border-radius: 5px;
   -moz-border-radius: 5x;
   -webkit-border-radius: 5px;
@@ -213,14 +236,42 @@ select {
   font-size: 18px;
   font-weight: bold;
   text-align: center;
-  text-shadow: #395c09 0px 1px 0px; }
+  text-shadow: #395c09 0px 1px 0px;
+  background: #7cc319 url("/images/bg-button.gif") repeat-x 0% 100%;
+  border-color: #6aad0f; }
   .button:hover, input[type=submit]:hover, button:hover {
-    background-image: url("/images/bg-button-over.gif");
     background-position: left top; }
   .button:active, input[type=submit]:active, button:active {
     box-shadow: -1px -1px 4px silver;
     -webkit-box-shadow: -1px -1px 4px silver;
     -moz-box-shadow: -1px -1px 4px silver; }
+  .button:hover, input[type=submit]:hover, button:hover {
+    background-image: url("/images/bg-button-over.gif"); }
+
+.button_red {
+  padding: 5px;
+  box-shadow: silver 1px 2px 4px;
+  -webkit-box-shadow: silver 1px 2px 4px;
+  -moz-box-shadow: silver 1px 2px 4px;
+  border: 1px solid;
+  border-radius: 5px;
+  -moz-border-radius: 5x;
+  -webkit-border-radius: 5px;
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  text-shadow: #395c09 0px 1px 0px;
+  background: #c02020 url("/images/bg-button-red.gif") repeat-x 0% 100%;
+  border-color: #8c1717; }
+  .button_red:hover {
+    background-position: left top; }
+  .button_red:active {
+    box-shadow: -1px -1px 4px silver;
+    -webkit-box-shadow: -1px -1px 4px silver;
+    -moz-box-shadow: -1px -1px 4px silver; }
+  .button_red:hover {
+    background-image: url("/images/bg-button-red-over.gif"); }
 
 #licence {
   border-left: 15px solid #e0e0e0;

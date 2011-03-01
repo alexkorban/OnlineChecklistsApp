@@ -45,6 +45,28 @@ a
 select
   padding: 4px
 
+@mixin button
+  padding: 5px
+  box-shadow: #c0c0c0 1px 2px 4px
+  -webkit-box-shadow: #c0c0c0 1px 2px 4px
+  -moz-box-shadow: #c0c0c0 1px 2px 4px
+  border: 1px solid
+  border-radius: 5px
+  -moz-border-radius: 5x
+  -webkit-border-radius: 5px
+  color: white
+  font-size: 18px
+  font-weight: bold
+  text-align: center
+  text-shadow: #395C09 0px 1px 0px
+  &:hover
+    background-position: left top
+  &:active
+    box-shadow: -1px -1px 4px #c0c0c0
+    -webkit-box-shadow: -1px -1px 4px #c0c0c0
+    -moz-box-shadow: -1px -1px 4px #c0c0c0
+
+
 // sections
 
 #header
@@ -95,6 +117,13 @@ select
     margin:
       left: -10px
       right: 10px
+    .button
+      @include button
+      background: #7CC319 url("/images/bg-button-pale.gif") repeat-x 0% 100%
+      border-color: #90bf22
+      &:hover
+        background-image: url("/images/bg-button-pale-over.gif")
+
 
 #content
   .controls
@@ -246,28 +275,20 @@ select
 .center
   text-align: center
 
+
 .button, input[type=submit], button
-  padding: 5px
-  box-shadow: #548E06 1px 2px 4px
-  -webkit-box-shadow: #548E06 1px 2px 4px
-  -moz-box-shadow: #548E06 1px 2px 4px
+  @include button
   background: #7CC319 url("/images/bg-button.gif") repeat-x 0% 100%
-  border: 1px solid #6AAD0F
-  border-radius: 5px
-  -moz-border-radius: 5x
-  -webkit-border-radius: 5px
-  color: white
-  font-size: 18px
-  font-weight: bold
-  text-align: center
-  text-shadow: #395C09 0px 1px 0px
+  border-color: #6AAD0F
   &:hover
     background-image: url("/images/bg-button-over.gif")
-    background-position: left top
-  &:active
-    box-shadow: -1px -1px 4px #c0c0c0
-    -webkit-box-shadow: -1px -1px 4px #c0c0c0
-    -moz-box-shadow: -1px -1px 4px #c0c0c0
+
+.button_red
+  @include button
+  background: #c02020 url("/images/bg-button-red.gif") repeat-x 0% 100%
+  border-color: #8c1717
+  &:hover
+    background-image: url("/images/bg-button-red-over.gif")
 
 #licence
   border-left: 15px solid #e0e0e0
