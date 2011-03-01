@@ -202,6 +202,7 @@
         "for": this.$("input[name=for]").val()
       });
       entry.save();
+      current_account.has_entries = true;
       window.app.flash = "Completed checklist: " + (this.model.name());
       return window.location.hash = "checklists";
     };
