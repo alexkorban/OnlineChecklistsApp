@@ -121,11 +121,8 @@ class root.UserListView extends Backbone.View
     @controls_contents = {}
 
   on_delete: (e) ->
-    console.log "on_delete"
     cid = e.target.id.substr(7)
-    console.log cid
     controls = @$(e.target).closest(".controls")
-    console.log controls
     @controls_contents[cid] = controls.html()
     controls.html("""
       <b>Delete user?</b>
@@ -224,10 +221,8 @@ class root.InvitationView extends Backbone.View
 
 
   render: ->
-    console.log "rendering invitation view"
     $(@el).html(@template())
     @item_el = $("#invitation_items")
-    console.log "adding invitation set"
     @invitations = new InvitationSet
     @invitations.bind "add", @add_item
     @invitations.bind "remove", @remove_item
@@ -245,8 +240,6 @@ class root.InvitationView extends Backbone.View
 
 
   on_add_item: (e) ->
-    console.log "Total: ", Users.length + @invitations.length()
-    console.log "Plan: ", Plan.users
     if Users.length + @invitations.length() >= Plan.users
       @$(".message").show()
     else
@@ -256,15 +249,11 @@ class root.InvitationView extends Backbone.View
 
   on_save: (e) ->
     @invitations.save({}, {success: (model, response) =>
-      console.log("response:", response)
-      console.log("users before:", @users)
       @users.refresh(response)
-      console.log("users after:", @users)
     })
     e.preventDefault()
 
 #    for invitation in @invitations.models
-#      console.log invitation
 #      invitation.save() if invitation.email().length > 0
 
 

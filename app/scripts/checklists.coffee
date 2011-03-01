@@ -66,10 +66,8 @@ class Entry extends Backbone.Model
 
 
 #  parse: (response) ->
-#    console.log("in Checklists.parse")
 #    res = _.map response, (attrs, key) ->
 #      attrs.checklist
-#    console.log(res)
 #    res
 
 root.Checklists = new ChecklistCollection
@@ -86,7 +84,6 @@ class root.TimeZoneView extends Backbone.View
 
     # when the time zone isn't set, show time zone selection thing
     $.get "/time_zone", (data, textStatus, xhr) =>
-      console.log data
       @template = _.template """
         Please set the time zone you are in:<br/><br/>
         #{data}
@@ -180,11 +177,8 @@ class root.ChecklistListView extends Backbone.View
 
 
   on_delete: (e) ->
-    console.log "on_delete"
     cid = e.target.id.substr(7)
-    console.log cid
     controls = @$(e.target).closest(".controls")
-    console.log controls
     @controls_contents[cid] = controls.html()
     controls.html("""
       <b>Delete checklist?</b>
@@ -206,8 +200,6 @@ class root.ChecklistListView extends Backbone.View
 
   on_cancel_delete: (e) ->
     controls = @$(e.target).closest(".controls")
-    console.log @controls_contents
-    console.log e.target.id.substr(14)
     controls.html(@controls_contents[e.target.id.substr(14)])
     e.preventDefault()
     e.stopPropagation()
@@ -275,11 +267,6 @@ class root.ChecklistView extends Backbone.View
       @$("#completion_warning").show()
     else
       @$("#completion_warning").hide()
-
-
-
-  on_keydown: (e) ->
-    console.log e.keyCode
 
 
   on_focus_input: (e) ->

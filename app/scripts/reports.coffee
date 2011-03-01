@@ -132,7 +132,6 @@ class root.TimelineView extends Backbone.View
       @$("#users").val(@user_id) if @user_id
       @$("#checklists").val(@checklist_id) if @checklist_id
     else
-      console.log "no entries"
       $(@el).html @no_entries_template({
         users: @users
         checklists: @checklists
@@ -278,9 +277,7 @@ class root.ChartView extends Backbone.View
             <div id = "timeline_chart" style='width: 700px; height: 400px; display: inline-block'></div>
           </td>
           <td style = "padding-left: 20px; vertical-align: top">
-            <% console.log("Users: ", users); %>
             <% _.each(users, function(user, index) { %>
-              <% console.log("User: ", user); %>
               <input type = "checkbox" class = "user_checkbox" id = "checkbox_<%= user.id %>" value = "<%= user.id %>"
                <% if (user.id == 0) { %> checked = "checked" <% } %>
               />
@@ -345,9 +342,7 @@ class root.ChartView extends Backbone.View
     _.each @count_users, (user, index) =>
       if user.id == Number($(e.target).val())
         if $(e.target).is(":checked")
-          console.log "showing column", index
           @timeline_chart.chart.showDataColumns(index)
         else
-          console.log "hiding column", index
           @timeline_chart.chart.hideDataColumns(index)
 
