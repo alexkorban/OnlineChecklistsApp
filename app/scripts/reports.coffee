@@ -283,12 +283,6 @@ class root.ChartView extends Backbone.View
           </td>
         </tr>
       </table>
-      <table>
-      <tr>
-      <% _.each(colors, function(color) { %>
-        <td style = "background-color: <%= color %>">&nbsp;</td>
-      <% }); %>
-      </tr></table>
     ''')
 
     $.getJSON @counts_url(), (data, textStatus, xhr) =>
