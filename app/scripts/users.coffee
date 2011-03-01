@@ -101,7 +101,7 @@ class root.UserListView extends Backbone.View
                 <a id = "delete_<%= user.cid %>" class = "delete" href = "#">Delete</a>
               </div>
             <% } else { %>
-              <br/><br/>This is you. You can't delete yourself. If you need to cancel your subscription, you can do it in the <a href = "/users/edit">Settings</a>.
+              <br/><br/>This is you. You can't delete yourself. If you need to cancel your subscription, you can do it in the <a href = "/billing">Settings</a>.
             <% } %>
             <% if (user.is_invited()) { %>
               <br/><br/>Invitation sent, waiting for the user to set password.
