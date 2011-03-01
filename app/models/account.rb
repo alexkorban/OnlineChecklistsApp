@@ -8,10 +8,6 @@ class Account < ActiveRecord::Base
   # this list
   PLAN_NAMES = ["basic", "professional", "premier"]
 
-  def has_entries
-    entries.count > 0
-  end
-
   def create_subscriber(plan_name)
     plan_name = plan_name.downcase
     plan_name = "trial" if !PLAN_NAMES.include? plan_name

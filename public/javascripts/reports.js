@@ -50,7 +50,8 @@
       this.checklist_id = args.checklist_id != null ? args.checklist_id : 0;
       this.all = "- All -";
       $("#" + this.id).replaceWith(this.el);
-      this.template = _.template('<% if (current_account.has_entries) { %>\n  <div class = "report_controls">\n    <div class = "prev_week">\n      <a href = "#<%= prev_week_link %>" style = "border: none"><img src = "/images/left_32.png" /></a>\n      <a href = "#<%= prev_week_link %>">Prev week</a>\n    </div>\n    <% if (next_week_link != null) { %>\n      <div class = "next_week">\n        <a href = "#<%= next_week_link %>">Next week</a>\n        <a href = "#<%= next_week_link %>" style = "border: none"><img src = "/images/right_32.png" /></a>\n      </div>\n    <% } %>\n    <div style = "display: inline-block; padding-right: 50px">\n      User:\n      <select id = "users" class = "filter">\n        <option value = "0"><%= all %></option>\n        <% users.each(function(user) { %>\n          <option value = "<%= user.id %>"><%= user.name() == null || user.name().length == 0 ? user.email() : user.name() %></option>\n        <% }); %>\n      </select>\n    </div>\n    Checklist:\n    <select id = "checklists"></select>\n    <a class = "button" style = "margin-left: 40px" href = "#charts">Chart view</a>\n  </div>\n  <% if (entries_by_day.length == 0) { %>\n    <h2>No entries for this week</h2>\n  <% } %>\n  <% _.each(entries_by_day, function(day_entry) { %>\n    <h2><%= day_entry[0] %></h2>\n    <table class = "timeline_entries">\n      <tr>\n        <th>Checklist</th>\n        <th>User</th>\n        <th>Completed at</th>\n        <th>Completed for</th>\n      </tr>\n\n      <% _.each(day_entry[1], function(entry) { %>\n        <tr>\n          <td class = "first"><%= entry.checklist_name %></td>\n          <td><%= entry.user_name %></td>\n          <td><%= entry.display_time %></td>\n          <td><%= entry.for %></td>\n        </tr>\n      <% }); %>\n    </table>\n  <% }); %>\n<% } else { %>\n  You\'ll need to\n  <% if (checklists.length == 0) { %>\n    <a href = "#checklists">define some checklists</a> and get people to fill them out\n  <% } else { %>\n    define some checklists and <a href = "#checklists">get people to fill them out</a>\n  <% } %>\n  to get reports and charts like this:<br/><br/>\n  <img src = "/images/timeline-sample.png" /><br/>\n  <img src = "/images/chart-sample.png" /><br/>\n\n<% } %>');
+      this.template = _.template('<div class = "report_controls">\n  <div class = "prev_week">\n    <a href = "#<%= prev_week_link %>" style = "border: none"><img src = "/images/left_32.png" /></a>\n    <a href = "#<%= prev_week_link %>">Prev week</a>\n  </div>\n  <% if (next_week_link != null) { %>\n    <div class = "next_week">\n      <a href = "#<%= next_week_link %>">Next week</a>\n      <a href = "#<%= next_week_link %>" style = "border: none"><img src = "/images/right_32.png" /></a>\n    </div>\n  <% } %>\n  <div style = "display: inline-block; padding-right: 50px">\n    User:\n    <select id = "users" class = "filter">\n      <option value = "0"><%= all %></option>\n      <% users.each(function(user) { %>\n        <option value = "<%= user.id %>"><%= user.name() == null || user.name().length == 0 ? user.email() : user.name() %></option>\n      <% }); %>\n    </select>\n  </div>\n  Checklist:\n  <select id = "checklists"></select>\n  <a class = "button" style = "margin-left: 40px" href = "#charts">Chart view</a>\n</div>\n<% if (entries_by_day.length == 0) { %>\n  <h2>No entries for this week</h2>\n<% } %>\n<% _.each(entries_by_day, function(day_entry) { %>\n  <h2><%= day_entry[0] %></h2>\n  <table class = "timeline_entries">\n    <tr>\n      <th>Checklist</th>\n      <th>User</th>\n      <th>Completed at</th>\n      <th>Completed for</th>\n    </tr>\n\n    <% _.each(day_entry[1], function(entry) { %>\n      <tr>\n        <td class = "first"><%= entry.checklist_name %></td>\n        <td><%= entry.user_name %></td>\n        <td><%= entry.display_time %></td>\n        <td><%= entry.for %></td>\n      </tr>\n    <% }); %>\n  </table>\n<% }); %>');
+      this.no_entries_template = _.template('You\'ll need to\n<% if (checklists.length == 0) { %>\n  <a href = "#checklists">define some checklists</a> and get people to fill them out\n<% } else { %>\n  define some checklists and <a href = "#checklists">get people to fill them out</a>\n<% } %>\nto get reports and charts like this:<br/><br/>\n<img src = "/images/timeline-sample.png" /><br/>\n<img src = "/images/chart-sample.png" /><br/>');
       this.checklist_dropdown = new ChecklistDropdown({
         id: "checklists",
         checklists: this.checklists,
@@ -62,21 +63,29 @@
       }, this));
     }
     TimelineView.prototype.render = function() {
-      $(this.el).html(this.template({
-        all: this.all,
-        users: this.users,
-        checklists: this.checklists,
-        entries_by_day: this.entries_by_day,
-        next_week_link: this.next_week_link(),
-        prev_week_link: this.prev_week_link()
-      }));
       $("#heading").html("Reports &gt; Timeline");
-      this.checklist_dropdown.render();
-      if (this.user_id) {
-        this.$("#users").val(this.user_id);
-      }
-      if (this.checklist_id) {
-        return this.$("#checklists").val(this.checklist_id);
+      if (this.entries_by_day.length > 0) {
+        $(this.el).html(this.template({
+          all: this.all,
+          users: this.users,
+          checklists: this.checklists,
+          entries_by_day: this.entries_by_day,
+          next_week_link: this.next_week_link(),
+          prev_week_link: this.prev_week_link()
+        }));
+        this.checklist_dropdown.render();
+        if (this.user_id) {
+          this.$("#users").val(this.user_id);
+        }
+        if (this.checklist_id) {
+          return this.$("#checklists").val(this.checklist_id);
+        }
+      } else {
+        console.log("no entries");
+        return $(this.el).html(this.no_entries_template({
+          users: this.users,
+          checklists: this.checklists
+        }));
       }
     };
     TimelineView.prototype.next_week_link = function() {

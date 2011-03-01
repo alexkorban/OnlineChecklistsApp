@@ -19,7 +19,7 @@
 
     :javascript
       var current_user = #{current_user.to_json(:only => User::JSON_FIELDS)};
-      var current_account = #{current_user ? current_user.account.to_json(:only => [:created_at, :time_zone], :methods => [:has_entries]) : "null"};
+      var current_account = #{current_user ? current_user.account.to_json(:only => [:time_zone]) : "null"};
 
       $(function() {
         // using a global handler for Set time zone button because time zone can be set from two places:

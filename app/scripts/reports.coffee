@@ -50,67 +50,66 @@ class root.TimelineView extends Backbone.View
     $("#" + @id).replaceWith(@el)
 
     @template = _.template('''
-      <% if (current_account.has_entries) { %>
-        <div class = "report_controls">
-          <div class = "prev_week">
-            <a href = "#<%= prev_week_link %>" style = "border: none"><img src = "/images/left_32.png" /></a>
-            <a href = "#<%= prev_week_link %>">Prev week</a>
-          </div>
-          <% if (next_week_link != null) { %>
-            <div class = "next_week">
-              <a href = "#<%= next_week_link %>">Next week</a>
-              <a href = "#<%= next_week_link %>" style = "border: none"><img src = "/images/right_32.png" /></a>
-            </div>
-          <% } %>
-          <div style = "display: inline-block; padding-right: 50px">
-            User:
-            <select id = "users" class = "filter">
-              <option value = "0"><%= all %></option>
-              <% users.each(function(user) { %>
-                <option value = "<%= user.id %>"><%= user.name() == null || user.name().length == 0 ? user.email() : user.name() %></option>
-              <% }); %>
-            </select>
-          </div>
-          Checklist:
-          <select id = "checklists"></select>
-          <a class = "button" style = "margin-left: 40px" href = "#charts">Chart view</a>
+      <div class = "report_controls">
+        <div class = "prev_week">
+          <a href = "#<%= prev_week_link %>" style = "border: none"><img src = "/images/left_32.png" /></a>
+          <a href = "#<%= prev_week_link %>">Prev week</a>
         </div>
-        <% if (entries_by_day.length == 0) { %>
-          <h2>No entries for this week</h2>
+        <% if (next_week_link != null) { %>
+          <div class = "next_week">
+            <a href = "#<%= next_week_link %>">Next week</a>
+            <a href = "#<%= next_week_link %>" style = "border: none"><img src = "/images/right_32.png" /></a>
+          </div>
         <% } %>
-        <% _.each(entries_by_day, function(day_entry) { %>
-          <h2><%= day_entry[0] %></h2>
-          <table class = "timeline_entries">
-            <tr>
-              <th>Checklist</th>
-              <th>User</th>
-              <th>Completed at</th>
-              <th>Completed for</th>
-            </tr>
-
-            <% _.each(day_entry[1], function(entry) { %>
-              <tr>
-                <td class = "first"><%= entry.checklist_name %></td>
-                <td><%= entry.user_name %></td>
-                <td><%= entry.display_time %></td>
-                <td><%= entry.for %></td>
-              </tr>
+        <div style = "display: inline-block; padding-right: 50px">
+          User:
+          <select id = "users" class = "filter">
+            <option value = "0"><%= all %></option>
+            <% users.each(function(user) { %>
+              <option value = "<%= user.id %>"><%= user.name() == null || user.name().length == 0 ? user.email() : user.name() %></option>
             <% }); %>
-          </table>
-        <% }); %>
-      <% } else { %>
-        You'll need to
-        <% if (checklists.length == 0) { %>
-          <a href = "#checklists">define some checklists</a> and get people to fill them out
-        <% } else { %>
-          define some checklists and <a href = "#checklists">get people to fill them out</a>
-        <% } %>
-        to get reports and charts like this:<br/><br/>
-        <img src = "/images/timeline-sample.png" /><br/>
-        <img src = "/images/chart-sample.png" /><br/>
-
+          </select>
+        </div>
+        Checklist:
+        <select id = "checklists"></select>
+        <a class = "button" style = "margin-left: 40px" href = "#charts">Chart view</a>
+      </div>
+      <% if (entries_by_day.length == 0) { %>
+        <h2>No entries for this week</h2>
       <% } %>
+      <% _.each(entries_by_day, function(day_entry) { %>
+        <h2><%= day_entry[0] %></h2>
+        <table class = "timeline_entries">
+          <tr>
+            <th>Checklist</th>
+            <th>User</th>
+            <th>Completed at</th>
+            <th>Completed for</th>
+          </tr>
+
+          <% _.each(day_entry[1], function(entry) { %>
+            <tr>
+              <td class = "first"><%= entry.checklist_name %></td>
+              <td><%= entry.user_name %></td>
+              <td><%= entry.display_time %></td>
+              <td><%= entry.for %></td>
+            </tr>
+          <% }); %>
+        </table>
+      <% }); %>
     ''')
+
+    @no_entries_template = _.template '''
+      You'll need to
+      <% if (checklists.length == 0) { %>
+        <a href = "#checklists">define some checklists</a> and get people to fill them out
+      <% } else { %>
+        define some checklists and <a href = "#checklists">get people to fill them out</a>
+      <% } %>
+      to get reports and charts like this:<br/><br/>
+      <img src = "/images/timeline-sample.png" /><br/>
+      <img src = "/images/chart-sample.png" /><br/>
+    '''
 
     @checklist_dropdown = new ChecklistDropdown({id: "checklists", checklists: @checklists, allow_all: yes})
     $.getJSON @entries_url(), (data, textStatus, xhr) =>
@@ -119,18 +118,25 @@ class root.TimelineView extends Backbone.View
 
 
   render: ->
-    $(@el).html @template({
-      all: @all
-      users: @users
-      checklists: @checklists
-      entries_by_day: @entries_by_day
-      next_week_link: @next_week_link()
-      prev_week_link: @prev_week_link()
-      })
     $("#heading").html("Reports &gt; Timeline")
-    @checklist_dropdown.render()
-    @$("#users").val(@user_id) if @user_id
-    @$("#checklists").val(@checklist_id) if @checklist_id
+    if @entries_by_day.length > 0
+      $(@el).html @template({
+        all: @all
+        users: @users
+        checklists: @checklists
+        entries_by_day: @entries_by_day
+        next_week_link: @next_week_link()
+        prev_week_link: @prev_week_link()
+        })
+      @checklist_dropdown.render()
+      @$("#users").val(@user_id) if @user_id
+      @$("#checklists").val(@checklist_id) if @checklist_id
+    else
+      console.log "no entries"
+      $(@el).html @no_entries_template({
+        users: @users
+        checklists: @checklists
+      })
 
 
   next_week_link: ->

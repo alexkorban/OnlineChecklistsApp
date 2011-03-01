@@ -265,7 +265,6 @@ class root.ChecklistView extends Backbone.View
       return
     entry = new Entry({checklist_id: @model.id, for: @$("input[name=for]").val()})
     entry.save()
-    current_account.has_entries = true
     window.app.flash = "Completed checklist: #{@model.name()}"
     window.location.hash = "checklists"
 
