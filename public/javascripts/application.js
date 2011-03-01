@@ -55,7 +55,11 @@
       return s;
     };
     AppController.prototype.checklists = function() {
-      return this.view = new ChecklistListView;
+      if (!(current_account.time_zone != null) || current_account.time_zone.length === 0) {
+        return this.view = new TimeZoneView;
+      } else {
+        return this.view = new ChecklistListView;
+      }
     };
     AppController.prototype.show = function(cid) {
       return this.view = new ChecklistView({

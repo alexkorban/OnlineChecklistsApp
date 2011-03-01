@@ -72,6 +72,26 @@
     return Entry;
   })();
   root.Checklists = new ChecklistCollection;
+  root.TimeZoneView = (function() {
+    __extends(TimeZoneView, Backbone.View);
+    TimeZoneView.prototype.tagName = "div";
+    TimeZoneView.prototype.id = "content";
+    function TimeZoneView() {
+      TimeZoneView.__super__.constructor.apply(this, arguments);
+      $("#" + this.id).replaceWith(this.el);
+      $.get("/time_zone", __bind(function(data, textStatus, xhr) {
+        console.log(data);
+        this.template = _.template("Please set the time zone you are in:<br/><br/>\n" + data + "\n<br/><br/>This is necessary to get accurate reports.");
+        return this.render();
+      }, this));
+    }
+    TimeZoneView.prototype.render = function() {
+      $(this.el).html(this.template());
+      $("#heading").html("Set time zone");
+      return this.$("#set_time_zone").attr("href", "#checklists");
+    };
+    return TimeZoneView;
+  })();
   root.ChecklistListView = (function() {
     __extends(ChecklistListView, Backbone.View);
     ChecklistListView.prototype.tagName = "div";
@@ -88,8 +108,8 @@
       Checklists.refresh(Checklists.select(function(model) {
         return model.id != null;
       }));
-      this.template = _.template('<% if (flash != null) { %>\n  <div id = \'flash\' class = \'notice\'><div><%= flash %></div></div>\n<% } %>\n<% if (checklists.length == 0) { %>\n  <div>\n    It\'s time to create some checklists because you don\'t have any!<br/><br/>Press the <b>Create checklist</b> button below to create one.\n    <img src = "/images/down_32.png" style = "display: block; margin-left: 50px; margin-top: 10px" />\n  </div>\n<% } %>\n<ul class = "checklists">\n<% checklists.each(function(checklist) { %>\n<li class = "checklist" id = "<%= checklist.cid %>"><%= checklist.name() %>\n  <span class = "controls">\n    <a href="#checklists/<%= checklist.cid %>">Fill out</a> |\n    <a class = "secondary" href = "#checklists/<%= checklist.cid %>/edit">Edit</a> |\n    <a class = "secondary delete" id = "delete_<%= checklist.cid %>" href = "#">Delete</a>\n  </span>\n</li>\n<% }); %>\n</ul>\n<div class = "message" style = "display: none">\n  You\'ve reached the limit of your plan with <%= window.Plan.checklists %> checklists.\n  <% if (current_user.role == "admin") { %>\n    <a href = "/users/edit#plan">Please consider upgrading to a larger plan</a>.\n  <% } else { %>\n    Please ask the administrator of your account to upgrade to a larger plan.\n  <% } %>\n</div>\n<div style = "margin-top: <%= checklists.length > 0 ? 40 : 0 %>px">\n  <a class = "create button" href = "#">Create checklist</a>\n  <a class = "button" href = "#timeline">View reports</a>\n  <% if (current_user.role == "admin") { %> <a class = "button" href = "#users">Invite users</a> <% } %>\n</div>');
       $("#" + this.id).replaceWith(this.el);
+      this.template = _.template('<% if (flash != null) { %>\n  <div id = \'flash\' class = \'notice\'><div><%= flash %></div></div>\n<% } %>\n<% if (checklists.length == 0) { %>\n  <div>\n    It\'s time to create some checklists because you don\'t have any!<br/><br/>Press the <b>Create checklist</b> button below to create one.\n    <img src = "/images/down_32.png" style = "display: block; margin-left: 50px; margin-top: 10px" />\n  </div>\n<% } %>\n<ul class = "checklists">\n<% checklists.each(function(checklist) { %>\n<li class = "checklist" id = "<%= checklist.cid %>"><%= checklist.name() %>\n  <span class = "controls">\n    <a href="#checklists/<%= checklist.cid %>">Fill out</a> |\n    <a class = "secondary" href = "#checklists/<%= checklist.cid %>/edit">Edit</a> |\n    <a class = "secondary delete" id = "delete_<%= checklist.cid %>" href = "#">Delete</a>\n  </span>\n</li>\n<% }); %>\n</ul>\n<div class = "message" style = "display: none">\n  You\'ve reached the limit of your plan with <%= window.Plan.checklists %> checklists.\n  <% if (current_user.role == "admin") { %>\n    <a href = "/users/edit#plan">Please consider upgrading to a larger plan</a>.\n  <% } else { %>\n    Please ask the administrator of your account to upgrade to a larger plan.\n  <% } %>\n</div>\n<div style = "margin-top: <%= checklists.length > 0 ? 40 : 0 %>px">\n  <a class = "create button" href = "#">Create checklist</a>\n  <a class = "button" href = "#timeline">View reports</a>\n  <% if (current_user.role == "admin") { %> <a class = "button" href = "#users">Invite users</a> <% } %>\n</div>');
       this.render();
     }
     ChecklistListView.prototype.render = function() {

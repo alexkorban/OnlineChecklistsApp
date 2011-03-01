@@ -19,7 +19,7 @@
 
     :javascript
       var current_user = #{current_user.to_json(:only => User::JSON_FIELDS)};
-      var current_account = #{current_user ? current_user.account.to_json(:only => [:created_at], :methods => [:has_entries]) : "null"};
+      var current_account = #{current_user ? current_user.account.to_json(:only => [:created_at, :time_zone], :methods => [:has_entries]) : "null"};
 
       $(function() {
         // using a global handler for Set time zone button because time zone can be set from two places:
@@ -29,7 +29,12 @@
           $(this).html("Saving...");
           self = this;
           $.post("/time_zone", {time_zone: $(this).prev("select").val()}, function (data, textStatus, xhr) {
+            current_account.time_zone = $(self).prev("select").val();
             $(self).html("Set time zone");
+
+            // redirect to another location via the location hash when the href attribute is set
+            if ($(self).attr("href") != "#")
+              window.location.hash = $(self).attr("href");
           });
           e.preventDefault();
         });

@@ -75,6 +75,33 @@ class Entry extends Backbone.Model
 root.Checklists = new ChecklistCollection
 
 
+class root.TimeZoneView extends Backbone.View
+  tagName: "div"
+  id: "content"
+
+  constructor: ->
+    super
+
+    $("#" + @id).replaceWith(@el)
+
+    # when the time zone isn't set, show time zone selection thing
+    $.get "/time_zone", (data, textStatus, xhr) =>
+      console.log data
+      @template = _.template """
+        Please set the time zone you are in:<br/><br/>
+        #{data}
+        <br/><br/>This is necessary to get accurate reports.
+      """
+
+      @render()
+
+
+  render: ->
+    $(@el).html(@template())
+    $("#heading").html("Set time zone")
+    @$("#set_time_zone").attr("href", "#checklists")    # go to the checklists page after setting time zone
+
+
 class root.ChecklistListView extends Backbone.View
   tagName: "div"
   id: "content"
@@ -92,6 +119,8 @@ class root.ChecklistListView extends Backbone.View
 
     # get rid of any leftover unsaved checklists
     Checklists.refresh(Checklists.select (model) -> model.id?)
+
+    $("#" + @id).replaceWith(@el)
 
     @template = _.template('''
       <% if (flash != null) { %>
@@ -128,8 +157,6 @@ class root.ChecklistListView extends Backbone.View
         <% if (current_user.role == "admin") { %> <a class = "button" href = "#users">Invite users</a> <% } %>
       </div>
       ''')
-
-    $("#" + @id).replaceWith(@el)
 
     @render()
 

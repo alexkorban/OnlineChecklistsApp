@@ -52,7 +52,10 @@ class AppController extends Backbone.Controller
     s
 
   checklists: ->
-    @view = new ChecklistListView
+    if !current_account.time_zone? || current_account.time_zone.length == 0
+      @view = new TimeZoneView
+    else
+      @view = new ChecklistListView
 
 
   show: (cid) ->
