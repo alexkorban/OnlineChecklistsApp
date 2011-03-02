@@ -6,6 +6,8 @@ class User < ActiveRecord::Base
 
   # validations
   validates :role, format: /user|admin/
+  validates :account_id, presence: true, numericality: true
+  validates :email, presence: true
 
   # relations
   belongs_to :account

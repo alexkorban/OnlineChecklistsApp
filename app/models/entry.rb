@@ -1,4 +1,15 @@
 class Entry < ActiveRecord::Base
+  # Relations
+  belongs_to :checklist
+  belongs_to :user
+  belongs_to :account
+
+  # Validations
+  validates :checklist_id, presence: true, numericality: true
+  validates :user_id, presence: true, numericality: true
+  validates :account_id, presence: true, numericality: true
+
+  # Scopes
   scope :between_dates, lambda { |from, to| where("created_at >= ? AND created_at <= ?", from.to_s, to.to_s) }
   scope :for_checklist, lambda { |checklist_id| where("checklist_id = ?", checklist_id) }
   scope :for_user, lambda { |user_id| where("user_id = ?", user_id) }
@@ -11,12 +22,6 @@ class Entry < ActiveRecord::Base
       order("date_trunc('#{group_by}', created_at), user_id")
   end
 
-  belongs_to :checklist
-  belongs_to :user
-  belongs_to :account
-
-  validates :checklist_id, presence: true, numericality: true
-  validates :user_id, presence: true, numericality: true
 
   def user_name
     user.safe_name
