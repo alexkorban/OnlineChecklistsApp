@@ -37,6 +37,7 @@
       "checklists": "checklists",
       "checklists/:cid/edit": "edit",
       "checklists/:cid": "show",
+      "timezone": "timezone",
       "create": "create",
       "users": "users",
       "timeline": "timeline",
@@ -56,10 +57,13 @@
     };
     AppController.prototype.checklists = function() {
       if (!(current_account.time_zone != null) || current_account.time_zone.length === 0) {
-        return this.view = new TimeZoneView;
+        return window.location.hash = "timezone";
       } else {
         return this.view = new ChecklistListView;
       }
+    };
+    AppController.prototype.timezone = function() {
+      return this.view = new TimeZoneView;
     };
     AppController.prototype.show = function(cid) {
       return this.view = new ChecklistView({

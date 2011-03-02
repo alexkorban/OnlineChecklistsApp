@@ -34,6 +34,7 @@ class AppController extends Backbone.Controller
     "checklists": "checklists"
     "checklists/:cid/edit": "edit"
     "checklists/:cid": "show"
+    "timezone": "timezone"
     "create": "create"
     "users": "users"
     "timeline": "timeline"
@@ -53,9 +54,13 @@ class AppController extends Backbone.Controller
 
   checklists: ->
     if !current_account.time_zone? || current_account.time_zone.length == 0
-      @view = new TimeZoneView
+      window.location.hash = "timezone"
     else
       @view = new ChecklistListView
+
+
+  timezone: ->
+    @view = new TimeZoneView
 
 
   show: (cid) ->

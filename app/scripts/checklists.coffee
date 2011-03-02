@@ -173,7 +173,7 @@ class root.ChecklistListView extends Backbone.View
     e.preventDefault()
 
   on_doubleclick: (e) ->
-    window.location.hash = "#checklists/#{e.target.id}"
+    window.location.hash = "checklists/#{e.target.id}"
 
 
   on_delete: (e) ->
