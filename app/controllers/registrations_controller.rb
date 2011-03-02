@@ -49,16 +49,17 @@ class RegistrationsController < Devise::RegistrationsController
         success = true
       }
     rescue ActiveRecord::RecordInvalid
-      flash.now[:error] = "The email address is already in use, please log into your existing account or use another email address to create a new account."
+      flash.now[:alert] = "The email address is already in use, please log into your existing account or use another email address to create a new account."
     rescue
-      flash.now[:error] = "Account couldn't be created, sorry about that. Please contact us at #{SUPPORT_EMAIL} and we'll sort it out for you."
+      flash.now[:alert] = "Account couldn't be created, sorry about that. Please contact us at #{SUPPORT_EMAIL} and we'll sort it out for you."
       raise
     end
     if success
       set_flash_message :notice, :signed_up
+      DelayedMailer.push(:signup_confirmation, resource.id)
       sign_in_and_redirect(resource_name, resource)
     else
-      flash.now[:error] ||= "Sign up failed, please try again"
+      flash.now[:alert] ||= "Sign up failed, please try again"
       clean_up_passwords(resource)
       flash.now[:plan] = params[resource_name][:plan]
       render_with_scope :new
@@ -79,7 +80,7 @@ class RegistrationsController < Devise::RegistrationsController
   protected
 
   def registrations_layout
-    ["edit", "new", "destroy", "billing"].include?(action_name) ? "application" : nil
+    ["edit", "new", "destroy", "billing", "create"].include?(action_name) ? "application" : nil
   end
 
 end

@@ -1,0 +1,24 @@
+Hi #{@user.name}
+%br
+%br
+Welcome to OnlineChecklists!
+%br
+%br
+Your username is:
+%b= @user.email
+%br
+%br
+You can login to the site at
+= succeed "." do
+  %a(href = "http://onlinechecklists.com") http://onlinechecklists.com
+%br
+%br
+If you have any questions, feel free to get in touch by replying to this email.
+%br
+%br
+Thanks for joining and have a great day!
+%br
+%br
+Best regards
+%br
+Alex Korban.
