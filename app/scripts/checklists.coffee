@@ -40,6 +40,11 @@ class root.Checklist extends Backbone.Model
     @items.url = "/checklists/#{@id}"
 
 
+#  validate: (attrs) ->
+#    console.log "attrs:", attrs
+#    "Please enter a name for the checklist" if attrs.name? && $.trim(attrs.name).length == 0
+
+
 
 class ChecklistCollection extends Backbone.Collection
   model: Checklist
@@ -214,6 +219,7 @@ class root.ChecklistView extends Backbone.View
     "click .checklist_item": "on_click_item"
     "focus input": "on_focus_input"
     "blur input": "on_blur_input"
+    "error": "on_error"
     #"keydown input": "on_keydown"
     #"keydown li": "on_keydown"
   }
@@ -278,6 +284,10 @@ class root.ChecklistView extends Backbone.View
     @$(".input_field .instructions").hide()
 
 
+  on_error: (model, error) ->
+    alert(error)
+
+
 class root.EditItemView extends Backbone.View
   model: Item
   tagName: "li"
@@ -312,6 +322,7 @@ class root.EditChecklistView extends Backbone.View
   events: {
     "click .save": "on_save"
     "click .add_item": "on_add_item"
+    "error": "on_error"
   }
   tagName: "div"
   id: "content"
@@ -320,7 +331,9 @@ class root.EditChecklistView extends Backbone.View
     super
 
     @template = _.template('''
-      Checklist: <input type = "text" class = "checklist_name" value = "<%= name %>" /><br/><br/>
+      Checklist: <input type = "text" class = "checklist_name" value = "<%= name %>" /><br/>
+      <div class = "message"></div>
+      <br/>
       <ul>
       </ul>
       <ul><li><a class = "button add_item" href = "#">Add step</a></li></ul>
@@ -333,6 +346,8 @@ class root.EditChecklistView extends Backbone.View
     @model.items.bind "add", @add_item
     @model.items.bind "remove", @remove_item
     @model.items.bind "refresh", @add_items
+
+    #@model.bind("error", (model, error) => @on_error(error))
 
     $("#" + @id).replaceWith(@el)
     @render()
@@ -350,13 +365,21 @@ class root.EditChecklistView extends Backbone.View
 
 
   on_save: (e) ->
+    if $.trim(@$(".checklist_name").val()).length == 0
+      @on_error("Please enter a name for the checklist")
+      e.preventDefault()
+      return
+
     @model.set {"name": @$(".checklist_name").val()}
 
-    @model.save({}, success: (model, response) =>
-      @model.set_items_url()
-      #@model.set {id: response.id}
-      window.location.hash = $(e.target).attr("href")
-    )
+    @model.save {},
+      { success: (model, response) =>
+          @model.set_items_url()
+          #@model.set {id: response.id}
+          window.location.hash = $(e.target).attr("href")
+        error: (model, error) =>
+          @on_error(error)
+      }
     e.preventDefault()
 
   on_add_item: (e) ->
@@ -383,3 +406,6 @@ class root.EditChecklistView extends Backbone.View
   remove_item: (item) ->
     item.view.remove()
 
+
+  on_error: (error) =>
+    @$(".message").html(error).show()

@@ -128,7 +128,7 @@
       return e.preventDefault();
     };
     ChecklistListView.prototype.on_doubleclick = function(e) {
-      return window.location.hash = "#checklists/" + e.target.id;
+      return window.location.hash = "checklists/" + e.target.id;
     };
     ChecklistListView.prototype.on_delete = function(e) {
       var cid, controls;
@@ -164,7 +164,8 @@
       "click .complete": "on_complete",
       "click .checklist_item": "on_click_item",
       "focus input": "on_focus_input",
-      "blur input": "on_blur_input"
+      "blur input": "on_blur_input",
+      "error": "on_error"
     };
     function ChecklistView() {
       ChecklistView.__super__.constructor.apply(this, arguments);
@@ -214,6 +215,9 @@
     ChecklistView.prototype.on_blur_input = function(e) {
       return this.$(".input_field .instructions").hide();
     };
+    ChecklistView.prototype.on_error = function(model, error) {
+      return alert(error);
+    };
     return ChecklistView;
   })();
   root.EditItemView = (function() {
@@ -250,14 +254,16 @@
     __extends(EditChecklistView, Backbone.View);
     EditChecklistView.prototype.events = {
       "click .save": "on_save",
-      "click .add_item": "on_add_item"
+      "click .add_item": "on_add_item",
+      "error": "on_error"
     };
     EditChecklistView.prototype.tagName = "div";
     EditChecklistView.prototype.id = "content";
     function EditChecklistView() {
+      this.on_error = __bind(this.on_error, this);;
       this.add_items = __bind(this.add_items, this);;
       this.add_item = __bind(this.add_item, this);;      EditChecklistView.__super__.constructor.apply(this, arguments);
-      this.template = _.template('Checklist: <input type = "text" class = "checklist_name" value = "<%= name %>" /><br/><br/>\n<ul>\n</ul>\n<ul><li><a class = "button add_item" href = "#">Add step</a></li></ul>\n<br/>\n<br/>\n<a class = "button save" href = "#checklists">Save checklist</a>\n<span style = "margin-left: 20px; margin-right: 10px">or</span>  <a href = "#checklists">Cancel</a>');
+      this.template = _.template('Checklist: <input type = "text" class = "checklist_name" value = "<%= name %>" /><br/>\n<div class = "message"></div>\n<br/>\n<ul>\n</ul>\n<ul><li><a class = "button add_item" href = "#">Add step</a></li></ul>\n<br/>\n<br/>\n<a class = "button save" href = "#checklists">Save checklist</a>\n<span style = "margin-left: 20px; margin-right: 10px">or</span>  <a href = "#checklists">Cancel</a>');
       this.model.items.bind("add", this.add_item);
       this.model.items.bind("remove", this.remove_item);
       this.model.items.bind("refresh", this.add_items);
@@ -271,6 +277,11 @@
       }
     }
     EditChecklistView.prototype.on_save = function(e) {
+      if ($.trim(this.$(".checklist_name").val()).length === 0) {
+        this.on_error("Please enter a name for the checklist");
+        e.preventDefault();
+        return;
+      }
       this.model.set({
         "name": this.$(".checklist_name").val()
       });
@@ -278,6 +289,9 @@
         success: __bind(function(model, response) {
           this.model.set_items_url();
           return window.location.hash = $(e.target).attr("href");
+        }, this),
+        error: __bind(function(model, error) {
+          return this.on_error(error);
         }, this)
       });
       return e.preventDefault();
@@ -308,6 +322,9 @@
     };
     EditChecklistView.prototype.remove_item = function(item) {
       return item.view.remove();
+    };
+    EditChecklistView.prototype.on_error = function(error) {
+      return this.$(".message").html(error).show();
     };
     return EditChecklistView;
   })();
