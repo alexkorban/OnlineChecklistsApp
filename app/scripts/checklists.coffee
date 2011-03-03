@@ -130,6 +130,14 @@ class root.ChecklistListView extends Backbone.View
         <a class = "button" href = "#timeline">View reports</a>
         <% if (current_user.role == "admin") { %> <a class = "button" href = "#users">Invite users</a> <% } %>
       </div>
+      <div class = "message" style = "display: none">
+        You've reached the limit of your plan with <%= window.Plan.checklists %> checklists.
+        <% if (current_user.role == "admin") { %>
+          <a href = "/billing">Please consider upgrading to a larger plan</a>.
+        <% } else { %>
+          Please ask the administrator of your account to upgrade to a larger plan.
+        <% } %>
+      </div>
       <% if (flash != null) { %>
         <div id = 'flash' class = 'notice'><div><%= flash %></div></div>
       <% } %>
@@ -150,14 +158,6 @@ class root.ChecklistListView extends Backbone.View
       </li>
       <% }); %>
       </ul>
-      <div class = "message" style = "display: none">
-        You've reached the limit of your plan with <%= window.Plan.checklists %> checklists.
-        <% if (current_user.role == "admin") { %>
-          <a href = "/users/edit#plan">Please consider upgrading to a larger plan</a>.
-        <% } else { %>
-          Please ask the administrator of your account to upgrade to a larger plan.
-        <% } %>
-      </div>
       ''')
 
     @render()

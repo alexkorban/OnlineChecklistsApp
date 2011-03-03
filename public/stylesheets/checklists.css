@@ -216,7 +216,7 @@ select {
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px; }
 
-.message {
+.message, #error_explanation {
   color: #da9201;
   font-weight: bold; }
 
