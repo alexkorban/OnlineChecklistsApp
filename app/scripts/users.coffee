@@ -198,7 +198,7 @@ class root.InvitationView extends Backbone.View
 
     message = """
           You've reached the limits of your plan with <%= window.Plan.users %> users.
-          <a href = "/users/edit#plan">Please consider upgrading to a larger plan</a>.
+          <a href = "/billing">Please consider upgrading to a larger plan</a>.
         """
 
     @template = _.template("""
@@ -209,7 +209,7 @@ class root.InvitationView extends Backbone.View
         <div id = "invitation_items" style = "margin-bottom: 20px"></div>
         <div class = "message" style = "margin-bottom: 20px; display: none">
           You cannot invite more than #{Plan.users - Users.length} users on your current plan.<br/>
-          <a href = "/users/edit#plan">Please consider upgrading to a larger plan</a> if you need more users.
+          <a href = "/billing">Please consider upgrading to a larger plan</a> if you need more users.
         </div>
 
         <a class = "button add_item" href = "#">Add another invitation</a>

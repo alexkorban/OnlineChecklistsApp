@@ -174,8 +174,8 @@
       InvitationView.__super__.constructor.apply(this, arguments);
       this.users = users;
       $("#" + this.id).replaceWith(this.el);
-      message = "You've reached the limits of your plan with <%= window.Plan.users %> users.\n<a href = \"/users/edit#plan\">Please consider upgrading to a larger plan</a>.";
-      this.template = _.template("<h2>Invite users</h2>\n<% if (Users.length >= Plan.users) { %>\n  <div class = \"message\">" + message + "</div>\n<% } else { %>\n  <div id = \"invitation_items\" style = \"margin-bottom: 20px\"></div>\n  <div class = \"message\" style = \"margin-bottom: 20px; display: none\">\n    You cannot invite more than " + (Plan.users - Users.length) + " users on your current plan.<br/>\n    <a href = \"/users/edit#plan\">Please consider upgrading to a larger plan</a> if you need more users.\n  </div>\n\n  <a class = \"button add_item\" href = \"#\">Add another invitation</a>\n  <br/><br/><br/>\n  <a class = \"button save\" href = \"#\">Send invitations</a>\n<% } %>");
+      message = "You've reached the limits of your plan with <%= window.Plan.users %> users.\n<a href = \"/billing\">Please consider upgrading to a larger plan</a>.";
+      this.template = _.template("<h2>Invite users</h2>\n<% if (Users.length >= Plan.users) { %>\n  <div class = \"message\">" + message + "</div>\n<% } else { %>\n  <div id = \"invitation_items\" style = \"margin-bottom: 20px\"></div>\n  <div class = \"message\" style = \"margin-bottom: 20px; display: none\">\n    You cannot invite more than " + (Plan.users - Users.length) + " users on your current plan.<br/>\n    <a href = \"/billing\">Please consider upgrading to a larger plan</a> if you need more users.\n  </div>\n\n  <a class = \"button add_item\" href = \"#\">Add another invitation</a>\n  <br/><br/><br/>\n  <a class = \"button save\" href = \"#\">Send invitations</a>\n<% } %>");
     }
     InvitationView.prototype.render = function() {
       $(this.el).html(this.template());
