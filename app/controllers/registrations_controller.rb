@@ -1,4 +1,6 @@
 class RegistrationsController < Devise::RegistrationsController
+  prepend_before_filter :authenticate_scope!, :only => [:index, :billing]
+
   layout :registrations_layout
 
   def index
