@@ -45,6 +45,8 @@ class RegistrationsController < Devise::RegistrationsController
         build_resource
         resource.role = "admin"
         acc.users << resource
+        logger.info "admin: #{resource.account_id}"
+        logger.info "saving account"
         acc.save!
         acc.create_subscriber(plan)
         success = true
@@ -85,6 +87,11 @@ class RegistrationsController < Devise::RegistrationsController
   def after_update_path_for(resource)
     edit_user_registration_path
   end
+
+  def after_sign_in_path_for(resource)
+    root_path
+  end
+
 #  def registrations_layout
 #    ["edit", "new", "destroy", "billing", "create"].include?(action_name) ? "application" : nil
 #  end
