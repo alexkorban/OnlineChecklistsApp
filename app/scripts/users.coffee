@@ -222,10 +222,8 @@ class root.InvitationView extends Backbone.View
 
     @error_template = _.template """
       Please correct the following errors:<br/>
-      <% console.log("errors: ", errors); %>
       <ul>
       <% _.each(errors, function(error) { %>
-        <% console.log("error: ", error); %>
         <li><%= error %></li>
       <% }); %>
       </ul>
@@ -264,7 +262,6 @@ class root.InvitationView extends Backbone.View
       success: (model, response) =>
         @users.refresh(response)
       error: (model, xhr) =>
-        console.log xhr
         @$("#submit_errors").html(@error_template({errors: $.parseJSON(xhr.responseText)})).show()
 
     })
