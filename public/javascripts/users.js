@@ -139,7 +139,7 @@
     };
     function InvitationItemView() {
       InvitationItemView.__super__.constructor.apply(this, arguments);
-      this.template = _.template('Name: <input type = "text" name = "name" value = "" />\nEmail: <input type = "text" name = "email" value = "" /> <a href = "#" class = "remove_item">X</a>');
+      this.template = _.template('<input type = "hidden" value = "<%= item.cid %>" />\nName: <input type = "text" name = "name" value = "" />\nEmail: <input type = "text" name = "email" value = "" /> <a href = "#" class = "remove_item">X</a>');
     }
     InvitationItemView.prototype.render = function() {
       $(this.el).html(this.template({
@@ -175,7 +175,8 @@
       this.users = users;
       $("#" + this.id).replaceWith(this.el);
       message = "You've reached the limits of your plan with <%= window.Plan.users %> users.\n<a href = \"/billing\">Please consider upgrading to a larger plan</a>.";
-      this.template = _.template("<h2>Invite users</h2>\n<% if (Users.length >= Plan.users) { %>\n  <div class = \"message\">" + message + "</div>\n<% } else { %>\n  <div id = \"invitation_items\" style = \"margin-bottom: 20px\"></div>\n  <div class = \"message\" style = \"margin-bottom: 20px; display: none\">\n    You cannot invite more than " + (Plan.users - Users.length) + " users on your current plan.<br/>\n    <a href = \"/billing\">Please consider upgrading to a larger plan</a> if you need more users.\n  </div>\n\n  <a class = \"button add_item\" href = \"#\">Add another invitation</a>\n  <br/><br/><br/>\n  <a class = \"button save\" href = \"#\">Send invitations</a>\n<% } %>");
+      this.template = _.template("<h2>Invite users</h2>\n<div class = \"message\" id = \"submit_errors\" style = \"display:none\"></div>\n<% if (Users.length >= Plan.users) { %>\n  <div class = \"message\">" + message + "</div>\n<% } else { %>\n  <div id = \"invitation_items\" style = \"margin-bottom: 20px\"></div>\n  <div class = \"message\" style = \"margin-bottom: 20px; display: none\">\n    You cannot invite more than " + (Plan.users - Users.length) + " users on your current plan.<br/>\n    <a href = \"/billing\">Please consider upgrading to a larger plan</a> if you need more users.\n  </div>\n\n  <a class = \"button add_item\" href = \"#\">Add another invitation</a>\n  <br/><br/><br/>\n  <a class = \"button save\" href = \"#\">Send invitations</a>\n<% } %>");
+      this.error_template = _.template("Please correct the following errors:<br/>\n<ul>\n<% _.each(errors, function(error) { %>\n  <li><%= error %></li>\n<% }); %>\n</ul>");
     }
     InvitationView.prototype.render = function() {
       $(this.el).html(this.template());
@@ -208,7 +209,14 @@
     InvitationView.prototype.on_save = function(e) {
       this.invitations.save({}, {
         success: __bind(function(model, response) {
+          console.log("success");
           return this.users.refresh(response);
+        }, this),
+        error: __bind(function(model, xhr) {
+          console.log("errors", xhr);
+          return this.$("#submit_errors").html(this.error_template({
+            errors: $.parseJSON(xhr.response)
+          })).show();
         }, this)
       });
       return e.preventDefault();

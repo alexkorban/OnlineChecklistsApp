@@ -34,4 +34,9 @@ class User < ActiveRecord::Base
   def safe_name
     name.nil? || name.empty? ? email : name
   end
+
+  def password_required?
+    return false if invitation_token.nil? || invitation_token.empty?
+    super
+  end
 end

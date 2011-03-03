@@ -160,6 +160,7 @@ class root.InvitationItemView extends Backbone.View
     super
 
     @template = _.template('''
+      <input type = "hidden" value = "<%= item.cid %>" />
       Name: <input type = "text" name = "name" value = "" />
       Email: <input type = "text" name = "email" value = "" /> <a href = "#" class = "remove_item">X</a>
     ''')
@@ -203,6 +204,7 @@ class root.InvitationView extends Backbone.View
 
     @template = _.template("""
       <h2>Invite users</h2>
+      <div class = "message" id = "submit_errors" style = "display:none"></div>
       <% if (Users.length >= Plan.users) { %>
         <div class = "message">#{message}</div>
       <% } else { %>
@@ -218,7 +220,14 @@ class root.InvitationView extends Backbone.View
       <% } %>
       """)
 
-
+    @error_template = _.template """
+      Please correct the following errors:<br/>
+      <ul>
+      <% _.each(errors, function(error) { %>
+        <li><%= error %></li>
+      <% }); %>
+      </ul>
+    """
 
   render: ->
     $(@el).html(@template())
@@ -248,8 +257,15 @@ class root.InvitationView extends Backbone.View
 
 
   on_save: (e) ->
-    @invitations.save({}, {success: (model, response) =>
-      @users.refresh(response)
+    @invitations.save({},
+    {
+      success: (model, response) =>
+        console.log "success"
+        @users.refresh(response)
+      error: (model, xhr) =>
+        console.log "errors", xhr
+        @$("#submit_errors").html(@error_template({errors: $.parseJSON(xhr.response)})).show()
+
     })
     e.preventDefault()
 
