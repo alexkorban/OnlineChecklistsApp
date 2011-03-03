@@ -209,11 +209,9 @@
     InvitationView.prototype.on_save = function(e) {
       this.invitations.save({}, {
         success: __bind(function(model, response) {
-          console.log("success");
           return this.users.refresh(response);
         }, this),
         error: __bind(function(model, xhr) {
-          console.log("errors", xhr);
           return this.$("#submit_errors").html(this.error_template({
             errors: $.parseJSON(xhr.response)
           })).show();

@@ -28,7 +28,7 @@ class ApplicationController < ActionController::Base
   def check_account_status
     user_session[:account_status] = nil
     if current_account.card_expires_before_next_auto_renew?
-      user_session[:account_status] = "Your credit card on file will expire before the next renewal, please enter new credit card details."
+      user_session[:account_status] = "Your credit card on file will expire before the next payment is due, please enter new credit card details."
     end
     if current_account.in_grace_period?
       user_session[:account_status] = "Your account is unpaid. Please pay before " +

@@ -21,7 +21,7 @@ class User < ActiveRecord::Base
   # this will be used during authentication by Devise
   def active?
     # Comment out the below debug statement to view the properties of the returned self model values.
-    # logger.debug self.to_yaml
+    #logger.debug self.to_yaml
 
     super && active && account.active
   end
