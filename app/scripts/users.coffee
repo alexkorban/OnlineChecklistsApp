@@ -260,10 +260,8 @@ class root.InvitationView extends Backbone.View
     @invitations.save({},
     {
       success: (model, response) =>
-        console.log "success"
         @users.refresh(response)
       error: (model, xhr) =>
-        console.log "errors", xhr
         @$("#submit_errors").html(@error_template({errors: $.parseJSON(xhr.response)})).show()
 
     })

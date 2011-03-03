@@ -46,7 +46,6 @@ class RegistrationsController < Devise::RegistrationsController
         resource.role = "admin"
         acc.users << resource
         acc.save!
-        logger.info "Res name: #{resource_name}, plan: #{plan}"
         acc.create_subscriber(plan)
         success = true
       }

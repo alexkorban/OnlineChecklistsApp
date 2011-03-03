@@ -41,7 +41,6 @@ class EntriesController < ApplicationController
 
     counts = Entry.get_counts(current_account, checklist_id, group_by)
 
-    logger.info "COUNTS: ", counts.inspect
     respond_to {|format|
       format.json { render json: counts, status: :ok }
     }

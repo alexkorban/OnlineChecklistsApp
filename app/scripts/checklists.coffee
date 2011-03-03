@@ -41,7 +41,6 @@ class root.Checklist extends Backbone.Model
 
 
 #  validate: (attrs) ->
-#    console.log "attrs:", attrs
 #    "Please enter a name for the checklist" if attrs.name? && $.trim(attrs.name).length == 0
 
 
