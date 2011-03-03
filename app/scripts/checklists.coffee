@@ -125,14 +125,14 @@ class root.ChecklistListView extends Backbone.View
     $("#" + @id).replaceWith(@el)
 
     @template = _.template('''
-      <% if (flash != null) { %>
-        <div id = 'flash' class = 'notice'><div><%= flash %></div></div>
-      <% } %>
       <div id = "buttons">
         <a class = "create button" href = "#">Create checklist</a>
         <a class = "button" href = "#timeline">View reports</a>
         <% if (current_user.role == "admin") { %> <a class = "button" href = "#users">Invite users</a> <% } %>
       </div>
+      <% if (flash != null) { %>
+        <div id = 'flash' class = 'notice'><div><%= flash %></div></div>
+      <% } %>
       <% if (checklists.length == 0) { %>
         <div>
           <img src = "/images/up_32.png" style = "display: block; margin-left: 50px; margin-top: 10px; margin-bottom: 10px" />
