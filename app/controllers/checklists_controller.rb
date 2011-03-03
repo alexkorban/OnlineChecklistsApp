@@ -6,21 +6,7 @@ class ChecklistsController < ApplicationController
   # this is the only place where we perform subscription checks because the other controllers and actions don't provide
   # UI access to checklists; therefore it seems good enough
   def index
-    if current_account.card_expires_before_next_auto_renew?
-      flash[:alert] = "Your credit card on file will expire before the next renewal, please enter new credit card details."
-    end
-    if current_account.in_grace_period?
-      flash[:alert] = "Your account is unpaid. Please pay before #{current_account.end_of_grace_period}."
-    end
-    if !current_account.subscription_active?    # this includes cancelled subscriptions, expired trials and grace period running over
-      if current_account.on_trial?
-        flash[:alert] = "Your trial has expired, please choose a paid plan and enter payment details."
-      else
-        flash[:alert] = "Your account is unpaid, please choose a paid plan and enter payment details."
-      end
-      redirect_to edit_user_registration_path
-      return
-    end
+    return if !check_account_status
 
     @checklists = current_account.checklists.active.order("name")
     @users = current_account.users.active.order("name")

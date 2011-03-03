@@ -69,6 +69,8 @@ class RegistrationsController < Devise::RegistrationsController
   end
 
   def billing
+    check_account_status
+
     if current_user.role != "admin"
       redirect_to edit_user_registration_path
       return

@@ -216,6 +216,18 @@ select {
   -moz-border-radius: 5px;
   -webkit-border-radius: 5px; }
 
+#account_status {
+  position: absolute;
+  right: 20px;
+  top: 65px;
+  width: 50%;
+  font-weight: bold;
+  text-align: left;
+  padding-left: 20px;
+  padding-right: 20px;
+  border-left: 10px solid #da9201;
+  border-right: 10px solid #da9201; }
+
 .message, #error_explanation {
   color: #da9201;
   font-weight: bold; }

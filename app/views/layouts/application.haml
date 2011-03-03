@@ -52,6 +52,9 @@
   %body
     #header
       #nav
+        - if user_session[:account_status]
+          #account_status= user_session[:account_status]
+
         .logo
           %a(href = "#{root_path}")
             <span class = "capital">O</span>nline<span class = "capital">C</span>hecklists

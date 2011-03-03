@@ -24,4 +24,26 @@ class ApplicationController < ActionController::Base
   def set_time_zone
     Time.zone = current_account.time_zone if current_user
   end
+
+  def check_account_status
+    user_session[:account_status] = nil
+    if current_account.card_expires_before_next_auto_renew?
+      user_session[:account_status] = "Your credit card on file will expire before the next renewal, please enter new credit card details."
+    end
+    if current_account.in_grace_period?
+      user_session[:account_status] = "Your account is unpaid. Please pay before " +
+        "#{current_account.get_subscriber.grace_until.to_date.strftime("%A, %d %b %Y")}."
+    end
+    if !current_account.subscription_active? # this includes cancelled subscriptions, expired trials and grace period running over
+      if current_account.on_trial?
+        user_session[:account_status] = "Your trial has expired and your account has been disabled, please subscribe to a paid plan."
+      else
+        user_session[:account_status] = "Your account is unpaid and has been disabled, please subscribe to a paid plan."
+      end
+      redirect_to billing_path unless request.url == billing_url
+      return false
+    end
+    true
+  end
+
 end
