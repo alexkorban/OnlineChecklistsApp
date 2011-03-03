@@ -6,7 +6,7 @@ OnlineChecklistsApp::Application.configure do
   config.cache_classes = true
 
   # Full error reports are disabled and caching is turned on
-  config.consider_all_requests_local       = false
+  config.consider_all_requests_local = false
   config.action_controller.perform_caching = true
 
   # Specifies the header that your server uses for sending files
@@ -37,7 +37,7 @@ OnlineChecklistsApp::Application.configure do
   # Disable delivery errors, bad email addresses will be ignored
   # config.action_mailer.raise_delivery_errors = false
 
-  config.action_mailer.default_url_options = {:host => 'app.onlinechecklists.com'}
+  config.action_mailer.default_url_options = {:host => 'staging.onlinechecklists.com'}
 
   # Enable threaded mode
   # config.threadsafe!
