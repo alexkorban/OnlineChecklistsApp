@@ -57,14 +57,21 @@
         checklists: this.checklists,
         allow_all: true
       });
-      $.getJSON(this.entries_url(), __bind(function(data, textStatus, xhr) {
-        this.entries_by_day = data;
-        return this.render();
-      }, this));
+      $.ajax({
+        url: this.entries_url(),
+        dataType: 'json',
+        success: __bind(function(data, textStatus, xhr) {
+          this.entries_by_day = data;
+          return this.render();
+        }, this),
+        error: __bind(function(xhr) {
+          return this.render();
+        }, this)
+      });
     }
     TimelineView.prototype.render = function() {
       $("#heading").html("Reports &gt; Timeline");
-      if (this.entries_by_day.length > 0) {
+      if (this.entries_by_day != null) {
         $(this.el).html(this.template({
           all: this.all,
           users: this.users,

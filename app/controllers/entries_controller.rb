@@ -22,12 +22,11 @@ class EntriesController < ApplicationController
     user_id = params[:user_id] ? params[:user_id].to_i : 0
     entries = entries.for_user(user_id) if user_id > 0
 
-    logger.info "Entries:"
-    logger.info entries.inspect
-
     respond_to {|format|
       format.json {
-        render json: Entry.get_entries_by_day(entries), status: :ok
+        entries_by_day = Entry.get_entries_by_day(entries)
+        # return a 404 to indicate an account without entries so the client can display instructions
+        render json: entries_by_day, status: (entries_by_day.empty? && current_account.entries.count == 0) ? :not_found : :ok
       }
     }
   end

@@ -115,14 +115,18 @@ class root.TimelineView extends Backbone.View
     '''
 
     @checklist_dropdown = new ChecklistDropdown({id: "checklists", checklists: @checklists, allow_all: yes})
-    $.getJSON @entries_url(), (data, textStatus, xhr) =>
-      @entries_by_day = data
-      @render()
-
-
+    $.ajax {
+      url: @entries_url(),
+      dataType: 'json',
+      success: (data, textStatus, xhr) =>
+        @entries_by_day = data
+        @render()
+      error: (xhr) =>
+        @render()         # entries_by_day will be undefined, causing the view to show instructions about creating some checklists and entries
+    }
   render: ->
     $("#heading").html("Reports &gt; Timeline")
-    if @entries_by_day.length > 0
+    if @entries_by_day?   # entries_by_day will be undefined when the server returned an error, indicating that the account has no entries
       $(@el).html @template({
         all: @all
         users: @users
