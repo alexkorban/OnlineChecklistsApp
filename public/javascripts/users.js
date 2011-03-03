@@ -176,7 +176,7 @@
       $("#" + this.id).replaceWith(this.el);
       message = "You've reached the limits of your plan with <%= window.Plan.users %> users.\n<a href = \"/billing\">Please consider upgrading to a larger plan</a>.";
       this.template = _.template("<h2>Invite users</h2>\n<div class = \"message\" id = \"submit_errors\" style = \"display:none\"></div>\n<% if (Users.length >= Plan.users) { %>\n  <div class = \"message\">" + message + "</div>\n<% } else { %>\n  <div id = \"invitation_items\" style = \"margin-bottom: 20px\"></div>\n  <div class = \"message\" style = \"margin-bottom: 20px; display: none\">\n    You cannot invite more than " + (Plan.users - Users.length) + " users on your current plan.<br/>\n    <a href = \"/billing\">Please consider upgrading to a larger plan</a> if you need more users.\n  </div>\n\n  <a class = \"button add_item\" href = \"#\">Add another invitation</a>\n  <br/><br/><br/>\n  <a class = \"button save\" href = \"#\">Send invitations</a>\n<% } %>");
-      this.error_template = _.template("Please correct the following errors:<br/>\n<ul>\n<% _.each(errors, function(error) { %>\n  <li><%= error %></li>\n<% }); %>\n</ul>");
+      this.error_template = _.template("Please correct the following errors:<br/>\n<% console.log(\"errors: \", errors); %>\n<ul>\n<% _.each(errors, function(error) { %>\n  <% console.log(\"error: \", error); %>\n  <li><%= error %></li>\n<% }); %>\n</ul>");
     }
     InvitationView.prototype.render = function() {
       $(this.el).html(this.template());
@@ -212,8 +212,9 @@
           return this.users.refresh(response);
         }, this),
         error: __bind(function(model, xhr) {
+          console.log(xhr);
           return this.$("#submit_errors").html(this.error_template({
-            errors: $.parseJSON(xhr.response)
+            errors: $.parseJSON(xhr.responseText)
           })).show();
         }, this)
       });
