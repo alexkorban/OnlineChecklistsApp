@@ -223,7 +223,7 @@
         this.group_by = "day";
       }
       $("#" + this.id).replaceWith(this.el);
-      this.template = _.template('<div id = "buttons">\n  <a class = "button" href = "#checklists">Go to checklists</a>\n  <a class = "button" href = "#timeline">View timeline</a>\n</div>\n<div class = "report_controls">\n  Checklist:\n  <select id = "checklists"></select>\n  <span style = "padding-left: 40px">Totals:</span>\n  <select id = "group_by" class = "filter">\n    <option value = "day">Daily</option>\n    <option value = "week">Weekly</option>\n    <option value = "month">Monthly</option>\n  </select>\n</div>\n<div class = "daily" style = "padding-top: 20px">Note: daily counts are only available for the last 30 days</divS>\n<table style = "margin-top: 20px">\n  <tr>\n    <td>\n      <div id = "timeline_chart" style=\'width: 700px; height: 400px; display: inline-block\'></div>\n    </td>\n    <td style = "padding-left: 20px; vertical-align: top">\n      <% _.each(users, function(user, index) { %>\n        <input type = "checkbox" class = "user_checkbox" id = "checkbox_<%= user.id %>" value = "<%= user.id %>"\n         <% if (user.id == 0) { %> checked = "checked" <% } %>\n        />\n        <label for="checkbox_<%= user.id %>" style = "color: <%= colors[_.lastIndexOf(users, user)] %>"><%= user.name %></label><br/>\n      <% }); %>\n    </td>\n  </tr>\n</table>');
+      this.template = _.template('<div id = "buttons">\n  <a class = "button" href = "#checklists">Go to checklists</a>\n  <a class = "button" href = "#timeline">View timeline</a>\n</div>\n<div class = "report_controls">\n  Checklist:\n  <select id = "checklists"></select>\n  <span style = "padding-left: 40px">Totals:</span>\n  <select id = "group_by" class = "filter">\n    <option value = "day">Daily</option>\n    <option value = "week">Weekly</option>\n    <option value = "month">Monthly</option>\n  </select>\n</div>\n<div id = "daily_message" style = "padding-top: 20px">\n  Note: daily counts are only available for the last 30 days\n</div>\n<table style = "margin-top: 20px">\n  <tr>\n    <td>\n      <div id = "timeline_chart" style=\'width: 700px; height: 400px; display: inline-block\'></div>\n    </td>\n    <td style = "padding-left: 20px; vertical-align: top">\n      <% _.each(users, function(user, index) { %>\n        <input type = "checkbox" class = "user_checkbox" id = "checkbox_<%= user.id %>" value = "<%= user.id %>"\n         <% if (user.id == 0) { %> checked = "checked" <% } %>\n        />\n        <label for="checkbox_<%= user.id %>" style = "color: <%= colors[_.lastIndexOf(users, user)] %>"><%= user.name %></label><br/>\n      <% }); %>\n    </td>\n  </tr>\n</table>');
       $.getJSON(this.counts_url(), __bind(function(data, textStatus, xhr) {
         var item, _i, _len, _ref;
         this.counts = data.counts;
@@ -249,20 +249,21 @@
         users: this.count_users,
         counts: this.counts,
         all: this.all,
-        colors: this.colors
+        colors: this.colors,
+        group_by: this.group_by
       }));
       $("#heading").html("Reports &gt; Charts");
       this.checklist_dropdown.render();
+      if (this.group_by !== "day") {
+        $("#daily_message").hide();
+      }
       if (this.counts.length > 0) {
         this.timeline_chart.render();
       } else {
         this.$("#timeline_chart").html("<b>No data available</b>");
       }
       this.$("#checklists").val(this.checklist_id);
-      this.$("#group_by").val(this.group_by);
-      if (this.group_by !== "day") {
-        return this.$(".daily").hide();
-      }
+      return this.$("#group_by").val(this.group_by);
     };
     ChartView.prototype.link = function() {
       var link;

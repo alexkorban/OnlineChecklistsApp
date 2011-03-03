@@ -276,7 +276,9 @@ class root.ChartView extends Backbone.View
           <option value = "month">Monthly</option>
         </select>
       </div>
-      <div class = "daily" style = "padding-top: 20px">Note: daily counts are only available for the last 30 days</divS>
+      <div id = "daily_message" style = "padding-top: 20px">
+        Note: daily counts are only available for the last 30 days
+      </div>
       <table style = "margin-top: 20px">
         <tr>
           <td>
@@ -311,16 +313,16 @@ class root.ChartView extends Backbone.View
 
 
   render: ->
-    $(@el).html(@template({checklists: @checklists, users: @count_users, counts: @counts, all: @all, colors: @colors}))
+    $(@el).html(@template({checklists: @checklists, users: @count_users, counts: @counts, all: @all, colors: @colors, group_by: @group_by}))
     $("#heading").html("Reports &gt; Charts")
     @checklist_dropdown.render()
+    $("#daily_message").hide() if @group_by != "day"
     if @counts.length > 0
       @timeline_chart.render()
     else
       @$("#timeline_chart").html("<b>No data available</b>")
     @$("#checklists").val(@checklist_id)
     @$("#group_by").val(@group_by)
-    @$(".daily").hide() if @group_by != "day"
 
 
   link: ->
