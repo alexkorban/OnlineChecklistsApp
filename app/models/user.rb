@@ -2,7 +2,7 @@ class User < ActiveRecord::Base
   # Include default devise modules. Others available are:
   # :token_authenticatable, :confirmable, :lockable and :timeoutable
   devise :invitable, :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :trackable, :validatable
+         :recoverable, :rememberable, :trackable, :validatable, :timeoutable
 
   # validations
   validates :role, format: /user|admin/
@@ -39,4 +39,17 @@ class User < ActiveRecord::Base
     return false if invitation_token.nil? || invitation_token.empty?
     super
   end
+
+  # override the default version in Timeoutable to make it play nicely with Rememberable
+  def timedout?(last_access)
+    return false if remember_exists_and_not_expired?
+    super
+  end
+
+  def remember_exists_and_not_expired?
+    return false unless respond_to?(:remember_expired?)
+    remember_created_at && !remember_expired?
+  end
+  private :remember_exists_and_not_expired?
+
 end
