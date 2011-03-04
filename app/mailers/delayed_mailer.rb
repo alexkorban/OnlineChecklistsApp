@@ -4,7 +4,6 @@ class DelayedMailer < Struct.new(:method, :args)
   end
 
   def perform
-    raise "Test exception in signup email"
     Mailer.send(method, *args).deliver
   end
 
