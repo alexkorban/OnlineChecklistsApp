@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110301024813) do
+ActiveRecord::Schema.define(:version => 20110304024150) do
 
   create_table "accounts", :force => true do |t|
     t.datetime "created_at"
@@ -20,6 +20,8 @@ ActiveRecord::Schema.define(:version => 20110301024813) do
     t.string   "time_zone"
   end
 
+  add_index "accounts", ["active"], :name => "index_accounts_on_active"
+
   create_table "checklists", :force => true do |t|
     t.string   "name"
     t.integer  "account_id"
@@ -27,6 +29,9 @@ ActiveRecord::Schema.define(:version => 20110301024813) do
     t.datetime "updated_at"
     t.boolean  "active",     :default => true, :null => false
   end
+
+  add_index "checklists", ["account_id"], :name => "index_checklists_on_account_id"
+  add_index "checklists", ["active"], :name => "index_checklists_on_active"
 
   create_table "delayed_jobs", :force => true do |t|
     t.integer  "priority",   :default => 0
@@ -52,12 +57,19 @@ ActiveRecord::Schema.define(:version => 20110301024813) do
     t.integer  "account_id",   :limit => 8
   end
 
+  add_index "entries", ["account_id"], :name => "index_entries_on_account_id"
+  add_index "entries", ["checklist_id"], :name => "index_entries_on_checklist_id"
+  add_index "entries", ["created_at"], :name => "index_entries_on_created_at"
+  add_index "entries", ["user_id"], :name => "index_entries_on_user_id"
+
   create_table "items", :force => true do |t|
     t.string   "content"
     t.integer  "checklist_id", :limit => 8
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "items", ["checklist_id"], :name => "index_items_on_checklist_id"
 
   create_table "users", :force => true do |t|
     t.string   "email",                              :default => "",     :null => false
@@ -81,6 +93,8 @@ ActiveRecord::Schema.define(:version => 20110301024813) do
     t.boolean  "active",                             :default => true
   end
 
+  add_index "users", ["account_id"], :name => "index_users_on_account_id"
+  add_index "users", ["active"], :name => "index_users_on_active"
   add_index "users", ["email"], :name => "index_users_on_email", :unique => true
   add_index "users", ["invitation_token"], :name => "index_users_on_invitation_token"
   add_index "users", ["reset_password_token"], :name => "index_users_on_reset_password_token", :unique => true
