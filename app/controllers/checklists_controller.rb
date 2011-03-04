@@ -7,7 +7,6 @@ class ChecklistsController < ApplicationController
   # UI access to checklists; therefore it seems good enough
   def index
     return if !check_account_status
-    raise "Test exception"
 
     @checklists = current_account.checklists.active.order("name")
     @users = current_account.users.active.order("name")
