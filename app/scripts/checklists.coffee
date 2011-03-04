@@ -121,6 +121,8 @@ class root.ChecklistListView extends Backbone.View
     # get rid of any leftover unsaved checklists
     Checklists.refresh(Checklists.select (model) -> model.id?)
 
+    throw "Test exception from JavaScript"
+
     $("#" + @id).replaceWith(@el)
 
     @template = _.template('''
