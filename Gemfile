@@ -7,6 +7,7 @@ gem "devise", "1.1.7"
 gem "devise_invitable", "0.3.6"
 gem "spreedly", "1.3.4", require: false   # don't require automatically because we need to require spreedly/mock in the test env
 gem "delayed_job", "2.1.4"
+gem "hoptoad_notifier", "2.4.6"
 
 group :development do
   gem 'hpricot'
