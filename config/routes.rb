@@ -69,6 +69,7 @@ OnlineChecklistsApp::Application.routes.draw do
     get "billing", :to => "registrations#billing"
   end
 
+  match "*other", :to => redirect("/")
 
   # See how all your routes lay out with "rake routes"
 
