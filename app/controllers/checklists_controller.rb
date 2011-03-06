@@ -68,8 +68,7 @@ class ChecklistsController < ApplicationController
   def destroy
     checklist = current_account.checklists.active.find(params[:id])
     if checklist.entries.count > 0    # only delete the checklist if it doesn't have any associated entries; otherwise only deactivate
-      checklist.active = false
-      checklist.save
+      checklist.update_attributes active: false
     else
       checklist.destroy
     end

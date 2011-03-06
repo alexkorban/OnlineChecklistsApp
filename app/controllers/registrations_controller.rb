@@ -21,8 +21,7 @@ class RegistrationsController < Devise::RegistrationsController
   def destroy
     if params[:id]    # deactivating a user
       u = current_account.users.find(params[:id])
-      u.active = false
-      u.save
+      u.update_attributes active: false
       respond_to { |format|
         format.json { render :json => {}, :status => :ok }
       }
