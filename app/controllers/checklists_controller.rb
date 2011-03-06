@@ -45,16 +45,17 @@ class ChecklistsController < ApplicationController
 
   def update
     checklist = current_account.checklists.active.find(params[:id])
-    checklist.name = params[:name]
-    checklist.save
-    checklist.item_ids = params[:items].map {|item| item[:id]}
+    checklist.update_attributes name: params[:name]
+
+    # intersect existing ids with new ids to ensure that an attacker can't grab items from another account's checklist
+    checklist.item_ids = checklist.items.map(&:id) & params[:items].map {|item| item[:id]}
+
     params[:items].each {|item|
       if item[:id]
         existing_item = checklist.items.find(item[:id])
-        existing_item.content = item[:content]
-        existing_item.save
+        existing_item.update_attributes(content: item[:content]) if existing_item
       else
-        checklist.items.create :content => item[:content]
+        checklist.items.create content: item[:content]
       end
     }
 
