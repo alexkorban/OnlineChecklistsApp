@@ -10,16 +10,22 @@ class Entry < ActiveRecord::Base
   validates :account_id, presence: true, numericality: true
 
   # Scopes
-  scope :between_dates, lambda { |from, to| where("created_at >= ? AND created_at <= ?", from.to_s, to.to_s) }
   scope :for_checklist, lambda { |checklist_id| where("checklist_id = ?", checklist_id) }
   scope :for_user, lambda { |user_id| where("user_id = ?", user_id) }
-  scope :within_one_year, lambda { |today| where("created_at > ?", today - 1.year)}
-  scope :within_one_month, lambda { |today| where("created_at > ?", today - 1.month) }
+  scope :within_one_year, lambda { |today| where("created_at > ?", (today - 1.year).end_of_day.utc.to_s) }
+  scope :within_one_month, lambda { |today| where("created_at > ?", (today - 1.month).end_of_day.utc.to_s) }
+
+  def self.between_dates(from, to)
+    where("created_at >= ? AND created_at <= ?", from.beginning_of_day.utc.to_s, to.end_of_day.utc.to_s)
+  end
 
   def self.grouped_counts(group_by)
-    select("count(id), date_trunc('#{group_by}', created_at) as date, user_id").
-      group("date_trunc('#{group_by}', created_at), user_id").
-      order("date_trunc('#{group_by}', created_at), user_id")
+    # time_field expression is Postgres specific; it produces a timestamp which is converted from UTC to the current user's time zone,
+    # giving us the correct partitioning by the user's day/week/month
+    time_field = "created_at at time zone 'UTC' at time zone interval '#{Time.zone.now.formatted_offset}'"
+    select("count(id), date_trunc('#{group_by}', #{time_field}) as date, user_id").
+      group("date_trunc('#{group_by}', #{time_field}), user_id").
+      order("date_trunc('#{group_by}', #{time_field}), user_id")
   end
 
 
@@ -56,7 +62,7 @@ class Entry < ActiveRecord::Base
   end
 
   def self.get_counts(account, checklist_id, group_by)
-    entries = account.entries.send(group_by == :day ? :within_one_month : :within_one_year, Date.today)
+    entries = account.entries.send(group_by == :day ? :within_one_month : :within_one_year, Time.zone.today)
     entries = entries.for_checklist(checklist_id) if checklist_id > 0
 
     users = account.users.select("id, name, email").order("id")
