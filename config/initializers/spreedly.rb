@@ -4,7 +4,13 @@ else
   require 'spreedly'
 end
 
-Spreedly.configure("AoteaStudios-test", "***REMOVED***")
+if Rails.env.staging?
+  Spreedly.configure("OnlineChecklists-staging", "***REMOVED***")
+elsif Rails.env.production?
+  Spreedly.configure("OnlineChecklists-production", "")
+else
+  Spreedly.configure("OnlineChecklists-dev", "***REMOVED***")
+end
 
 # this should only be done for testing
 #class Spreedly::Subscriber
