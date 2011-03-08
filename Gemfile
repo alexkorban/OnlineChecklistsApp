@@ -9,6 +9,7 @@ gem "spreedly", "1.3.4", require: false   # don't require automatically because 
 gem "delayed_job", "2.1.4"
 gem "hoptoad_notifier", "2.4.6"
 gem "right_aws", "2.0.0"
+gem "heroku_backup_task", "0.0.4"
 
 group :development do
   gem 'hpricot'
