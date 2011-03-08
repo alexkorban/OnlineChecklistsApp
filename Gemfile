@@ -8,7 +8,11 @@ gem "devise_invitable", "0.3.6"
 gem "spreedly", "1.3.4", require: false   # don't require automatically because we need to require spreedly/mock in the test env
 gem "delayed_job", "2.1.4"
 gem "hoptoad_notifier", "2.4.6"
-gem "right_aws", "2.0.0"
+# TODO: specify versions; right_aws 2.0.0 isn't compatible with Rails, so I had to use the latest version
+# of right_aws along with its dependency right_http_connection; in the future it should be enough to just specify
+# right_aws 2.0.1 (or whatever version works) and drop right_http_connection declaration
+gem "right_http_connection", git: "git://github.com/rightscale/right_http_connection.git"
+gem "right_aws", git: "git://github.com/rightscale/right_aws.git"
 gem "heroku_backup_task", "0.0.4"
 
 group :development do

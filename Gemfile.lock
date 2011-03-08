@@ -1,3 +1,16 @@
+GIT
+  remote: git://github.com/rightscale/right_aws.git
+  revision: 740c54f56d65691ea656b04ed298e03cb5508fcc
+  specs:
+    right_aws (2.1.0)
+      right_http_connection (>= 1.2.5)
+
+GIT
+  remote: git://github.com/rightscale/right_http_connection.git
+  revision: a68e2687767518f0a5b7f01d91f1877f3f4dee07
+  specs:
+    right_http_connection (1.3.0)
+
 GEM
   remote: http://rubygems.org/
   specs:
@@ -93,9 +106,6 @@ GEM
     rake (0.8.7)
     rest-client (1.6.1)
       mime-types (>= 1.16)
-    right_aws (2.0.0)
-      right_http_connection (>= 1.2.1)
-    right_http_connection (1.2.4)
     ruby_parser (2.0.6)
       sexp_processor (~> 3.0)
     sexp_processor (3.0.5)
@@ -123,7 +133,8 @@ DEPENDENCIES
   machinist (>= 2.0.0.beta1)
   pg (= 0.10.1)
   rails (= 3.0.5)
-  right_aws (= 2.0.0)
+  right_aws!
+  right_http_connection!
   ruby_parser
   spreedly (= 1.3.4)
   test-unit
