@@ -38,9 +38,9 @@ namespace :heroku do
   end
 end
 
+require "heroku_backup_task"
 task :cron => :environment do
-  #Rake::Task['heroku:pgbackups:capture'].invoke "--expire"
-
+  HerokuBackupTask.execute
   Rake::Task['heroku:s3backup'].invoke
 end
 
