@@ -9,7 +9,8 @@ if Rails.env.staging?
 elsif Rails.env.production?
   Spreedly.configure("OnlineChecklists-production", "")
 else
-  Spreedly.configure("OnlineChecklists-dev", "***REMOVED***")
+  Spreedly.configure("OnlineChecklists-paytest", "***REMOVED***")
+  #Spreedly.configure("OnlineChecklists-dev", "***REMOVED***")
 end
 
 # this should only be done for testing
