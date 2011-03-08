@@ -10,14 +10,14 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110308034931) do
+ActiveRecord::Schema.define(:version => 20110308040609) do
 
   create_table "accounts", :force => true do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "active",     :default => true,         :null => false
     t.string   "time_zone"
-    t.string   "test",       :default => "test_value"
+    t.string   "test_col",   :default => "test_value"
   end
 
   add_index "accounts", ["active"], :name => "index_accounts_on_active"
