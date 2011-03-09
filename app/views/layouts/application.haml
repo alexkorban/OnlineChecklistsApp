@@ -54,7 +54,7 @@
   %body
     #header
       #nav
-        - if user_session && user_session[:account_status]
+        - if user_signed_in? && user_session && user_session[:account_status]
           #account_status= user_session[:account_status]
 
         .logo
