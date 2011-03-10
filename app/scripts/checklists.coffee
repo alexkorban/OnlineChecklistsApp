@@ -229,7 +229,7 @@ class root.ChecklistView extends Backbone.View
 
     @template = _.template('''
       <div class = "input_field">
-        Notes: <input name = "for" type = "text" />
+        Notes: <input name = "for" type = "text" style = "width: 500px" />
         <span class = "instructions">(press Enter to continue)</span>
       </div>
       <ul style = "margin-bottom: 40px; margin-top: 40px">
