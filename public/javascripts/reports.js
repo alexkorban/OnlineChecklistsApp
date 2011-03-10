@@ -223,7 +223,7 @@
         id: "checklists",
         checklists: this.checklists
       });
-      if (!(this.checklist_id != null)) {
+      if (this.checklists.length > 0 && !(this.checklist_id != null)) {
         this.checklist_id = this.checklists.at(0).id;
       }
       if (!(this.group_by != null)) {

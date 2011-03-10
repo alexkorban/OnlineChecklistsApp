@@ -29,7 +29,7 @@ Devise.setup do |config|
   # config.http_authenticatable = false
 
   # Set this to true to use Basic Auth for AJAX requests.  True by default.
-  # config.http_authenticatable_on_xhr = true
+  config.http_authenticatable_on_xhr = false
 
   # The realm used in Http Basic Authentication
   # config.http_authentication_realm = "Application"
@@ -43,7 +43,8 @@ Devise.setup do |config|
   # from others authentication tools as :clearance_sha1, :authlogic_sha512 (then
   # you should set stretches above to 20 for default behavior) and :restful_authentication_sha1
   # (then you should set stretches to 10, and copy REST_AUTH_SITE_KEY to pepper)
-  config.encryptor = :bcrypt
+  # NOT REQUIRED FROM VERSION 1.2
+  #config.encryptor = :bcrypt
 
   # Setup a pepper to generate the encrypted password.
   config.pepper = "f97037d59ea9c0bc273f5bbda6f5f70ab9133b61c9cf9c6d9cec0eb060224a37a975e61b141f8d0e7e91fc72597a5674b09d562de5ff0663d09fc047d6f487b7"
@@ -82,7 +83,7 @@ Devise.setup do |config|
   # ==> Configuration for :timeoutable
   # The time you want to timeout the user session without activity. After this
   # time the user will be asked for credentials again.
-  config.timeout_in = 30.minutes
+  config.timeout_in = 10.minutes
 
   # ==> Configuration for :lockable
   # Defines which strategy will be used to lock an account.

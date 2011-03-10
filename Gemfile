@@ -3,8 +3,11 @@ source 'http://rubygems.org'
 gem 'rails', '3.0.5'
 gem "haml", "3.0.25"
 gem 'pg', "0.10.1"
-gem "devise", "1.1.7"
-gem "devise_invitable", "0.3.6"
+
+# TODO: replace with a release > 1.1.7; for now use Devise master branch (> 1.1.7) because I need to
+# disable HTTP Auth prompt on AJAX requests
+gem "devise", "1.2.rc" #git: "git://github.com/plataformatec/devise.git"
+gem "devise_invitable", "0.4.rc4" #"0.3.6"
 gem "spreedly", "1.3.4", require: false   # don't require automatically because we need to require spreedly/mock in the test env
 gem "delayed_job", "2.1.4"
 gem "hoptoad_notifier", "2.4.6"

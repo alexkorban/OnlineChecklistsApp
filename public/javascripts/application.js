@@ -100,7 +100,7 @@
       });
     };
     AppController.prototype.charts = function(checklist_id, group_by) {
-      if (!(checklist_id != null)) {
+      if (Checklists.length > 0 && !(checklist_id != null)) {
         checklist_id = Checklists.at(0).id;
       }
       if (!(group_by != null)) {
@@ -116,7 +116,21 @@
     return AppController;
   })();
   heartbeat = function() {
-    return $.get("/heartbeat");
+    return $.ajax({
+      url: "/heartbeat",
+      dataType: "json",
+      error: function(xhr) {
+        console.log("in error handler");
+        console.log(xhr);
+        if (xhr.status === 200) {
+          return window.location.href = "/users/sign_in";
+        }
+      },
+      success: function(data, textStatus, xhr) {
+        console.log("in success handler");
+        return console.log(xhr);
+      }
+    });
   };
   $(function() {
     window.app = new AppController();

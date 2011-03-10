@@ -260,7 +260,7 @@ class root.ChartView extends Backbone.View
     @all = "- All -"
 
     @checklist_dropdown = new ChecklistDropdown({id: "checklists", checklists: @checklists})
-    @checklist_id = @checklists.at(0).id if !@checklist_id?
+    @checklist_id = @checklists.at(0).id if @checklists.length > 0 && !@checklist_id?
     @group_by = "day" if !@group_by?
 
     $("#" + @id).replaceWith(@el)

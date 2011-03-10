@@ -9,7 +9,7 @@ module Devise
     end
 
     module Invitable
-      handle_asynchronously :send_invitation
+      handle_asynchronously :deliver_invitation #:send_invitation
     end
   end
 end

@@ -87,7 +87,7 @@ class AppController extends Backbone.Controller
 
 
   charts: (checklist_id, group_by)->
-    checklist_id = Checklists.at(0).id if !checklist_id?
+    checklist_id = Checklists.at(0).id if Checklists.length > 0 && !checklist_id?
     group_by = "day" if !group_by?
     @view = new ChartView({checklist_id: checklist_id, group_by: group_by, users: Users, checklists: Checklists})
 
@@ -96,7 +96,15 @@ class AppController extends Backbone.Controller
 # Start the app
 #
 heartbeat = ->
-  $.get "/heartbeat"
+  $.ajax {
+    url: "/heartbeat"
+    dataType: "json"
+    error: (xhr) ->
+      # when an AJAX request is made after session timeout, Devise will do a 302 redirect to /users/sign_in,
+      # resulting in a subsequent successful GET /users/sign_in; luckily for me though, the error handler
+      # is fired in this situation, allowing to trigger a client side redirect to login page
+      window.location.href = "/users/sign_in" if xhr.status == 200  # redirect to login page when Not Authorised code is returned
+    }
 
 $ ->
   window.app = new AppController()
