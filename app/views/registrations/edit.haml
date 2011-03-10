@@ -31,11 +31,6 @@
       = f.label :password_confirmation
       %br/
       = f.password_field :password_confirmation
-    %p
-      = f.label :current_password
-      %i (we need your current password to confirm your changes)
-      %br/
-      = f.password_field :current_password
     %p= f.submit "Update"
 
 - if current_user.role == "admin"

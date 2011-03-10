@@ -39,6 +39,16 @@ class User < ActiveRecord::Base
     return false if invitation_token.nil? || invitation_token.empty?
     super
   end
+  protected :password_required?
+
+  # bypasses Devise's requirement to re-enter current password to edit
+  def update_with_password(params={})
+    if params[:password].blank?
+      params.delete(:password)
+      params.delete(:password_confirmation) if params[:password_confirmation].blank?
+    end
+    update_attributes(params)
+  end
 
   # override the default version in Timeoutable to make it play nicely with Rememberable
   def timedout?(last_access)
