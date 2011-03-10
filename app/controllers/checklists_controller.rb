@@ -83,7 +83,7 @@ class ChecklistsController < ApplicationController
     end
 
     respond_to { |format|
-      format.html { request.post? ? render(nothing: true) : render(:partial => "time_zone_select") }
+      format.html { request.post? ? render(nothing: true) : render(partial: "time_zone_select") }
     }
   end
 end

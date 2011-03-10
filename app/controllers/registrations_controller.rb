@@ -66,6 +66,19 @@ class RegistrationsController < Devise::RegistrationsController
     end
   end
 
+  # PUT /resource
+  def update
+    if resource.update_with_password(params[resource_name])
+      current_account.update_attributes time_zone: params[:account][:time_zone]
+      set_flash_message :notice, :updated
+      redirect_to after_update_path_for(resource)
+    else
+      clean_up_passwords(resource)
+      render_with_scope :edit
+    end
+  end
+
+
   def billing
     check_account_status
 

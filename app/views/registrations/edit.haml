@@ -31,10 +31,13 @@
       = f.label :password_confirmation
       %br/
       = f.password_field :password_confirmation
+
+    - if current_user.role == "admin"
+      = f.label :time_zone
+      .time_zone
+        = time_zone_select "account", "time_zone", nil, default: current_user.account.time_zone, include_blank: false
+
     %p= f.submit "Update"
 
-- if current_user.role == "admin"
-  %h2 Time zone
-  = render :partial => "checklists/time_zone_select", locals: {include_blank: false}
 
 
