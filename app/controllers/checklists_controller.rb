@@ -86,4 +86,11 @@ class ChecklistsController < ApplicationController
       format.html { request.post? ? render(nothing: true) : render(partial: "time_zone_select") }
     }
   end
+
+  # this is to prevent session timeout; the client pings the server every few minutes
+  def heartbeat
+    respond_to { |format|
+      format.json { render :json => {}, :status => :ok }
+    }
+  end
 end

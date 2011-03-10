@@ -95,10 +95,13 @@ class AppController extends Backbone.Controller
 #
 # Start the app
 #
+heartbeat = ->
+  $.get "/heartbeat"
 
 $ ->
   window.app = new AppController()
   Backbone.history.start()
+  setInterval(heartbeat, 5 * 60 * 1000)    # let the server know the session is active every 5 minutes
 
   # Enter key handler for ChecklistView
   $("body").keydown (e) ->

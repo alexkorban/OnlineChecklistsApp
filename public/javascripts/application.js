@@ -1,5 +1,5 @@
 (function() {
-  var AppController, root;
+  var AppController, heartbeat, root;
   var __hasProp = Object.prototype.hasOwnProperty, __extends = function(child, parent) {
     for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; }
     function ctor() { this.constructor = child; }
@@ -115,9 +115,13 @@
     };
     return AppController;
   })();
+  heartbeat = function() {
+    return $.get("/heartbeat");
+  };
   $(function() {
     window.app = new AppController();
     Backbone.history.start();
+    setInterval(heartbeat, 5 * 60 * 1000);
     return $("body").keydown(function(e) {
       var last_selected, next;
       if (e.keyCode !== 13) {
