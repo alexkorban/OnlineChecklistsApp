@@ -112,7 +112,7 @@ $ ->
   setInterval(heartbeat, 5 * 60 * 1000)    # let the server know the session is active every 5 minutes
 
   # Enter key handler for ChecklistView
-  $("body").keydown (e) ->
+  $(document).keypress (e) ->
     if e.keyCode != 13   # something other than Enter pressed
       return
       # 38 is up, 40 is down

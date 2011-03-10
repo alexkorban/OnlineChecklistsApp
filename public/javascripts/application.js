@@ -120,15 +120,9 @@
       url: "/heartbeat",
       dataType: "json",
       error: function(xhr) {
-        console.log("in error handler");
-        console.log(xhr);
         if (xhr.status === 200) {
           return window.location.href = "/users/sign_in";
         }
-      },
-      success: function(data, textStatus, xhr) {
-        console.log("in success handler");
-        return console.log(xhr);
       }
     });
   };
@@ -136,7 +130,7 @@
     window.app = new AppController();
     Backbone.history.start();
     setInterval(heartbeat, 5 * 60 * 1000);
-    return $("body").keydown(function(e) {
+    return $(document).keypress(function(e) {
       var last_selected, next;
       if (e.keyCode !== 13) {
         return;
