@@ -99,24 +99,28 @@ class AppController extends Backbone.Controller
 $ ->
   window.app = new AppController()
   Backbone.history.start()
+
+  # Enter key handler for ChecklistView
   $("body").keydown (e) ->
     if e.keyCode != 13   # something other than Enter pressed
       return
       # 38 is up, 40 is down
 
-    if $("#completion_warning").is(":visible")
+    if $("#completion_message").is(":visible")
       # we can only get here if all items were complete at one point, so attempt to submit
       # note that some items could have been subsequently unchecked with the mouse, so the submission may still fail
       $(".complete").click()
       return
 
-    if e.target.name == "for" # Enter pressed on the For text field
+    if e.target.name == "for" # Enter pressed on the Notes text field
       $(".checklist_item").not(".checked").first().toggleClass("selected")
       $(e.target).blur()
+      if $(".checklist_item").length == 0
+        $("#completion_message").show()
       e.preventDefault();
       return
 
-    # If we end up here, Enter was pressed somewhere other than the For text field
+    # If we end up here, Enter was pressed somewhere other than the Notes text field
 
     last_selected = $(".checklist_item.selected")
 
@@ -130,7 +134,7 @@ $ ->
       e.preventDefault()
     else                  # we are on the last item
       if $(".checklist_item").not(".checked").length == 0   # everything is checked
-        $("#completion_warning").show()
+        $("#completion_message").show()
         $("#incomplete_warning").hide()
         e.preventDefault()
 

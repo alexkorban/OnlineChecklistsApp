@@ -213,6 +213,8 @@ class root.ChecklistView extends Backbone.View
   tagName: "div"
   id: "content"
 
+  # Enter key is handled in application.coffee because the handler has to be attached to the body element, and it is
+  # only created once that way
   events: {
     "click .complete": "on_complete"
     "click .checklist_item": "on_click_item"
@@ -227,7 +229,7 @@ class root.ChecklistView extends Backbone.View
 
     @template = _.template('''
       <div class = "input_field">
-        For: <input name = "for" type = "text" />
+        Notes: <input name = "for" type = "text" />
         <span class = "instructions">(press Enter to continue)</span>
       </div>
       <ul style = "margin-bottom: 40px; margin-top: 40px">
@@ -236,7 +238,7 @@ class root.ChecklistView extends Backbone.View
       <% }); %>
       </ul>
       <div class = "message" id = "incomplete_warning" style = "display: none; margin-bottom: 20px">Please complete and check off all the items in the checklist first.</div>
-      <div class = "message" id = "completion_warning" style = "display: none; margin-bottom: 20px">Press Enter to submit the checklist.</div>
+      <div class = "message" id = "completion_message" style = "display: none; margin-bottom: 20px">Press Enter or click Complete! to submit the checklist.</div>
       <button class = "complete">Complete!</button>
       <span style = "margin-left: 20px; margin-right: 10px">or</span>  <a href = "#checklists">Cancel</a>
       ''')
@@ -257,7 +259,7 @@ class root.ChecklistView extends Backbone.View
   on_complete: (e) ->
     if @$(".checklist_item").not(".checked").length > 0
       @$("#incomplete_warning").show()
-      @$("#completion_warning").hide()
+      @$("#completion_message").hide()
       e.preventDefault()
       return
     entry = new Entry({checklist_id: @model.id, for: @$("input[name=for]").val()})
@@ -269,9 +271,9 @@ class root.ChecklistView extends Backbone.View
   on_click_item: (e) ->
     @$(e.target).toggleClass("checked")
     if @$(".checklist_item").not(".checked").length == 0
-      @$("#completion_warning").show()
+      @$("#completion_message").show()
     else
-      @$("#completion_warning").hide()
+      @$("#completion_message").hide()
 
 
   on_focus_input: (e) ->

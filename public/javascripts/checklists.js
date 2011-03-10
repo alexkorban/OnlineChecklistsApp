@@ -169,7 +169,7 @@
     };
     function ChecklistView() {
       ChecklistView.__super__.constructor.apply(this, arguments);
-      this.template = _.template('<div class = "input_field">\n  For: <input name = "for" type = "text" />\n  <span class = "instructions">(press Enter to continue)</span>\n</div>\n<ul style = "margin-bottom: 40px; margin-top: 40px">\n<% items.each(function(item) { %>\n<li class = "checklist_item"><%= item.content() %><span class = "instructions">(press Enter to mark as done)</span></li>\n<% }); %>\n</ul>\n<div class = "message" id = "incomplete_warning" style = "display: none; margin-bottom: 20px">Please complete and check off all the items in the checklist first.</div>\n<div class = "message" id = "completion_warning" style = "display: none; margin-bottom: 20px">Press Enter to submit the checklist.</div>\n<button class = "complete">Complete!</button>\n<span style = "margin-left: 20px; margin-right: 10px">or</span>  <a href = "#checklists">Cancel</a>');
+      this.template = _.template('<div class = "input_field">\n  Notes: <input name = "for" type = "text" />\n  <span class = "instructions">(press Enter to continue)</span>\n</div>\n<ul style = "margin-bottom: 40px; margin-top: 40px">\n<% items.each(function(item) { %>\n<li class = "checklist_item"><%= item.content() %><span class = "instructions">(press Enter to mark as done)</span></li>\n<% }); %>\n</ul>\n<div class = "message" id = "incomplete_warning" style = "display: none; margin-bottom: 20px">Please complete and check off all the items in the checklist first.</div>\n<div class = "message" id = "completion_message" style = "display: none; margin-bottom: 20px">Press Enter or click Complete! to submit the checklist.</div>\n<button class = "complete">Complete!</button>\n<span style = "margin-left: 20px; margin-right: 10px">or</span>  <a href = "#checklists">Cancel</a>');
       $("#" + this.id).replaceWith(this.el);
       this.model.items.fetch({
         success: __bind(function() {
@@ -188,7 +188,7 @@
       var entry;
       if (this.$(".checklist_item").not(".checked").length > 0) {
         this.$("#incomplete_warning").show();
-        this.$("#completion_warning").hide();
+        this.$("#completion_message").hide();
         e.preventDefault();
         return;
       }
@@ -203,9 +203,9 @@
     ChecklistView.prototype.on_click_item = function(e) {
       this.$(e.target).toggleClass("checked");
       if (this.$(".checklist_item").not(".checked").length === 0) {
-        return this.$("#completion_warning").show();
+        return this.$("#completion_message").show();
       } else {
-        return this.$("#completion_warning").hide();
+        return this.$("#completion_message").hide();
       }
     };
     ChecklistView.prototype.on_focus_input = function(e) {

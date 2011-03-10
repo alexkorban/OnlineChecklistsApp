@@ -123,13 +123,16 @@
       if (e.keyCode !== 13) {
         return;
       }
-      if ($("#completion_warning").is(":visible")) {
+      if ($("#completion_message").is(":visible")) {
         $(".complete").click();
         return;
       }
       if (e.target.name === "for") {
         $(".checklist_item").not(".checked").first().toggleClass("selected");
         $(e.target).blur();
+        if ($(".checklist_item").length === 0) {
+          $("#completion_message").show();
+        }
         e.preventDefault();
         return;
       }
@@ -142,7 +145,7 @@
         return e.preventDefault();
       } else {
         if ($(".checklist_item").not(".checked").length === 0) {
-          $("#completion_warning").show();
+          $("#completion_message").show();
           $("#incomplete_warning").hide();
           return e.preventDefault();
         }
