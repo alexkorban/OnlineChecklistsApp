@@ -1,7 +1,7 @@
 class RegistrationsController < Devise::RegistrationsController
   prepend_before_filter :authenticate_scope!, :only => [:index, :billing, :edit, :update, :destroy]
 
-  layout "application" #:registrations_layout
+  layout "application"
 
   def index
     @users = current_account.users.active.order("name") if current_user
@@ -81,16 +81,11 @@ class RegistrationsController < Devise::RegistrationsController
 
   protected
 
-  def after_update_path_for(resource)
-    edit_user_registration_path
-  end
+#  def after_update_path_for(resource)
+#    edit_user_registration_path
+#  end
 
   def after_sign_in_path_for(resource)
     root_path
   end
-
-#  def registrations_layout
-#    ["edit", "new", "destroy", "billing", "create"].include?(action_name) ? "application" : nil
-#  end
-
 end
