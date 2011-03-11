@@ -81,7 +81,9 @@ class Entry < ActiveRecord::Base
     # prepend an extra batch of zero counts before the first month; this is to make the chart look nicer
     counts.insert(0, [get_end_of_period(group_by, counts[0].first - 1.send(group_by))] + Array.new(users.size + 1, 0)) if counts.size > 0
 
-    {users: [{id: 0, name: 'All users'}] + users.map { |u| {id: u.id, name: u.safe_name} }, counts: counts}
+    checklists = account.checklists.select("id, name").order("name")
+
+    {users: [{id: 0, name: 'All users'}] + users.map { |u| {id: u.id, name: u.safe_name} }, counts: counts, checklists: checklists}
   end
 
   # produces an array of counts for each user id, inserting zero if there is no count present in input counts

@@ -24,7 +24,7 @@
       this.checklists = args.checklists;
       this.allow_all = (args.allow_all != null) && args.allow_all === true;
       this.id = args.id;
-      this.template = _.template('<select id = "checklists" class = "filter">\n  <% if (allow_all) { %> <option value = "0">- All -</option> <% } %>\n  <% checklists.each(function(checklist) { %>\n    <option value = "<%= checklist.id %>"><%= checklist.name() %></option>\n  <% }); %>\n</select>');
+      this.template = _.template('<select id = "checklists" class = "filter">\n  <% if (allow_all) { %> <option value = "0">- All -</option> <% } %>\n  <% _.each(checklists, function(checklist) { %>\n    <option value = "<%= checklist.id %>"><%= checklist.name %></option>\n  <% }); %>\n</select>');
     }
     ChecklistDropdown.prototype.render = function() {
       return $("#" + this.id).replaceWith(this.template({
@@ -47,21 +47,24 @@
       this.checklists = args.checklists;
       this.week_offset = args.week_offset != null ? Number(args.week_offset) : 0;
       this.user_id = args.user_id != null ? args.user_id : 0;
-      this.checklist_id = args.checklist_id != null ? args.checklist_id : 0;
       this.all = "- All -";
       $("#" + this.id).replaceWith(this.el);
-      this.template = _.template('<div id = "buttons">\n  <a class = "button" href = "#checklists">Go to checklists</a>\n  <a class = "button" href = "#charts">View charts</a>\n</div>\n<div class = "report_controls">\n  <div class = "prev_week">\n    <a href = "#<%= prev_week_link %>" style = "border: none"><img src = "/images/left_32.png" /></a>\n    <a href = "#<%= prev_week_link %>">Prev week</a>\n  </div>\n  <% if (next_week_link != null) { %>\n    <div class = "next_week">\n      <a href = "#<%= next_week_link %>">Next week</a>\n      <a href = "#<%= next_week_link %>" style = "border: none"><img src = "/images/right_32.png" /></a>\n    </div>\n  <% } %>\n  <div style = "display: inline-block; padding-right: 50px">\n    User:\n    <select id = "users" class = "filter">\n      <option value = "0"><%= all %></option>\n      <% users.each(function(user) { %>\n        <option value = "<%= user.id %>"><%= user.name() == null || user.name().length == 0 ? user.email() : user.name() %></option>\n      <% }); %>\n    </select>\n  </div>\n  Checklist:\n  <select id = "checklists"></select>\n</div>\n<% if (entries_by_day.length == 0) { %>\n  <h2>No entries for this week</h2>\n<% } %>\n<% _.each(entries_by_day, function(day_entry) { %>\n  <h2><%= day_entry[0] %></h2>\n  <table class = "timeline_entries">\n    <tr>\n      <th>Checklist</th>\n      <th>User</th>\n      <th>Completed at</th>\n      <th>Completed for</th>\n    </tr>\n\n    <% _.each(day_entry[1], function(entry) { %>\n      <tr>\n        <td class = "first"><%= entry.checklist_name %></td>\n        <td><%= entry.user_name %></td>\n        <td><%= entry.display_time %></td>\n        <td><%= entry.for %></td>\n      </tr>\n    <% }); %>\n  </table>\n<% }); %>');
+      this.template = _.template('<div id = "buttons">\n  <a class = "button" href = "#checklists">Go to checklists</a>\n  <a class = "button" href = "#charts">View charts</a>\n</div>\n<div class = "report_controls">\n  <div class = "prev_week">\n    <a href = "#<%= prev_week_link %>" style = "border: none"><img src = "/images/left_32.png" /></a>\n    <a href = "#<%= prev_week_link %>">Prev week</a>\n  </div>\n  <% if (next_week_link != null) { %>\n    <div class = "next_week">\n      <a href = "#<%= next_week_link %>">Next week</a>\n      <a href = "#<%= next_week_link %>" style = "border: none"><img src = "/images/right_32.png" /></a>\n    </div>\n  <% } %>\n  <div style = "display: inline-block; padding-right: 50px">\n    User:\n    <select id = "users" class = "filter">\n      <option value = "0"><%= all %></option>\n      <% _.each(users, function(user) { %>\n        <option value = "<%= user.id %>"><%= user.name == null || user.name.length == 0 ? user.email : user.name %></option>\n      <% }); %>\n    </select>\n  </div>\n  Checklist:\n  <select id = "checklists"></select>\n</div>\n<% if (entries_by_day.length == 0) { %>\n  <h2>No entries for this week</h2>\n<% } %>\n<% _.each(entries_by_day, function(day_entry) { %>\n  <h2><%= day_entry[0] %></h2>\n  <table class = "timeline_entries">\n    <tr>\n      <th>Checklist</th>\n      <th>User</th>\n      <th>Completed at</th>\n      <th>Completed for</th>\n    </tr>\n\n    <% _.each(day_entry[1], function(entry) { %>\n      <tr>\n        <td class = "first"><%= entry.checklist_name %></td>\n        <td><%= entry.user_name %></td>\n        <td><%= entry.display_time %></td>\n        <td><%= entry.for %></td>\n      </tr>\n    <% }); %>\n  </table>\n<% }); %>');
       this.no_entries_template = _.template('You\'ll need to\n<% if (checklists.length == 0) { %>\n  <a href = "#checklists">define some checklists</a> and get people to fill them out\n<% } else { %>\n  define some checklists and <a href = "#checklists">get people to fill them out</a>\n<% } %>\nto get reports and charts like this:<br/><br/>\n<img src = "/images/timeline-sample.png" /><br/>\n<img src = "/images/chart-sample.png" /><br/>');
-      this.checklist_dropdown = new ChecklistDropdown({
-        id: "checklists",
-        checklists: this.checklists,
-        allow_all: true
-      });
+      this.checklist_id = args.checklist_id != null ? args.checklist_id : 0;
       $.ajax({
         url: this.entries_url(),
         dataType: 'json',
         success: __bind(function(data, textStatus, xhr) {
-          this.entries_by_day = data;
+          this.entries_by_day = data.entries;
+          console.log(data.entries);
+          this.entries_checklists = data.checklists;
+          this.users = data.users;
+          this.checklist_dropdown = new ChecklistDropdown({
+            id: "checklists",
+            checklists: this.entries_checklists,
+            allow_all: true
+          });
           return this.render();
         }, this),
         error: __bind(function(xhr) {
@@ -219,13 +222,6 @@
       this.checklist_id = args.checklist_id;
       this.group_by = args.group_by;
       this.all = "- All -";
-      this.checklist_dropdown = new ChecklistDropdown({
-        id: "checklists",
-        checklists: this.checklists
-      });
-      if (this.checklists.length > 0 && !(this.checklist_id != null)) {
-        this.checklist_id = this.checklists.at(0).id;
-      }
       if (!(this.group_by != null)) {
         this.group_by = "day";
       }
@@ -235,11 +231,19 @@
         var item, _i, _len, _ref;
         this.counts = data.counts;
         this.count_users = data.users;
+        this.count_checklists = data.checklists;
         if (this.counts.length > 0) {
           _ref = this.counts;
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             item = _ref[_i];
             item[0] = new Date(item[0]);
+          }
+          this.checklist_dropdown = new ChecklistDropdown({
+            id: "checklists",
+            checklists: this.count_checklists
+          });
+          if (this.count_checklists.length > 0 && !(this.checklist_id != null)) {
+            this.checklist_id = this.count_checklists.at(0).id;
           }
           this.timeline_chart = new TimelineChart({
             counts: this.counts,

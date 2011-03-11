@@ -18,8 +18,8 @@ class ChecklistDropdown extends Backbone.View
     @template = _.template('''
       <select id = "checklists" class = "filter">
         <% if (allow_all) { %> <option value = "0">- All -</option> <% } %>
-        <% checklists.each(function(checklist) { %>
-          <option value = "<%= checklist.id %>"><%= checklist.name() %></option>
+        <% _.each(checklists, function(checklist) { %>
+          <option value = "<%= checklist.id %>"><%= checklist.name %></option>
         <% }); %>
       </select>
     ''')
@@ -43,7 +43,6 @@ class root.TimelineView extends Backbone.View
     @checklists = args.checklists
     @week_offset = if args.week_offset? then Number(args.week_offset) else 0
     @user_id = if args.user_id? then args.user_id else 0
-    @checklist_id = if args.checklist_id? then args.checklist_id else 0
 
     @all = "- All -"
 
@@ -69,8 +68,8 @@ class root.TimelineView extends Backbone.View
           User:
           <select id = "users" class = "filter">
             <option value = "0"><%= all %></option>
-            <% users.each(function(user) { %>
-              <option value = "<%= user.id %>"><%= user.name() == null || user.name().length == 0 ? user.email() : user.name() %></option>
+            <% _.each(users, function(user) { %>
+              <option value = "<%= user.id %>"><%= user.name == null || user.name.length == 0 ? user.email : user.name %></option>
             <% }); %>
           </select>
         </div>
@@ -114,12 +113,17 @@ class root.TimelineView extends Backbone.View
       <img src = "/images/chart-sample.png" /><br/>
     '''
 
-    @checklist_dropdown = new ChecklistDropdown({id: "checklists", checklists: @checklists, allow_all: yes})
+    @checklist_id = if args.checklist_id? then args.checklist_id else 0
+
     $.ajax {
       url: @entries_url(),
       dataType: 'json',
       success: (data, textStatus, xhr) =>
-        @entries_by_day = data
+        @entries_by_day = data.entries
+        console.log data.entries
+        @entries_checklists = data.checklists
+        @users = data.users
+        @checklist_dropdown = new ChecklistDropdown({id: "checklists", checklists: @entries_checklists, allow_all: yes})
         @render()
       error: (xhr) =>
         @render()         # entries_by_day will be undefined, causing the view to show instructions about creating some checklists and entries
@@ -258,9 +262,6 @@ class root.ChartView extends Backbone.View
     @checklist_id = args.checklist_id
     @group_by = args.group_by
     @all = "- All -"
-
-    @checklist_dropdown = new ChecklistDropdown({id: "checklists", checklists: @checklists})
-    @checklist_id = @checklists.at(0).id if @checklists.length > 0 && !@checklist_id?
     @group_by = "day" if !@group_by?
 
     $("#" + @id).replaceWith(@el)
@@ -303,10 +304,14 @@ class root.ChartView extends Backbone.View
     $.getJSON @counts_url(), (data, textStatus, xhr) =>
       @counts = data.counts #@type_cast(data.counts)
       @count_users = data.users
+      @count_checklists = data.checklists
 
       if @counts.length > 0
         for item in @counts
           item[0] = new Date(item[0])
+
+        @checklist_dropdown = new ChecklistDropdown({id: "checklists", checklists: @count_checklists})
+        @checklist_id = @count_checklists.at(0).id if @count_checklists.length > 0 && !@checklist_id?
 
         @timeline_chart = new TimelineChart({counts: @counts, users: @count_users, colors: @colors})
 

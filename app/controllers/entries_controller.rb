@@ -25,8 +25,10 @@ class EntriesController < ApplicationController
     respond_to {|format|
       format.json {
         entries_by_day = Entry.get_entries_by_day(entries)
+        result = {entries: entries_by_day, checklists: current_account.checklists.select("id, name").order("name"),
+          users: current_account.users.select("id, email, name").order("name")}
         # return a 404 to indicate an account without entries so the client can display instructions
-        render json: entries_by_day, status: (entries_by_day.empty? && current_account.entries.count == 0) ? :not_found : :ok
+        render json: result, status: (entries_by_day.empty? && current_account.entries.count == 0) ? :not_found : :ok
       }
     }
   end
