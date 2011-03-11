@@ -24,6 +24,10 @@ input
   &:focus
     background-color: #f6feff
 
+// IE draws the border *around* the whole checkbox, making it look stupid
+input[type=checkbox]
+  border: none
+
 label
   margin-bottom: 4px
 

@@ -22,6 +22,9 @@ input {
   input:focus {
     background-color: #f6feff; }
 
+input[type=checkbox] {
+  border: none; }
+
 label {
   margin-bottom: 4px; }
 
