@@ -50,54 +50,60 @@
       this.flash = null;
     }
     AppController.prototype.get_flash = function() {
-      var s;
-      s = this.flash;
+      var res;
+      res = this.flash;
       this.flash = null;
-      return s;
+      return res;
     };
     AppController.prototype.checklists = function() {
       if (!(current_account.time_zone != null) || current_account.time_zone.length === 0) {
         return window.location.hash = "timezone";
       } else {
-        return this.view = new ChecklistListView;
+        this.view = new ChecklistListView;
+        return this.saveLocation("checklists");
       }
     };
     AppController.prototype.timezone = function() {
       return this.view = new TimeZoneView;
     };
     AppController.prototype.show = function(cid) {
-      return this.view = new ChecklistView({
+      this.view = new ChecklistView({
         model: Checklists.getByCid(cid)
       });
+      return this.saveLocation("checklists/" + cid);
     };
     AppController.prototype.create = function() {
       var c;
       c = new Checklist;
       Checklists.add(c);
-      return this.view = new EditChecklistView({
+      this.view = new EditChecklistView({
         model: c
       });
+      return this.saveLocation("create");
     };
     AppController.prototype.edit = function(cid) {
-      return this.view = new EditChecklistView({
+      this.view = new EditChecklistView({
         model: Checklists.getByCid(cid)
       });
+      return this.saveLocation("checklists/" + cid + "/edit");
     };
     AppController.prototype.users = function() {
       if (current_user.role === "admin") {
-        return this.view = new UserPageView({
+        this.view = new UserPageView({
           users: Users
         });
+        return this.saveLocation("users");
       }
     };
     AppController.prototype.timeline = function(week_offset, user_id, checklist_id) {
-      return this.view = new TimelineView({
+      this.view = new TimelineView({
         week_offset: week_offset,
         users: Users,
         checklists: Checklists,
         user_id: user_id,
         checklist_id: checklist_id
       });
+      return this.saveLocation("timeline");
     };
     AppController.prototype.charts = function(checklist_id, group_by) {
       if (Checklists.length > 0 && !(checklist_id != null)) {
@@ -106,12 +112,13 @@
       if (!(group_by != null)) {
         group_by = "day";
       }
-      return this.view = new ChartView({
+      this.view = new ChartView({
         checklist_id: checklist_id,
         group_by: group_by,
         users: Users,
         checklists: Checklists
       });
+      return this.saveLocation("charts");
     };
     return AppController;
   })();

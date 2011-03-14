@@ -47,7 +47,7 @@ class root.Checklist extends Backbone.Model
 
 class ChecklistCollection extends Backbone.Collection
   model: Checklist
-  url: "/checklists"
+  url: "/checklists/checklists"
 
   constructor: ->
     super
@@ -80,6 +80,7 @@ root.Checklists = new ChecklistCollection
 class root.TimeZoneView extends Backbone.View
   tagName: "div"
   id: "content"
+  events: {"click #set_time_zone": "set_time_zone"}
 
   constructor: ->
     super
@@ -100,7 +101,16 @@ class root.TimeZoneView extends Backbone.View
   render: ->
     $(@el).html(@template())
     $("#heading").html("Set time zone")
-    @$("#set_time_zone").attr("href", "#checklists")    # go to the checklists page after setting time zone
+
+
+  set_time_zone: (e) ->
+    current_account.time_zone = $(e.target).prev("select").val()
+    $(this).html("Saving...")
+    $.post "/time_zone", {time_zone: $(e.target).prev("select").val()}, (data, textStatus, xhr) =>
+      $(e.target).html("Set time zone");
+      window.location.hash = "checklists";
+
+    e.preventDefault();
 
 
 class root.ChecklistListView extends Backbone.View
@@ -175,6 +185,7 @@ class root.ChecklistListView extends Backbone.View
     else
       window.location.hash = "create"
     e.preventDefault()
+    e.stopPropagation()
 
   on_doubleclick: (e) ->
     window.location.hash = "checklists/#{e.target.id}"

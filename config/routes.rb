@@ -51,7 +51,9 @@ OnlineChecklistsApp::Application.routes.draw do
   # just remember to delete public/index.html.
   # root :to => "welcome#index"
 
-  resources :checklists, :except => [:new, :edit]
+  resources :checklists, :except => [:new, :edit] do
+    get 'checklists', :on => :collection
+  end
 
   get 'time_zone', :to => "checklists#time_zone"
   post 'time_zone', :to => "checklists#time_zone"

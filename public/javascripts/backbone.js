@@ -715,6 +715,7 @@
       }
       if (current == this.fragment ||
           current == decodeURIComponent(this.fragment)) return false;
+
       if (this.iframe) {
         window.location.hash = this.iframe.location.hash = current;
       }

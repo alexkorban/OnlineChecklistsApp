@@ -79,7 +79,9 @@ class root.TimelineView extends Backbone.View
       <% if (entries_by_day.length == 0) { %>
         <h2>No entries for this week</h2>
       <% } %>
-      <% _.each(entries_by_day, function(day_entry) { %>
+    ''')
+
+    @day_entry_template = _.template '''
         <h2><%= day_entry[0] %></h2>
         <table class = "timeline_entries">
           <tr>
@@ -88,18 +90,18 @@ class root.TimelineView extends Backbone.View
             <th>Completed at</th>
             <th>Completed for</th>
           </tr>
-
-          <% _.each(day_entry[1], function(entry) { %>
-            <tr>
-              <td class = "first"><%= entry.checklist_name %></td>
-              <td><%= entry.user_name %></td>
-              <td><%= entry.display_time %></td>
-              <td><%= entry.for %></td>
-            </tr>
-          <% }); %>
         </table>
-      <% }); %>
-    ''')
+    '''
+
+    @day_entry_row_template = _.template '''
+      <tr>
+        <td class = "first"><%= row.checklist_name %></td>
+        <td><%= row.user_name %></td>
+        <td><%= row.display_time %></td>
+        <td><%= row.notes %></td>
+      </tr>
+    '''
+    #           <% _.each(day_entry[1], function(entry) { %>
 
     @no_entries_template = _.template '''
       You'll need to
@@ -120,7 +122,6 @@ class root.TimelineView extends Backbone.View
       dataType: 'json',
       success: (data, textStatus, xhr) =>
         @entries_by_day = data.entries
-        console.log data.entries
         @entries_checklists = data.checklists
         @users = data.users
         @checklist_dropdown = new ChecklistDropdown({id: "checklists", checklists: @entries_checklists, allow_all: yes})
@@ -134,11 +135,16 @@ class root.TimelineView extends Backbone.View
       $(@el).html @template({
         all: @all
         users: @users
-        checklists: @checklists
         entries_by_day: @entries_by_day
         next_week_link: @next_week_link()
         prev_week_link: @prev_week_link()
         })
+      for day_entry in @entries_by_day
+        $(@el).append(@day_entry_template({day_entry: day_entry}))
+        for row in day_entry[1]
+          row.notes = row.for   # Underscore.js parsing of the template trips up on row.for in IE, so I used row.notes instead. I hate IE.
+          @$(".timeline_entries:last").append(@day_entry_row_template({row: row}))
+
       @checklist_dropdown.render()
       @$("#users").val(@user_id) if @user_id
       @$("#checklists").val(@checklist_id) if @checklist_id

@@ -57,7 +57,7 @@
   ChecklistCollection = (function() {
     __extends(ChecklistCollection, Backbone.Collection);
     ChecklistCollection.prototype.model = Checklist;
-    ChecklistCollection.prototype.url = "/checklists";
+    ChecklistCollection.prototype.url = "/checklists/checklists";
     function ChecklistCollection() {
       ChecklistCollection.__super__.constructor.apply(this, arguments);
     }
@@ -76,6 +76,9 @@
     __extends(TimeZoneView, Backbone.View);
     TimeZoneView.prototype.tagName = "div";
     TimeZoneView.prototype.id = "content";
+    TimeZoneView.prototype.events = {
+      "click #set_time_zone": "set_time_zone"
+    };
     function TimeZoneView() {
       TimeZoneView.__super__.constructor.apply(this, arguments);
       $("#" + this.id).replaceWith(this.el);
@@ -86,8 +89,18 @@
     }
     TimeZoneView.prototype.render = function() {
       $(this.el).html(this.template());
-      $("#heading").html("Set time zone");
-      return this.$("#set_time_zone").attr("href", "#checklists");
+      return $("#heading").html("Set time zone");
+    };
+    TimeZoneView.prototype.set_time_zone = function(e) {
+      current_account.time_zone = $(e.target).prev("select").val();
+      $(this).html("Saving...");
+      $.post("/time_zone", {
+        time_zone: $(e.target).prev("select").val()
+      }, __bind(function(data, textStatus, xhr) {
+        $(e.target).html("Set time zone");
+        return window.location.hash = "checklists";
+      }, this));
+      return e.preventDefault();
     };
     return TimeZoneView;
   })();
@@ -125,7 +138,8 @@
       } else {
         window.location.hash = "create";
       }
-      return e.preventDefault();
+      e.preventDefault();
+      return e.stopPropagation();
     };
     ChecklistListView.prototype.on_doubleclick = function(e) {
       return window.location.hash = "checklists/" + e.target.id;

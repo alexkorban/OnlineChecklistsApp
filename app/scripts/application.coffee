@@ -48,15 +48,16 @@ class AppController extends Backbone.Controller
 
 
   get_flash: ->
-    s = @flash
+    res = @flash
     @flash = null
-    s
+    res
 
   checklists: ->
     if !current_account.time_zone? || current_account.time_zone.length == 0
       window.location.hash = "timezone"
     else
       @view = new ChecklistListView
+      @saveLocation("checklists")
 
 
   timezone: ->
@@ -65,31 +66,36 @@ class AppController extends Backbone.Controller
 
   show: (cid) ->
     @view = new ChecklistView { model: Checklists.getByCid(cid) }
-
+    @saveLocation("checklists/#{cid}")
 
   create: ->
     c = new Checklist
     Checklists.add(c)
     @view = new EditChecklistView { model: c }
+    @saveLocation("create")
 
 
   edit: (cid) ->
     @view = new EditChecklistView { model: Checklists.getByCid(cid) }
+    @saveLocation("checklists/#{cid}/edit")
 
 
   users: ->
     if current_user.role is "admin"
       @view = new UserPageView { users: Users }
+      @saveLocation("users")
 
 
   timeline: (week_offset, user_id, checklist_id) ->
     @view = new TimelineView({week_offset: week_offset, users: Users, checklists: Checklists, user_id: user_id, checklist_id: checklist_id})
+    @saveLocation("timeline")
 
 
   charts: (checklist_id, group_by)->
     checklist_id = Checklists.at(0).id if Checklists.length > 0 && !checklist_id?
     group_by = "day" if !group_by?
     @view = new ChartView({checklist_id: checklist_id, group_by: group_by, users: Users, checklists: Checklists})
+    @saveLocation("charts")
 
 
 #
@@ -109,6 +115,7 @@ heartbeat = ->
 $ ->
   window.app = new AppController()
   Backbone.history.start()
+  #Backbone.history.saveLocation("checklists")
   setInterval(heartbeat, 5 * 60 * 1000)    # let the server know the session is active every 5 minutes
 
   # Enter key handler for ChecklistView

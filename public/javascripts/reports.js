@@ -49,7 +49,9 @@
       this.user_id = args.user_id != null ? args.user_id : 0;
       this.all = "- All -";
       $("#" + this.id).replaceWith(this.el);
-      this.template = _.template('<div id = "buttons">\n  <a class = "button" href = "#checklists">Go to checklists</a>\n  <a class = "button" href = "#charts">View charts</a>\n</div>\n<div class = "report_controls">\n  <div class = "prev_week">\n    <a href = "#<%= prev_week_link %>" style = "border: none"><img src = "/images/left_32.png" /></a>\n    <a href = "#<%= prev_week_link %>">Prev week</a>\n  </div>\n  <% if (next_week_link != null) { %>\n    <div class = "next_week">\n      <a href = "#<%= next_week_link %>">Next week</a>\n      <a href = "#<%= next_week_link %>" style = "border: none"><img src = "/images/right_32.png" /></a>\n    </div>\n  <% } %>\n  <div style = "display: inline-block; padding-right: 50px">\n    User:\n    <select id = "users" class = "filter">\n      <option value = "0"><%= all %></option>\n      <% _.each(users, function(user) { %>\n        <option value = "<%= user.id %>"><%= user.name == null || user.name.length == 0 ? user.email : user.name %></option>\n      <% }); %>\n    </select>\n  </div>\n  Checklist:\n  <select id = "checklists"></select>\n</div>\n<% if (entries_by_day.length == 0) { %>\n  <h2>No entries for this week</h2>\n<% } %>\n<% _.each(entries_by_day, function(day_entry) { %>\n  <h2><%= day_entry[0] %></h2>\n  <table class = "timeline_entries">\n    <tr>\n      <th>Checklist</th>\n      <th>User</th>\n      <th>Completed at</th>\n      <th>Completed for</th>\n    </tr>\n\n    <% _.each(day_entry[1], function(entry) { %>\n      <tr>\n        <td class = "first"><%= entry.checklist_name %></td>\n        <td><%= entry.user_name %></td>\n        <td><%= entry.display_time %></td>\n        <td><%= entry.for %></td>\n      </tr>\n    <% }); %>\n  </table>\n<% }); %>');
+      this.template = _.template('<div id = "buttons">\n  <a class = "button" href = "#checklists">Go to checklists</a>\n  <a class = "button" href = "#charts">View charts</a>\n</div>\n<div class = "report_controls">\n  <div class = "prev_week">\n    <a href = "#<%= prev_week_link %>" style = "border: none"><img src = "/images/left_32.png" /></a>\n    <a href = "#<%= prev_week_link %>">Prev week</a>\n  </div>\n  <% if (next_week_link != null) { %>\n    <div class = "next_week">\n      <a href = "#<%= next_week_link %>">Next week</a>\n      <a href = "#<%= next_week_link %>" style = "border: none"><img src = "/images/right_32.png" /></a>\n    </div>\n  <% } %>\n  <div style = "display: inline-block; padding-right: 50px">\n    User:\n    <select id = "users" class = "filter">\n      <option value = "0"><%= all %></option>\n      <% _.each(users, function(user) { %>\n        <option value = "<%= user.id %>"><%= user.name == null || user.name.length == 0 ? user.email : user.name %></option>\n      <% }); %>\n    </select>\n  </div>\n  Checklist:\n  <select id = "checklists"></select>\n</div>\n<% if (entries_by_day.length == 0) { %>\n  <h2>No entries for this week</h2>\n<% } %>');
+      this.day_entry_template = _.template('<h2><%= day_entry[0] %></h2>\n<table class = "timeline_entries">\n  <tr>\n    <th>Checklist</th>\n    <th>User</th>\n    <th>Completed at</th>\n    <th>Completed for</th>\n  </tr>\n</table>');
+      this.day_entry_row_template = _.template('<tr>\n  <td class = "first"><%= row.checklist_name %></td>\n  <td><%= row.user_name %></td>\n  <td><%= row.display_time %></td>\n  <td><%= row.notes %></td>\n</tr>');
       this.no_entries_template = _.template('You\'ll need to\n<% if (checklists.length == 0) { %>\n  <a href = "#checklists">define some checklists</a> and get people to fill them out\n<% } else { %>\n  define some checklists and <a href = "#checklists">get people to fill them out</a>\n<% } %>\nto get reports and charts like this:<br/><br/>\n<img src = "/images/timeline-sample.png" /><br/>\n<img src = "/images/chart-sample.png" /><br/>');
       this.checklist_id = args.checklist_id != null ? args.checklist_id : 0;
       $.ajax({
@@ -57,7 +59,6 @@
         dataType: 'json',
         success: __bind(function(data, textStatus, xhr) {
           this.entries_by_day = data.entries;
-          console.log(data.entries);
           this.entries_checklists = data.checklists;
           this.users = data.users;
           this.checklist_dropdown = new ChecklistDropdown({
@@ -73,16 +74,31 @@
       });
     }
     TimelineView.prototype.render = function() {
+      var day_entry, row, _i, _j, _len, _len2, _ref, _ref2;
       $("#heading").html("Reports &gt; Timeline");
       if (this.entries_by_day != null) {
         $(this.el).html(this.template({
           all: this.all,
           users: this.users,
-          checklists: this.checklists,
           entries_by_day: this.entries_by_day,
           next_week_link: this.next_week_link(),
           prev_week_link: this.prev_week_link()
         }));
+        _ref = this.entries_by_day;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          day_entry = _ref[_i];
+          $(this.el).append(this.day_entry_template({
+            day_entry: day_entry
+          }));
+          _ref2 = day_entry[1];
+          for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
+            row = _ref2[_j];
+            row.notes = row["for"];
+            this.$(".timeline_entries:last").append(this.day_entry_row_template({
+              row: row
+            }));
+          }
+        }
         this.checklist_dropdown.render();
         if (this.user_id) {
           this.$("#users").val(this.user_id);
