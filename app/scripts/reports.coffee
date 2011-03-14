@@ -316,10 +316,10 @@ class root.ChartView extends Backbone.View
         for item in @counts
           item[0] = new Date(item[0])
 
-        @checklist_dropdown = new ChecklistDropdown({id: "checklists", checklists: @count_checklists})
-        @checklist_id = @count_checklists.at(0).id if @count_checklists.length > 0 && !@checklist_id?
+      @checklist_dropdown = new ChecklistDropdown({id: "checklists", checklists: @count_checklists})
+      @checklist_id = @count_checklists.at(0).id if @count_checklists.length > 0 && !@checklist_id?
 
-        @timeline_chart = new TimelineChart({counts: @counts, users: @count_users, colors: @colors})
+      @timeline_chart = new TimelineChart({counts: @counts, users: @count_users, colors: @colors})
 
       @render()
 

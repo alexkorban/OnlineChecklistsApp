@@ -254,19 +254,19 @@
             item = _ref[_i];
             item[0] = new Date(item[0]);
           }
-          this.checklist_dropdown = new ChecklistDropdown({
-            id: "checklists",
-            checklists: this.count_checklists
-          });
-          if (this.count_checklists.length > 0 && !(this.checklist_id != null)) {
-            this.checklist_id = this.count_checklists.at(0).id;
-          }
-          this.timeline_chart = new TimelineChart({
-            counts: this.counts,
-            users: this.count_users,
-            colors: this.colors
-          });
         }
+        this.checklist_dropdown = new ChecklistDropdown({
+          id: "checklists",
+          checklists: this.count_checklists
+        });
+        if (this.count_checklists.length > 0 && !(this.checklist_id != null)) {
+          this.checklist_id = this.count_checklists.at(0).id;
+        }
+        this.timeline_chart = new TimelineChart({
+          counts: this.counts,
+          users: this.count_users,
+          colors: this.colors
+        });
         return this.render();
       }, this));
     }
