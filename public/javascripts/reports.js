@@ -76,6 +76,7 @@
     TimelineView.prototype.render = function() {
       var day_entry, row, _i, _j, _len, _len2, _ref, _ref2;
       $("#heading").html("Reports &gt; Timeline");
+      document.title = "OnlineChecklists: Reports > Timeline";
       if (this.entries_by_day != null) {
         $(this.el).html(this.template({
           all: this.all,
@@ -280,6 +281,7 @@
         group_by: this.group_by
       }));
       $("#heading").html("Reports &gt; Charts");
+      document.title = "OnlineChecklists: Reports > Charts";
       this.checklist_dropdown.render();
       if (this.group_by !== "day") {
         $("#daily_message").hide();

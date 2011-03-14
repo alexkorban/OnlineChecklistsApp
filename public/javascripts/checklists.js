@@ -89,7 +89,8 @@
     }
     TimeZoneView.prototype.render = function() {
       $(this.el).html(this.template());
-      return $("#heading").html("Set time zone");
+      $("#heading").html("Set time zone");
+      return document.title = "OnlineChecklists: Set time zone";
     };
     TimeZoneView.prototype.set_time_zone = function(e) {
       current_account.time_zone = $(e.target).prev("select").val();
@@ -130,6 +131,7 @@
         flash: window.app.get_flash()
       }));
       $("#heading").html("Checklists");
+      document.title = "OnlineChecklists: Checklists";
       return this.controls_contents = {};
     };
     ChecklistListView.prototype.on_create = function(e) {
@@ -196,6 +198,7 @@
         items: this.model.items
       }));
       $("#heading").html(this.model.name());
+      document.title = "OnlineChecklists: " + (this.model.name());
       return this.$("input[name='for']").focus();
     };
     ChecklistView.prototype.on_complete = function(e) {
@@ -320,7 +323,13 @@
         name: this.model.name(),
         items: this.model.items
       }));
-      return $("#heading").html("Create checklist");
+      if (!(this.model.id != null)) {
+        $("#heading").html("Create checklist");
+        return document.title = "OnlineChecklists: Create checklist";
+      } else {
+        $("#heading").html("Edit " + (this.model.name()));
+        return document.title = "OnlineChecklists: Edit " + (this.model.name());
+      }
     };
     EditChecklistView.prototype.add_item = function(item) {
       var view;

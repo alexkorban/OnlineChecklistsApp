@@ -131,6 +131,7 @@ class root.TimelineView extends Backbone.View
     }
   render: ->
     $("#heading").html("Reports &gt; Timeline")
+    document.title = "OnlineChecklists: Reports > Timeline"
     if @entries_by_day?   # entries_by_day will be undefined when the server returned an error, indicating that the account has no entries
       $(@el).html @template({
         all: @all
@@ -330,6 +331,7 @@ class root.ChartView extends Backbone.View
   render: ->
     $(@el).html(@template({checklists: @checklists, users: @count_users, counts: @counts, all: @all, colors: @colors, group_by: @group_by}))
     $("#heading").html("Reports &gt; Charts")
+    document.title = "OnlineChecklists: Reports > Charts"
     @checklist_dropdown.render()
     $("#daily_message").hide() if @group_by != "day"
     if @counts.length > 0

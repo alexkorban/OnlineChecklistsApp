@@ -9,6 +9,11 @@
     = javascript_include_tag "http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"
     = javascript_include_tag "underscore-min"
 
+    /= javascript_include_tag "https://getfirebug.com/firebug-lite.js"
+    -#<!--[if lt IE 9]>
+    -#<script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE9.js"></script>
+    -#<![endif]-->
+
     - if controller.controller_name == "checklists"
       = javascript_include_tag Rails.env == "production" ? "backbone-min" : "backbone"
       = javascript_include_tag "http://www.google.com/jsapi"
@@ -22,34 +27,6 @@
     :javascript
       var current_user = #{current_user.to_json(:only => User::JSON_FIELDS)};
       var current_account = #{current_user ? current_user.account.to_json(:only => [:time_zone]) : "null"};
-
-      $(function() {
-        // Straight from Rails.js: Make sure that every Ajax request sends the CSRF token
-        function CSRFProtection(xhr) {
-        var token = $('meta[name="csrf-token"]').attr('content');
-        if (token) xhr.setRequestHeader('X-CSRF-Token', token);
-        }
-        if ('ajaxPrefilter' in $) $.ajaxPrefilter(function(options, originalOptions, xhr){ CSRFProtection(xhr) });
-        else $(document).ajaxSend(function(e, xhr){ CSRFProtection(xhr) });
-
-
-        // using a global handler for Set time zone button because time zone can be set from two places:
-        // - the home page on first login
-        // - the settings page
-        $("#set_time_zone").live("click", function (e) {
-          current_account.time_zone = $(this).prev("select").val();
-          $(this).html("Saving...");
-          self = this;
-          $.post("/time_zone", {time_zone: $(this).prev("select").val()}, function (data, textStatus, xhr) {
-            $(self).html("Set time zone");
-
-            // redirect to another location via the location hash when the href attribute is set
-            if ($(self).attr("href") != "#")
-              window.location.hash = $(self).attr("href");
-          });
-          e.preventDefault();
-        });
-      });
 
   %body
     #header
@@ -73,3 +50,15 @@
     #main
       = yield
 
+  :javascript
+    $(function() {
+      // Straight from Rails.js: Make sure that every Ajax request sends the CSRF token
+      function CSRFProtection(xhr) {
+        var token = $('meta[name="csrf-token"]').attr('content');
+        if (token) xhr.setRequestHeader('X-CSRF-Token', token);
+      }
+      if ('ajaxPrefilter' in $)
+        $.ajaxPrefilter(function(options, originalOptions, xhr){ CSRFProtection(xhr) });
+      else
+        $(document).ajaxSend(function(e, xhr){ CSRFProtection(xhr) });
+    });

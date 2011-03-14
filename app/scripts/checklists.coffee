@@ -101,6 +101,7 @@ class root.TimeZoneView extends Backbone.View
   render: ->
     $(@el).html(@template())
     $("#heading").html("Set time zone")
+    document.title = "OnlineChecklists: Set time zone"
 
 
   set_time_zone: (e) ->
@@ -175,6 +176,7 @@ class root.ChecklistListView extends Backbone.View
   render: ->
     $(@el).html(@template({checklists : Checklists, flash: window.app.get_flash()}))
     $("#heading").html("Checklists")
+    document.title = "OnlineChecklists: Checklists"
     @controls_contents = {}
     #$(".delete").live("click", (e) => @on_delete(e))
 
@@ -264,6 +266,7 @@ class root.ChecklistView extends Backbone.View
   render: ->
     $(@el).html(@template({items : @model.items}))
     $("#heading").html(@model.name())
+    document.title = "OnlineChecklists: #{@model.name()}"
     @$("input[name='for']").focus()
 
 
@@ -402,8 +405,12 @@ class root.EditChecklistView extends Backbone.View
 
   render: ->
     $(@el).html(@template({name: @model.name(), items : @model.items}))
-    $("#heading").html("Create checklist")
-
+    if !@model.id?
+      $("#heading").html("Create checklist")
+      document.title = "OnlineChecklists: Create checklist"
+    else
+      $("#heading").html("Edit #{@model.name()}")
+      document.title = "OnlineChecklists: Edit #{@model.name()}"
 
   add_item: (item) =>
     view = new EditItemView {model: item, collection: @model.items}
