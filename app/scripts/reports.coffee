@@ -241,7 +241,7 @@ class TimelineChart extends Backbone.View
         thickness: 2
         });
       if @first_render
-        for i in [1...@users.length]    # the first data column (all users) is left visible
+        for i in [1...@users.length]    # the first data column (All users) is left visible
           @chart.hideDataColumns(i)
         @first_render = no
     })
@@ -315,7 +315,9 @@ class root.ChartView extends Backbone.View
 
       if @counts.length > 0
         for item in @counts
-          item[0] = new Date(item[0])
+          # it might be tempting to try item[0] = new Date(item[0]) but that doesn't work in IE (why of course!)
+          date_parts = item[0].split("-")
+          item[0] = new Date(date_parts[0], date_parts[1] - 1, date_parts[2])
 
       @checklist_dropdown = new ChecklistDropdown({id: "checklists", checklists: @count_checklists})
       @checklist_id = @count_checklists.at(0).id if @count_checklists.length > 0 && !@checklist_id?
