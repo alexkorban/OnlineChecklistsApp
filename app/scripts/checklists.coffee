@@ -293,9 +293,6 @@ class root.ChecklistView extends Backbone.View
   on_focus_input: (e) ->
     @$(".checklist_item").removeClass("selected")
     @$(".input_field .instructions").show()
-                                           Fix: renamed Entry.for to Entry.notes because using reserved words as property names doesn't work all that well in JavaScript; also it's called Notes in the UI
-Fix: focus on the Notes field on entry page load
-Fix: position the checklist controls in a different way to make it work in IE7
 
   on_blur_input: (e) ->
     @$(".input_field .instructions").hide()

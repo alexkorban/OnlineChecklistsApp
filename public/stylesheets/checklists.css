@@ -174,9 +174,6 @@ select {
       display: inline; }
   #content li.checklist_item.checked {
     list-style-image: url("/images/checked.png"); }
-#content .input_field {
-  display: table-cell;
-  vertical-align: middle; }
 #content div.users {
   padding-bottom: 50px; }
   #content div.users div.user {
