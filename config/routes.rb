@@ -52,9 +52,9 @@ OnlineChecklistsApp::Application.routes.draw do
   # root :to => "welcome#index"
 
   resources :checklists, :except => [:new, :edit] do
-    get 'checklists', :on => :collection
   end
 
+  get 'home', :to => "checklists#home"
   get 'time_zone', :to => "checklists#time_zone"
   post 'time_zone', :to => "checklists#time_zone"
   get 'heartbeat', :to => "checklists#heartbeat"
@@ -63,7 +63,7 @@ OnlineChecklistsApp::Application.routes.draw do
     get 'counts', :on => :collection
   end
 
-  root :to => "checklists#index"
+  root :to => "checklists#home"
 
   devise_for :users, controllers: {registrations: "registrations", invitations: "invitations"} do
     get "users", :to => "registrations#index"

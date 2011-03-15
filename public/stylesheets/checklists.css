@@ -151,7 +151,8 @@ select {
   font-size: 20px;
   margin-bottom: 10px;
   width: 50%;
-  list-style-image: url("/images/unchecked.png"); }
+  list-style-image: url("/images/unchecked.png");
+  padding-left: 5px; }
   #content li.checklist_item .instructions {
     float: right;
     color: silver;

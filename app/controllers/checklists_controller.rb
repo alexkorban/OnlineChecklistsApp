@@ -5,7 +5,7 @@ class ChecklistsController < ApplicationController
   #
   # this is the only place where we perform subscription checks because the other controllers and actions don't provide
   # UI access to checklists; therefore it seems good enough
-  def index
+  def home
     return if !check_account_status
 
     @checklists = current_account.checklists.active.order("name")
@@ -17,7 +17,7 @@ class ChecklistsController < ApplicationController
     }
   end
 
-  def checklists
+  def index
     return if !check_account_status
 
     @checklists = current_account.checklists.active.order("name")

@@ -57,7 +57,7 @@
   ChecklistCollection = (function() {
     __extends(ChecklistCollection, Backbone.Collection);
     ChecklistCollection.prototype.model = Checklist;
-    ChecklistCollection.prototype.url = "/checklists/checklists";
+    ChecklistCollection.prototype.url = "/checklists";
     function ChecklistCollection() {
       ChecklistCollection.__super__.constructor.apply(this, arguments);
     }
@@ -280,7 +280,7 @@
       this.on_error = __bind(this.on_error, this);;
       this.add_items = __bind(this.add_items, this);;
       this.add_item = __bind(this.add_item, this);;      EditChecklistView.__super__.constructor.apply(this, arguments);
-      this.template = _.template('Checklist: <input type = "text" class = "checklist_name" value = "<%= name %>" /><br/>\n<div class = "message"></div>\n<br/>\n<ul>\n</ul>\n<ul><li><a class = "button add_item" href = "#">Add step</a></li></ul>\n<br/>\n<br/>\n<a class = "button save" href = "#checklists">Save checklist</a>\n<span style = "margin-left: 20px; margin-right: 10px">or</span>  <a href = "#checklists">Cancel</a>');
+      this.template = _.template('<div class = "message" style = "display: none"></div>\nChecklist: <input type = "text" class = "checklist_name" value = "<%= name %>" /><br/>\n<br/>\n<ul>\n</ul>\n<ul><li><a class = "button add_item" href = "#">Add step</a></li></ul>\n<br/>\n<br/>\n<a class = "button save" href = "#">Save checklist</a>\n<span style = "margin-left: 20px; margin-right: 10px">or</span>  <a href = "#checklists">Cancel</a>');
       this.model.items.bind("add", this.add_item);
       this.model.items.bind("remove", this.remove_item);
       this.model.items.bind("refresh", this.add_items);
@@ -305,7 +305,7 @@
       this.model.save({}, {
         success: __bind(function(model, response) {
           this.model.set_items_url();
-          return window.location.hash = $(e.target).attr("href");
+          return window.location.hash = "checklists";
         }, this),
         error: __bind(function(model, error) {
           return this.on_error(error);
@@ -347,7 +347,7 @@
       return item.view.remove();
     };
     EditChecklistView.prototype.on_error = function(error) {
-      return this.$(".message").html(error).show();
+      return this.$(".message").html(error.statusText).show();
     };
     return EditChecklistView;
   })();

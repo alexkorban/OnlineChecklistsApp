@@ -47,7 +47,7 @@ class root.Checklist extends Backbone.Model
 
 class ChecklistCollection extends Backbone.Collection
   model: Checklist
-  url: "/checklists/checklists"
+  url: "/checklists"
 
   constructor: ->
     super
@@ -293,7 +293,9 @@ class root.ChecklistView extends Backbone.View
   on_focus_input: (e) ->
     @$(".checklist_item").removeClass("selected")
     @$(".input_field .instructions").show()
-
+                                           Fix: renamed Entry.for to Entry.notes because using reserved words as property names doesn't work all that well in JavaScript; also it's called Notes in the UI
+Fix: focus on the Notes field on entry page load
+Fix: position the checklist controls in a different way to make it work in IE7
 
   on_blur_input: (e) ->
     @$(".input_field .instructions").hide()
@@ -346,15 +348,15 @@ class root.EditChecklistView extends Backbone.View
     super
 
     @template = _.template('''
+      <div class = "message" style = "display: none"></div>
       Checklist: <input type = "text" class = "checklist_name" value = "<%= name %>" /><br/>
-      <div class = "message"></div>
       <br/>
       <ul>
       </ul>
       <ul><li><a class = "button add_item" href = "#">Add step</a></li></ul>
       <br/>
       <br/>
-      <a class = "button save" href = "#checklists">Save checklist</a>
+      <a class = "button save" href = "#">Save checklist</a>
       <span style = "margin-left: 20px; margin-right: 10px">or</span>  <a href = "#checklists">Cancel</a>
       ''')
 
@@ -374,11 +376,6 @@ class root.EditChecklistView extends Backbone.View
       @model.items.refresh([new Item, new Item, new Item])
 
 
-#    @model.items.fetch {success: =>
-#      @render()
-#    }
-
-
   on_save: (e) ->
     if $.trim(@$(".checklist_name").val()).length == 0
       @on_error("Please enter a name for the checklist")
@@ -390,8 +387,7 @@ class root.EditChecklistView extends Backbone.View
     @model.save {},
       { success: (model, response) =>
           @model.set_items_url()
-          #@model.set {id: response.id}
-          window.location.hash = $(e.target).attr("href")
+          window.location.hash = "checklists"
         error: (model, error) =>
           @on_error(error)
       }
@@ -427,4 +423,4 @@ class root.EditChecklistView extends Backbone.View
 
 
   on_error: (error) =>
-    @$(".message").html(error).show()
+    @$(".message").html(error.statusText).show()
