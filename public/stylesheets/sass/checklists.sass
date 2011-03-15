@@ -180,9 +180,12 @@ select
     margin-bottom: 10px
     width: 50%
     list-style-image: url('/images/unchecked.png')
+    position: relative
     padding-left: 5px
     .instructions
-      float: right
+      position: absolute
+      right: 10px
+      top: 12px
       color: #c0c0c0
       display: none
       font-size: 12px
@@ -206,6 +209,7 @@ select
     padding-bottom: 50px
     div.user
       padding: 10px
+      position: relative
       &:hover
         border: 1px solid #92c5ef
         background-color: #f7fdff

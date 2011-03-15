@@ -152,9 +152,12 @@ select {
   margin-bottom: 10px;
   width: 50%;
   list-style-image: url("/images/unchecked.png");
+  position: relative;
   padding-left: 5px; }
   #content li.checklist_item .instructions {
-    float: right;
+    position: absolute;
+    right: 10px;
+    top: 12px;
     color: silver;
     display: none;
     font-size: 12px;
@@ -171,10 +174,14 @@ select {
       display: inline; }
   #content li.checklist_item.checked {
     list-style-image: url("/images/checked.png"); }
+#content .input_field {
+  display: table-cell;
+  vertical-align: middle; }
 #content div.users {
   padding-bottom: 50px; }
   #content div.users div.user {
-    padding: 10px; }
+    padding: 10px;
+    position: relative; }
     #content div.users div.user:hover {
       border: 1px solid #92c5ef;
       background-color: #f7fdff;

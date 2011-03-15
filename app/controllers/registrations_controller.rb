@@ -21,7 +21,7 @@ class RegistrationsController < Devise::RegistrationsController
   def destroy
     if params[:id]    # deactivating a user
       u = current_account.users.find(params[:id])
-      u.update_attributes active: false
+      u.update_attribute :active, false
       respond_to { |format|
         format.json { render :json => {}, :status => :ok }
       }
@@ -69,7 +69,7 @@ class RegistrationsController < Devise::RegistrationsController
   # PUT /resource
   def update
     if resource.update_with_password(params[resource_name])
-      current_account.update_attributes time_zone: params[:account][:time_zone]
+      current_account.update_attribute :time_zone, params[:account][:time_zone]
       set_flash_message :notice, :updated
       redirect_to after_update_path_for(resource)
     else

@@ -53,7 +53,7 @@ class ChecklistsController < ApplicationController
 
   def update
     checklist = current_account.checklists.active.find(params[:id])
-    checklist.update_attributes name: params[:name]
+    checklist.update_attribute :name, params[:name]
 
     # intersect existing ids with new ids to ensure that an attacker can't grab items from another account's checklist
     checklist.item_ids = checklist.items.map(&:id) & params[:items].map {|item| item[:id]}
@@ -61,7 +61,7 @@ class ChecklistsController < ApplicationController
     params[:items].each {|item|
       if item[:id]
         existing_item = checklist.items.find(item[:id])
-        existing_item.update_attributes(content: item[:content]) if existing_item
+        existing_item.update_attribute(:content, item[:content]) if existing_item
       else
         checklist.items.create content: item[:content]
       end
@@ -76,7 +76,7 @@ class ChecklistsController < ApplicationController
   def destroy
     checklist = current_account.checklists.active.find(params[:id])
     if checklist.entries.count > 0    # only delete the checklist if it doesn't have any associated entries; otherwise only deactivate
-      checklist.update_attributes active: false
+      checklist.update_attribute :active, false
     else
       checklist.destroy
     end
@@ -87,7 +87,7 @@ class ChecklistsController < ApplicationController
 
   def time_zone
     if request.post?
-      current_account.update_attributes time_zone: params[:time_zone]
+      current_account.update_attribute :time_zone, params[:time_zone]
     end
 
     respond_to { |format|

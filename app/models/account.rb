@@ -62,7 +62,7 @@ class Account < ActiveRecord::Base
 
   def deactivate
     get_subscriber.stop_auto_renew
-    update_attributes(active: false)
+    update_attribute :active, false
   end
 
   # this is taken from the Spreedly gem and modified to include subsciber token
