@@ -99,6 +99,7 @@ class ChecklistsController < ApplicationController
   def heartbeat
     respond_to { |format|
       format.json { render :json => {}, :status => :ok }
+      format.html { redirect_to root_path }
     }
   end
 end
