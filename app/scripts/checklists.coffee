@@ -159,7 +159,7 @@ class root.ChecklistListView extends Backbone.View
       <% } %>
       <ul class = "checklists">
       <% checklists.each(function(checklist) { %>
-      <li class = "checklist" id = "<%= checklist.cid %>"><%= checklist.name() %>
+      <li class = "checklist" id = "<%= checklist.cid %>"><span class = "name"><%= checklist.name() %></span>
         <span class = "controls">
           <a href="#checklists/<%= checklist.cid %>">Fill out</a> |
           <a class = "secondary" href = "#checklists/<%= checklist.cid %>/edit">Edit</a> |

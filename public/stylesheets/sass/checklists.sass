@@ -33,10 +33,6 @@ label
 
 form
   text-align: left
-//  width: 50%
-//  margin:
-//    left: auto
-//    right: auto
 
 a
   color: #3c62a1
@@ -48,6 +44,12 @@ a
 
 select
   padding: 4px
+
+li
+  color: #a8bfda
+  font-size: 24px
+  a
+    font-size: 14px
 
 @mixin button
   padding: 5px
@@ -134,9 +136,10 @@ select
     display: block
     position: absolute
     right: 10px
-    top: 10px
-    color: #c0c0c0
+    top: 16px
+    color: #d0d0d0
     padding-left: 100px
+    text-shadow: none
     a
       color: #9fb2d2
     .secondary
@@ -162,17 +165,19 @@ select
   ul.checklists
     width: 90%
     padding-left: 0
-    list-style: none
-    font-size: 20px
+    font-size: 24px
+    font-weight: bold
+    list-style-position: inside
     li.checklist
       position: relative
       padding: 10px
+      .name
+        color: #4b5e8a
+        text-shadow: #f0f0f0 0px 1px 0px
+      .controls
+        font-size: 14px
       &:hover
-        border: 1px solid #92c5ef
-        background-color: #f7fdff
-        border-radius: 5px
-        -moz-border-radius: 5px
-        -webkit-border-radius: 5px
+        background-color: #e7f3ff
 
 
   li.checklist_item
@@ -181,21 +186,21 @@ select
     width: 50%
     list-style-image: url('/images/unchecked.png')
     position: relative
+    color: #4b5e8a
     padding-left: 5px
     .instructions
       position: absolute
       right: 10px
       top: 12px
-      color: #c0c0c0
+      color: #a0a0a0
       display: none
       font-size: 12px
       line-height: 22px
       padding-right: 10px
     &.selected
-      border: 1px solid #92c5ef
-      background-color: #f7fdff
-      border-radius: 5px
+      background-color: #e7f3ff
       padding: 10px
+      border-radius: 5px
       -moz-border-radius: 5px
       -webkit-border-radius: 5px
       .instructions
@@ -211,11 +216,7 @@ select
       padding: 10px
       position: relative
       &:hover
-        border: 1px solid #92c5ef
-        background-color: #f7fdff
-        border-radius: 5px
-        -moz-border-radius: 5px
-        -webkit-border-radius: 5px
+        background-color: #e7f3ff
       h3
         margin-top: 0
 
@@ -272,12 +273,6 @@ select
   border-radius: 5px
   -moz-border-radius: 5px
   -webkit-border-radius: 5px
-  //div
-    //background: #e5e5e5 url("/images/bg-box.gif") repeat-x left top
-    //border-radius: 4px
-    //-moz-border-radius: 4px
-    //-webkit-border-radius: 4px
-    //padding: 10px
 
 #account_status
   position: absolute

@@ -42,6 +42,12 @@ a {
 select {
   padding: 4px; }
 
+li {
+  color: #a8bfda;
+  font-size: 24px; }
+  li a {
+    font-size: 14px; }
+
 #header {
   height: 120px;
   background: url("/images/bg-home-header-content.jpg") repeat-x center top; }
@@ -111,9 +117,10 @@ select {
   display: block;
   position: absolute;
   right: 10px;
-  top: 10px;
-  color: silver;
-  padding-left: 100px; }
+  top: 16px;
+  color: #d0d0d0;
+  padding-left: 100px;
+  text-shadow: none; }
   #content .controls a {
     color: #9fb2d2; }
   #content .controls .secondary {
@@ -136,38 +143,40 @@ select {
 #content ul.checklists {
   width: 90%;
   padding-left: 0;
-  list-style: none;
-  font-size: 20px; }
+  font-size: 24px;
+  font-weight: bold;
+  list-style-position: inside; }
   #content ul.checklists li.checklist {
     position: relative;
     padding: 10px; }
+    #content ul.checklists li.checklist .name {
+      color: #4b5e8a;
+      text-shadow: #f0f0f0 0px 1px 0px; }
+    #content ul.checklists li.checklist .controls {
+      font-size: 14px; }
     #content ul.checklists li.checklist:hover {
-      border: 1px solid #92c5ef;
-      background-color: #f7fdff;
-      border-radius: 5px;
-      -moz-border-radius: 5px;
-      -webkit-border-radius: 5px; }
+      background-color: #e7f3ff; }
 #content li.checklist_item {
   font-size: 20px;
   margin-bottom: 10px;
   width: 50%;
   list-style-image: url("/images/unchecked.png");
   position: relative;
+  color: #4b5e8a;
   padding-left: 5px; }
   #content li.checklist_item .instructions {
     position: absolute;
     right: 10px;
     top: 12px;
-    color: silver;
+    color: #a0a0a0;
     display: none;
     font-size: 12px;
     line-height: 22px;
     padding-right: 10px; }
   #content li.checklist_item.selected {
-    border: 1px solid #92c5ef;
-    background-color: #f7fdff;
-    border-radius: 5px;
+    background-color: #e7f3ff;
     padding: 10px;
+    border-radius: 5px;
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px; }
     #content li.checklist_item.selected .instructions {
@@ -180,11 +189,7 @@ select {
     padding: 10px;
     position: relative; }
     #content div.users div.user:hover {
-      border: 1px solid #92c5ef;
-      background-color: #f7fdff;
-      border-radius: 5px;
-      -moz-border-radius: 5px;
-      -webkit-border-radius: 5px; }
+      background-color: #e7f3ff; }
     #content div.users div.user h3 {
       margin-top: 0; }
 #content .checklist:hover .controls, #content .user:hover .controls {
