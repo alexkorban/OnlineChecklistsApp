@@ -146,7 +146,7 @@
         $(".complete").click();
         return;
       }
-      if (e.target.name === "for") {
+      if (e.target.name === "notes") {
         $(".checklist_item").not(".checked").first().toggleClass("selected");
         $(e.target).blur();
         if ($(".checklist_item").length === 0) {

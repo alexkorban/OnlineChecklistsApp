@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110310224132) do
+ActiveRecord::Schema.define(:version => 20110315021818) do
 
   create_table "accounts", :force => true do |t|
     t.datetime "created_at"
@@ -50,7 +50,7 @@ ActiveRecord::Schema.define(:version => 20110310224132) do
 
   create_table "entries", :force => true do |t|
     t.integer  "checklist_id", :limit => 8
-    t.string   "for"
+    t.string   "notes"
     t.integer  "user_id",      :limit => 8
     t.datetime "created_at"
     t.datetime "updated_at"

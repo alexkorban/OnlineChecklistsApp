@@ -131,13 +131,14 @@ select
 
 #content
   .controls
-    display: inline-block
-    float: right
+    display: block
+    position: absolute
+    right: 10px
+    top: 10px
     color: #c0c0c0
     padding-left: 100px
     a
       color: #9fb2d2
-      border-bottom-color: #9fb2d2
     .secondary
       font-size: 14px
 
@@ -164,6 +165,7 @@ select
     list-style: none
     font-size: 20px
     li.checklist
+      position: relative
       padding: 10px
       &:hover
         border: 1px solid #92c5ef

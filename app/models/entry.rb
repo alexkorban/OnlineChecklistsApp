@@ -51,7 +51,7 @@ class Entry < ActiveRecord::Base
       # Format keys (which are dates) for display, and filter out unnecessary attributes from the entries
       # the result is still a hash of entry arrays with formatted dates as keys
       res.push([entries_for_date.first, entries_for_date.last.map { |e|
-        {for: e.for, checklist_name: e.checklist_name, user_name: e.user_name, display_time: e.display_time}
+        {notes: e.notes, checklist_name: e.checklist_name, user_name: e.user_name, display_time: e.display_time}
       }]); res
 
     }.sort {|a, b|

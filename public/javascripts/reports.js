@@ -94,7 +94,6 @@
           _ref2 = day_entry[1];
           for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
             row = _ref2[_j];
-            row.notes = row["for"];
             this.$(".timeline_entries:last").append(this.day_entry_row_template({
               row: row
             }));

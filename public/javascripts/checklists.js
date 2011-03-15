@@ -185,7 +185,7 @@
     };
     function ChecklistView() {
       ChecklistView.__super__.constructor.apply(this, arguments);
-      this.template = _.template('<div class = "input_field">\n  Notes: <input name = "for" type = "text" style = "width: 500px" />\n  <span class = "instructions">(press Enter to continue)</span>\n</div>\n<ul style = "margin-bottom: 40px; margin-top: 40px">\n<% items.each(function(item) { %>\n<li class = "checklist_item"><%= item.content() %><span class = "instructions">(press Enter to mark as done)</span></li>\n<% }); %>\n</ul>\n<div class = "message" id = "incomplete_warning" style = "display: none; margin-bottom: 20px">Please complete and check off all the items in the checklist first.</div>\n<div class = "message" id = "completion_message" style = "display: none; margin-bottom: 20px">Press Enter or click Complete! to submit the checklist.</div>\n<button class = "complete">Complete!</button>\n<span style = "margin-left: 20px; margin-right: 10px">or</span>  <a href = "#checklists">Cancel</a>');
+      this.template = _.template('<div class = "input_field">\n  Notes: <input name = "notes" type = "text" style = "width: 500px" />\n  <span class = "instructions">(press Enter to continue)</span>\n</div>\n<ul style = "margin-bottom: 40px; margin-top: 40px">\n<% items.each(function(item) { %>\n<li class = "checklist_item"><%= item.content() %><span class = "instructions">(press Enter to mark as done)</span></li>\n<% }); %>\n</ul>\n<div class = "message" id = "incomplete_warning" style = "display: none; margin-bottom: 20px">Please complete and check off all the items in the checklist first.</div>\n<div class = "message" id = "completion_message" style = "display: none; margin-bottom: 20px">Press Enter or click Complete! to submit the checklist.</div>\n<button class = "complete">Complete!</button>\n<span style = "margin-left: 20px; margin-right: 10px">or</span>  <a href = "#checklists">Cancel</a>');
       $("#" + this.id).replaceWith(this.el);
       this.model.items.fetch({
         success: __bind(function() {
@@ -199,7 +199,7 @@
       }));
       $("#heading").html(this.model.name());
       document.title = "OnlineChecklists: " + (this.model.name());
-      return this.$("input[name='for']").focus();
+      return this.$("input[name=notes]").focus();
     };
     ChecklistView.prototype.on_complete = function(e) {
       var entry;
@@ -211,7 +211,7 @@
       }
       entry = new Entry({
         checklist_id: this.model.id,
-        "for": this.$("input[name=for]").val()
+        notes: this.$("input[name=notes]").val()
       });
       entry.save();
       window.app.flash = "Completed checklist: " + (this.model.name());

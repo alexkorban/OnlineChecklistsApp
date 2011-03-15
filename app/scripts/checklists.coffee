@@ -242,7 +242,7 @@ class root.ChecklistView extends Backbone.View
 
     @template = _.template('''
       <div class = "input_field">
-        Notes: <input name = "for" type = "text" style = "width: 500px" />
+        Notes: <input name = "notes" type = "text" style = "width: 500px" />
         <span class = "instructions">(press Enter to continue)</span>
       </div>
       <ul style = "margin-bottom: 40px; margin-top: 40px">
@@ -267,7 +267,7 @@ class root.ChecklistView extends Backbone.View
     $(@el).html(@template({items : @model.items}))
     $("#heading").html(@model.name())
     document.title = "OnlineChecklists: #{@model.name()}"
-    @$("input[name='for']").focus()
+    @$("input[name=notes]").focus()
 
 
   on_complete: (e) ->
@@ -276,7 +276,7 @@ class root.ChecklistView extends Backbone.View
       @$("#completion_message").hide()
       e.preventDefault()
       return
-    entry = new Entry({checklist_id: @model.id, for: @$("input[name=for]").val()})
+    entry = new Entry({checklist_id: @model.id, notes: @$("input[name=notes]").val()})
     entry.save()
     window.app.flash = "Completed checklist: #{@model.name()}"
     window.location.hash = "checklists"

@@ -101,8 +101,6 @@ class root.TimelineView extends Backbone.View
         <td><%= row.notes %></td>
       </tr>
     '''
-    #           <% _.each(day_entry[1], function(entry) { %>
-
     @no_entries_template = _.template '''
       You'll need to
       <% if (checklists.length == 0) { %>
@@ -143,7 +141,6 @@ class root.TimelineView extends Backbone.View
       for day_entry in @entries_by_day
         $(@el).append(@day_entry_template({day_entry: day_entry}))
         for row in day_entry[1]
-          row.notes = row.for   # Underscore.js parsing of the template trips up on row.for in IE, so I used row.notes instead. I hate IE.
           @$(".timeline_entries:last").append(@day_entry_row_template({row: row}))
 
       @checklist_dropdown.render()

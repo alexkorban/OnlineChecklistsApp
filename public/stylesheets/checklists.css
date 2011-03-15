@@ -108,13 +108,14 @@ select {
         background-image: url("/images/bg-button-pale-over.gif"); }
 
 #content .controls {
-  display: inline-block;
-  float: right;
+  display: block;
+  position: absolute;
+  right: 10px;
+  top: 10px;
   color: silver;
   padding-left: 100px; }
   #content .controls a {
-    color: #9fb2d2;
-    border-bottom-color: #9fb2d2; }
+    color: #9fb2d2; }
   #content .controls .secondary {
     font-size: 14px; }
 #content .report_controls {
@@ -138,6 +139,7 @@ select {
   list-style: none;
   font-size: 20px; }
   #content ul.checklists li.checklist {
+    position: relative;
     padding: 10px; }
     #content ul.checklists li.checklist:hover {
       border: 1px solid #92c5ef;

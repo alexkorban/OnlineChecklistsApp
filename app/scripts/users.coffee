@@ -97,7 +97,7 @@ class root.UserListView extends Backbone.View
             <h3><%= user.name() ? user.name() : "&lt;no name&gt;" %></h3>
             <%= user.email() %>
             <% if (user.email() != current_user.email) { %>
-              <div class = "controls" style = "float:right">
+              <div class = "controls">
                 <a id = "delete_<%= user.cid %>" class = "delete" href = "#">Delete</a>
               </div>
             <% } else { %>
