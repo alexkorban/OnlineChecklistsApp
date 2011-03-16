@@ -5,7 +5,7 @@
   %br/
 - if devise_mapping.registerable? && controller_name != 'registrations' && controller_name != 'passwords'
   Haven't got an account?
-  = link_to "Sign up", "http://onlinechecklists.com/plans_pricing" #new_registration_path(resource_name)
+  = link_to "Sign up", new_registration_path(resource_name)
   %br/
   %br/
 - if devise_mapping.recoverable? && controller_name != 'passwords'

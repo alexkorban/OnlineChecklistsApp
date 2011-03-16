@@ -16,8 +16,8 @@
     -#<![endif]-->
 
     - if controller.controller_name == "checklists"
-      = javascript_include_tag Rails.env == "production" ? "backbone-min" : "backbone"
       = javascript_include_tag "http://www.google.com/jsapi"
+      = javascript_include_tag "backbone-ie7"
       = javascript_include_tag "users"
       = javascript_include_tag "checklists"
       = javascript_include_tag "reports"
@@ -36,7 +36,7 @@
           #account_status= user_session[:account_status]
 
         .logo
-          %a(href = "#{root_path}")
+          %a(href = "#{user_signed_in? ? root_path : "http://onlinechecklists.com"}")
             <span class = "capital">O</span>nline<span class = "capital">C</span>hecklists
 
         - if current_user && user_signed_in?
