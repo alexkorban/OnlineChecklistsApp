@@ -1,5 +1,7 @@
 OnlineChecklistsApp::Application.routes.draw do
 
+  get "help/support"
+
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
@@ -70,6 +72,8 @@ OnlineChecklistsApp::Application.routes.draw do
     delete "users/:id", :to => "registrations#destroy"
     get "billing", :to => "registrations#billing"
   end
+
+  get "support", :to => "help#support"
 
   match "*other", :to => redirect("/")
 

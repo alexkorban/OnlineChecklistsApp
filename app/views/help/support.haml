@@ -1,0 +1,21 @@
+- content_for :heading do
+  Help & support
+
+#buttons
+  %a.button(href = "/") Go to checklists
+
+#page_list(style = "float: left; padding-right: 20px; border-right: 1px dotted #c0c0c0")
+  %ul
+    %li
+      %a.page(href = "#contact") Contact
+    %li
+      %a.page(href = "#manual") User manual
+    %li
+      %a.page(href = "#faq") FAQ
+
+  #contact.page
+    contact
+  #manual.page
+    manual
+  #faq.page
+    faq
