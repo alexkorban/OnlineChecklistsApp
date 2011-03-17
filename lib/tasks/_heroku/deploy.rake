@@ -31,7 +31,7 @@ namespace :deploy do
   end
 
   task :after_deploy, :env, :branch do |t, args|
-    puts "Preparing to run database migrations"
+    puts "About to run database migrations"
     if args[:env] == :production
       print "Switch maintenance page on? (y/n) " and STDOUT.flush
       char = $stdin.getc
@@ -40,8 +40,9 @@ namespace :deploy do
       `heroku rake db:migrate --app #{ENVIRONMENTS[args[:env]]}`
       `heroku maintenance:off --app #{ENVIRONMENTS[args[:env]]}` if maintenance_mode
     end
+    puts "Database migrations complete"
     #Rake::Task['hoptoad:deploy'].invoke
-    puts "Deployment Complete"
+    puts "Deployment complete"
   end
 
   task :update_code, :env, :branch do |t, args|
