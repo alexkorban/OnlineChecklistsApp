@@ -246,6 +246,9 @@ li {
 .message, #error_explanation {
   color: #da9201;
   font-weight: bold; }
+  .message li, #error_explanation li {
+    color: #da9201;
+    font-size: 14px; }
 
 .center {
   text-align: center; }
