@@ -267,7 +267,7 @@ class root.ChecklistView extends Backbone.View
     $(@el).html(@template({items : @model.items}))
     $("#heading").html(@model.name())
     document.title = "OnlineChecklists: #{@model.name()}"
-    @$("input[name=notes]").focus()
+    @$("input[name=notes]").focus().select()
 
 
   on_complete: (e) ->
@@ -409,12 +409,12 @@ class root.EditChecklistView extends Backbone.View
     view = new EditItemView {model: item, collection: @model.items}
     item.view = view
     @item_el.append view.render()
-    @$("input[type=text]").last().focus()
+    @$("input[type=text]").last().focus().select()
 
 
   add_items: =>
     @model.items.each(@add_item)
-    @$("input[type=text]").first().focus()
+    @$("input[type=text]").first().focus().select()
 
 
   remove_item: (item) ->

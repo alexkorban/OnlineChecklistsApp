@@ -199,7 +199,7 @@
       }));
       $("#heading").html(this.model.name());
       document.title = "OnlineChecklists: " + (this.model.name());
-      return this.$("input[name=notes]").focus();
+      return this.$("input[name=notes]").focus().select();
     };
     ChecklistView.prototype.on_complete = function(e) {
       var entry;
@@ -339,11 +339,11 @@
       });
       item.view = view;
       this.item_el.append(view.render());
-      return this.$("input[type=text]").last().focus();
+      return this.$("input[type=text]").last().focus().select();
     };
     EditChecklistView.prototype.add_items = function() {
       this.model.items.each(this.add_item);
-      return this.$("input[type=text]").first().focus();
+      return this.$("input[type=text]").first().focus().select();
     };
     EditChecklistView.prototype.remove_item = function(item) {
       return item.view.remove();
