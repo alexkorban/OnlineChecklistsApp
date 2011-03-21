@@ -247,7 +247,7 @@ class root.ChecklistView extends Backbone.View
       </div>
       <ul style = "margin-bottom: 40px; margin-top: 40px">
       <% items.each(function(item) { %>
-      <li class = "checklist_item"><%= item.content() %><span class = "instructions">(press Enter to mark as done)</span></li>
+      <li class = "checklist_item"><div style = "width: 80%"><%= item.content() %></div><span class = "instructions">(press Enter to mark as done)</span></li>
       <% }); %>
       </ul>
       <div class = "message" id = "incomplete_warning" style = "display: none; margin-bottom: 20px">Please complete and check off all the items in the checklist first.</div>
