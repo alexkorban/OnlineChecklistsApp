@@ -409,10 +409,12 @@ class root.EditChecklistView extends Backbone.View
     view = new EditItemView {model: item, collection: @model.items}
     item.view = view
     @item_el.append view.render()
+    @$("input[type=text]").last().focus()
 
 
   add_items: =>
     @model.items.each(@add_item)
+    @$("input[type=text]").first().focus()
 
 
   remove_item: (item) ->

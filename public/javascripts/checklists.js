@@ -338,10 +338,12 @@
         collection: this.model.items
       });
       item.view = view;
-      return this.item_el.append(view.render());
+      this.item_el.append(view.render());
+      return this.$("input[type=text]").last().focus();
     };
     EditChecklistView.prototype.add_items = function() {
-      return this.model.items.each(this.add_item);
+      this.model.items.each(this.add_item);
+      return this.$("input[type=text]").first().focus();
     };
     EditChecklistView.prototype.remove_item = function(item) {
       return item.view.remove();
