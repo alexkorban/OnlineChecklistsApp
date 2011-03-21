@@ -1,5 +1,6 @@
 class RegistrationsController < Devise::RegistrationsController
   prepend_before_filter :authenticate_scope!, :only => [:index, :billing, :edit, :update, :destroy]
+  before_filter :verify_admin, :only => [:index, :destroy, :billing]
 
   layout "application"
 
@@ -69,7 +70,7 @@ class RegistrationsController < Devise::RegistrationsController
   # PUT /resource
   def update
     if resource.update_with_password(params[resource_name])
-      current_account.update_attribute :time_zone, params[:account][:time_zone]
+      current_account.update_attribute :time_zone, params[:account][:time_zone] if current_user.role == "admin"
       set_flash_message :notice, :updated
       redirect_to after_update_path_for(resource)
     else
@@ -81,11 +82,6 @@ class RegistrationsController < Devise::RegistrationsController
 
   def billing
     check_account_status
-
-    if current_user.role != "admin"
-      redirect_to edit_user_registration_path
-      return
-    end
 
     @plan = get_plan
     @plans = current_account.get_plans
@@ -100,5 +96,11 @@ class RegistrationsController < Devise::RegistrationsController
 
   def after_sign_in_path_for(resource)
     root_path
+  end
+
+  def verify_admin
+    if current_user.role != "admin"
+      redirect_to edit_user_registration_path
+    end
   end
 end
