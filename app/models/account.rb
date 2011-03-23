@@ -89,6 +89,7 @@ class Account < ActiveRecord::Base
     PLAN_NAMES.each {|plan_name|
       plan = spreedly_plans.detect{|p| p.name =~ /#{plan_name}/i }
       plan_hash = ActiveSupport::JSON.decode(plan.feature_level).symbolize_keys
+      plan_hash[:price] = plan.price.to_i
       plan_hash[:name] = plan.name
       if checklists.active.count <= plan_hash[:checklists] && users.active.count <= plan_hash[:users]
         plan_hash[:url] = Account.subscribe_url(self.id, plan.id, token: get_subscriber.token)

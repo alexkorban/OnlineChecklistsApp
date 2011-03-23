@@ -57,6 +57,8 @@ from <b>Aotea Studios</b> on your credit card statement.
       - next if plan[:name] == @plan[:name]
       %td(style = "width: 200px")
         %h3= plan[:name]
+        $#{plan[:price]}/month
+        %br
         #{plan[:users]} users
         %br
         #{plan[:checklists]} checklists
@@ -84,6 +86,17 @@ You can change your plan at any time, provided the number of checklists and user
 %br
 %br
 Charges will be pro-rated accordingly. If you are changing to a smaller plan, you will receive store credit.
+%br
+%br
+We use industry leading payment systems to ensure the security of your credit card data (we never see your data ourselves):
+%br
+%br
+%div(style = "float:left; text-align: center")
+  %img(src = "/images/dpslogo.gif" alt = "DPS PaymentExpress")
+  %br
+  (<a target = "_blank" href = "http://www.paymentexpress.com/about/about_paymentexpress/privacy_policy.html">privacy policy</a>)
+%img(src = "/images/spreedlylogo.gif" alt = "Spreedly" style = "display: block; float: left; padding-left: 50px")
+%div(style = "clear: both")
 %br
 %br
 
