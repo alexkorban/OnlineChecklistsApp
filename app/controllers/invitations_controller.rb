@@ -1,5 +1,5 @@
 class InvitationsController < Devise::InvitationsController
-  before_filter :set_cache_buster, only: [create]
+  before_filter :set_cache_buster, only: [:create]
 
   def create
     errors = []
