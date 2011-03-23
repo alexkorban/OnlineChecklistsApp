@@ -1,4 +1,6 @@
 class EntriesController < ApplicationController
+  before_filter :set_cache_buster
+
   def create
     checklist = current_account.checklists.active.find(params[:checklist_id])
     checklist.entries.create :notes => params[:notes], :user_id => current_user.id, :account_id => current_account.id

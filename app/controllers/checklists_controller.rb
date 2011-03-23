@@ -1,10 +1,6 @@
 class ChecklistsController < ApplicationController
-  # this action serves a dual purpose:
-  # - provides a starting point for the whole application in response to an HTML request
-  # - returns a list of checklists in response to a JSON request
-  #
-  # this is the only place where we perform subscription checks because the other controllers and actions don't provide
-  # UI access to checklists; therefore it seems good enough
+  before_filter :set_cache_buster, except: [:home, :time_zone]
+
   def home
     return if !check_account_status
 

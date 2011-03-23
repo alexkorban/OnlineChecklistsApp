@@ -1,6 +1,7 @@
 class RegistrationsController < Devise::RegistrationsController
   prepend_before_filter :authenticate_scope!, :only => [:index, :billing, :edit, :update, :destroy]
   before_filter :verify_admin, :only => [:index, :destroy, :billing]
+  before_filter :set_cache_buster, except: [:new, :create, :update, :billing]
 
   layout "application"
 
