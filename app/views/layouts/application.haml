@@ -32,8 +32,9 @@
   %body
     #header
       #nav
-        - if user_signed_in? && user_session && user_session[:account_status]
-          #account_status= user_session[:account_status]
+        - if current_user && user_signed_in?
+          - if signed_in?(:user) && user_session && user_session[:account_status]
+            #account_status= user_session[:account_status]
 
         .logo
           %a(href = "#{user_signed_in? ? root_path : "http://onlinechecklists.com"}")

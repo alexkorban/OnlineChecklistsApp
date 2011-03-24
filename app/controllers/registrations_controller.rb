@@ -31,8 +31,7 @@ class RegistrationsController < Devise::RegistrationsController
       current_account.deactivate
       flash.now[:alert] = "We are sorry to see you go. If you have any feedback about OnlineChecklists, please write us "
       #redirect_to destroy_user_session_path
-      sign_out current_user
-
+      sign_out # this will sign out everyone (I think)
     end
   end
 
