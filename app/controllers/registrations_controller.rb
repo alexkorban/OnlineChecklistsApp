@@ -71,6 +71,7 @@ class RegistrationsController < Devise::RegistrationsController
   # PUT /resource
   def update
     if resource.update_with_password(params[resource_name])
+      sign_in(resource, :bypass => true)  # this is to prevent Devise from signing out after password change
       current_account.update_attribute :time_zone, params[:account][:time_zone] if current_user.role == "admin"
       set_flash_message :notice, :updated
       redirect_to after_update_path_for(resource)
