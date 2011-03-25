@@ -32,6 +32,13 @@
       We will reply to the email address you use to sign in to OnlineChecklists.
       %br
       %br
+      Alternatively, you can email us at
+      = succeed "." do
+        = mail_to "support@onlinechecklists.com", nil, subject: "OnlineChecklists support request from #{current_user.email}"
+
+      %br
+      %br
+
       - if flash[:message]
         #flash(style = "margin-left: 0") #{flash[:message]}
 
