@@ -66,6 +66,9 @@ GEM
     heroku_backup_task (0.0.4)
       heroku (>= 1.13.7, < 2.0)
       rake
+    heroku_san (1.1.0)
+      heroku
+      rails (>= 2)
     hoptoad_notifier (2.4.6)
       activesupport
       builder
@@ -131,6 +134,7 @@ DEPENDENCIES
   devise_invitable (= 0.4.rc4)
   haml (= 3.0.25)
   heroku_backup_task (= 0.0.4)
+  heroku_san
   hoptoad_notifier (= 2.4.6)
   hpricot
   machinist (>= 2.0.0.beta1)

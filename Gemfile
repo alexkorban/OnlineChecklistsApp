@@ -21,6 +21,7 @@ gem "heroku_backup_task", "0.0.4"
 group :development do
   gem 'hpricot'
   gem 'ruby_parser'
+  gem 'heroku_san'
 end
 
 group :test do
