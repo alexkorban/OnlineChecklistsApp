@@ -5,8 +5,9 @@
   = devise_error_messages!
   = f.hidden_field :plan, :value => flash.now[:plan]
   %p
-    Selected plan:
-    %b= flash.now[:plan].titleize
+    You are signing up for a <b> 14-day free trial</b>.
+    %br
+    You can select a suitable paid plan from within the application at any time.
   %p
     = f.label :name
     %br/
