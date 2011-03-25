@@ -55,6 +55,7 @@ class Account < ActiveRecord::Base
   end
 
   def get_plan
+    return {name: "Inactive", checklists: 0, users: 0} if !subscription_active?
     plan_hash = ActiveSupport::JSON.decode(get_subscriber.feature_level).symbolize_keys
     plan_hash[:name] = get_subscriber.subscription_plan_name
     plan_hash

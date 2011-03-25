@@ -47,7 +47,9 @@ class User < ActiveRecord::Base
       params.delete(:password)
       params.delete(:password_confirmation) if params[:password_confirmation].blank?
     end
-    update_attributes(params)
+    res = update_attributes(params)
+    clean_up_passwords
+    result
   end
 
   # override the default version in Timeoutable to make it play nicely with Rememberable
