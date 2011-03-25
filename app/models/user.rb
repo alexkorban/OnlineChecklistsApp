@@ -9,6 +9,10 @@ class User < ActiveRecord::Base
   #validates :account_id, presence: true, numericality: true
   validates :email, presence: true
 
+  # Devise is supposed to take care of verifying password confirmation but it doesn't for whatever reason, so I have to do it myself
+  validates_presence_of :password_confirmation, :if => :password_required?
+  validates :password, :confirmation => true
+
   # relations
   belongs_to :account
   has_many :entries
@@ -49,7 +53,7 @@ class User < ActiveRecord::Base
     end
     res = update_attributes(params)
     clean_up_passwords
-    result
+    res
   end
 
   # override the default version in Timeoutable to make it play nicely with Rememberable
