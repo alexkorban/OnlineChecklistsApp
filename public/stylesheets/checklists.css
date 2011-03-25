@@ -212,6 +212,10 @@ li {
   #content table.timeline_entries tr td.first {
     border-left: none; }
 
+#main div.page {
+  float: left;
+  display: none; }
+
 #flash {
   background-color: #ffcc66;
   padding: 10px;

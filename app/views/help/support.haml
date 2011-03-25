@@ -1,6 +1,16 @@
 - content_for :heading do
   Help & support
 
+:javascript
+  $(function() {
+    $("a.page").click(function (e) {
+      console.log(e);
+      $("div.page").hide();
+      $($(e.target).attr("href")).show();
+    });
+  });
+
+
 #buttons
   %a.button(href = "/") Go to checklists
 
@@ -13,9 +23,9 @@
     %li
       %a.page(href = "#faq") FAQ
 
-  #contact.page
-    contact
-  #manual.page
-    manual
-  #faq.page
-    faq
+#contact.page(style = "display: block")
+  contact
+#manual.page
+  manual
+#faq.page
+  faq
