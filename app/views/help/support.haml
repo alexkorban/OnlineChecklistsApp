@@ -14,18 +14,44 @@
 #buttons
   %a.button(href = "/") Go to checklists
 
-#page_list(style = "float: left; padding-right: 20px; border-right: 1px dotted #c0c0c0")
-  %ul
-    %li
-      %a.page(href = "#contact") Contact
-    %li
-      %a.page(href = "#manual") User manual
-    %li
-      %a.page(href = "#faq") FAQ
+#content(style = "position: relative")
+  #page_list(style = "position: absolute; left: 0; top: 0; width: 100px; height: 300px; padding-right: 20px; padding-top: 0; border-right: 1px dotted #c0c0c0")
+    %ul(style = "list-style: none; padding-left: 0; padding-top: 0")
+      %li
+        %a.page(href = "#contact") Contact
+      %li
+        %a.page(href = "#manual") User manual
+      %li
+        %a.page(href = "#faq") FAQ
 
-#contact.page(style = "display: block")
-  contact
-#manual.page
-  manual
-#faq.page
-  faq
+  #contact.page(style = "display: block")
+    %h2 Contact
+    %p
+      If you have a problem, would like to request a feature, or provide feedback, please contact us via the form below.
+      %br
+      We will reply to the email address you use to sign in to OnlineChecklists.
+      %br
+      %br
+      - if flash[:message]
+        #flash(style = "margin-left: 0") #{flash[:message]}
+
+    - form_tag :action => "support" do
+      %textarea(id = "message" name = "message" style = "display: block; height: 200px; width: 60%")
+      %br
+      %button(type = "submit") Send
+
+  #manual.page
+    %h2 User manual
+
+  #faq.page
+    %h2 Frequently asked questions
+
+    %h3 Do you make refunds?
+    %p
+      We bill you monthly so you are free to cancel the service at any time, and because of this we do not provide refunds.
+      However, if you change plans, previous charges will be pro-rated.
+
+    %h3 Can I change plans at any time?
+    %p
+      Yes, you can change plans whenever you like. Charges will be pro-rated if you are changing to a more expensive plan,
+      and you will receive store credit if you change to a cheaper plan.

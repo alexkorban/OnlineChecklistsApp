@@ -74,6 +74,7 @@ OnlineChecklistsApp::Application.routes.draw do
   end
 
   get "support", :to => "help#support"
+  post "help/support", :to => "help#support"
 
   match "*other", :to => redirect("/")
 

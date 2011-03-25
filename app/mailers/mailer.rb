@@ -5,5 +5,11 @@ class Mailer < ActionMailer::Base
     @user = User.find(user_id)
     mail(to: @user.email, subject: "Welcome to OnlineChecklists")
   end
+
+  def support_request(user_id, message)
+    @user = User.find(user_id)
+    @message = message
+    mail(to: "support@onlinechecklists.com", subject: "OnlineChecklists support request from #{@user.email}")
+  end
 end
 

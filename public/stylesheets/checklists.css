@@ -9,7 +9,7 @@ h1 {
   margin: 10px;
   color: white; }
 
-input {
+input, textarea {
   font-size: 20px;
   padding: 4px;
   border: 1px solid #d0d0d0;
@@ -19,7 +19,7 @@ input {
   box-shadow: rgba(0, 0, 0, 0.1) 1px 1px 3px 0px inset;
   -moz-box-shadow: rgba(0, 0, 0, 0.1) 1px 1px 3px 0px inset;
   -webkit-box-shadow: rgba(0, 0, 0, 0.1) 1px 1px 3px 0px inset; }
-  input:focus {
+  input:focus, textarea:focus {
     background-color: #f6feff; }
 
 input[type=checkbox] {
@@ -211,10 +211,11 @@ li {
   padding-right: 50px; }
   #content table.timeline_entries tr td.first {
     border-left: none; }
-
-#main div.page {
-  float: left;
-  display: none; }
+#content div.page {
+  display: none;
+  padding-left: 140px; }
+  #content div.page h2 {
+    margin-top: 0; }
 
 #flash {
   background-color: #ffcc66;
