@@ -91,7 +91,7 @@ class Entry < ActiveRecord::Base
   def self.get_user_counts(counts, users)
     counts_by_user_id = counts.inject({}) {|hash, count| hash[count[:user_id]] = count[:count]; hash}
     users.map {|u|
-      counts_by_user_id.include?(u.id) ? counts_by_user_id[u.id].to_i : 0
+      counts_by_user_id.include?(u.id) ? counts_by_user_id[u.id].to_i * 3 : 0
     }
   end
 
