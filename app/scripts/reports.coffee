@@ -87,8 +87,8 @@ class root.TimelineView extends Backbone.View
           <tr>
             <th style = "width: 40%">Checklist</th>
             <th style = "width: 10%">User</th>
-            <th style = "width: 10%">Completed at</th>
-            <th style = "width: 40%">Completed for</th>
+            <th style = "width: 15%">Completed at</th>
+            <th style = "width: 35%">Completed for</th>
 
           </tr>
         </table>
@@ -98,8 +98,8 @@ class root.TimelineView extends Backbone.View
       <tr>
         <td style = "width: 40%" class = "first"><%= row.checklist_name %></td>
         <td style = "width: 10%"><%= row.user_name %></td>
-        <td style = "width: 10%"><%= row.display_time %></td>
-        <td style = "width: 40%"><%= row.notes %></td>
+        <td style = "width: 15%"><%= row.display_time %></td>
+        <td style = "width: 35%"><%= row.notes %></td>
       </tr>
     '''
     @no_entries_template = _.template '''
