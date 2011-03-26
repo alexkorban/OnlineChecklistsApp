@@ -313,7 +313,7 @@ class root.EditItemView extends Backbone.View
   constructor: ->
     super
     @template = _.template('''
-      <input type = "text" value = "<%= item.content() %>" /> <a href = "#" class = "remove_item">X</a>
+      <input type = "text" value = "<%= item.content() %>" style = "width: 80%" /> <a href = "#" class = "remove_item">X</a>
     ''')
 
 
@@ -346,7 +346,7 @@ class root.EditChecklistView extends Backbone.View
 
     @template = _.template('''
       <div class = "message" style = "display: none"></div>
-      Checklist: <input type = "text" class = "checklist_name" value = "<%= name %>" /><br/>
+      Checklist: <input type = "text" class = "checklist_name" style = "width: 80%" value = "<%= name %>" /><br/>
       <br/>
       <ul>
       </ul>

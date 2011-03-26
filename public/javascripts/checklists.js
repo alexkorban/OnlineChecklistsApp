@@ -247,7 +247,7 @@
     };
     function EditItemView() {
       EditItemView.__super__.constructor.apply(this, arguments);
-      this.template = _.template('<input type = "text" value = "<%= item.content() %>" /> <a href = "#" class = "remove_item">X</a>');
+      this.template = _.template('<input type = "text" value = "<%= item.content() %>" style = "width: 80%" /> <a href = "#" class = "remove_item">X</a>');
     }
     EditItemView.prototype.render = function() {
       $(this.el).html(this.template({
@@ -280,7 +280,7 @@
       this.on_error = __bind(this.on_error, this);;
       this.add_items = __bind(this.add_items, this);;
       this.add_item = __bind(this.add_item, this);;      EditChecklistView.__super__.constructor.apply(this, arguments);
-      this.template = _.template('<div class = "message" style = "display: none"></div>\nChecklist: <input type = "text" class = "checklist_name" value = "<%= name %>" /><br/>\n<br/>\n<ul>\n</ul>\n<ul><li><a class = "button add_item" href = "#">Add step</a></li></ul>\n<br/>\n<br/>\n<a class = "button save" href = "#">Save checklist</a>\n<span style = "margin-left: 20px; margin-right: 10px">or</span>  <a href = "#checklists">Cancel</a>');
+      this.template = _.template('<div class = "message" style = "display: none"></div>\nChecklist: <input type = "text" class = "checklist_name" style = "width: 80%" value = "<%= name %>" /><br/>\n<br/>\n<ul>\n</ul>\n<ul><li><a class = "button add_item" href = "#">Add step</a></li></ul>\n<br/>\n<br/>\n<a class = "button save" href = "#">Save checklist</a>\n<span style = "margin-left: 20px; margin-right: 10px">or</span>  <a href = "#checklists">Cancel</a>');
       this.model.items.bind("add", this.add_item);
       this.model.items.bind("remove", this.remove_item);
       this.model.items.bind("refresh", this.add_items);
