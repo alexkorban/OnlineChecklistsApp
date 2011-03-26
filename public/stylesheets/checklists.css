@@ -216,6 +216,9 @@ li {
   padding-left: 140px; }
   #content div.page h2 {
     margin-top: 0; }
+  #content div.page h3 {
+    margin-top: 40px;
+    color: #da9201; }
 
 #flash {
   background-color: #ffcc66;
