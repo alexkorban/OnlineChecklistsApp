@@ -292,7 +292,7 @@ class root.ChartView extends Backbone.View
       <table style = "margin-top: 20px">
         <tr>
           <td>
-            <div id = "timeline_chart" style='width: 700px; height: 400px; display: inline-block'></div>
+            <div id = "timeline_chart" style='width: 700px; height: 350px; display: inline-block'></div>
           </td>
           <td style = "padding-left: 20px; vertical-align: top">
             <% _.each(users, function(user, index) { %>
