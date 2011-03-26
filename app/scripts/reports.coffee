@@ -83,22 +83,23 @@ class root.TimelineView extends Backbone.View
 
     @day_entry_template = _.template '''
         <h2><%= day_entry[0] %></h2>
-        <table class = "timeline_entries">
+        <table class = "timeline_entries" style = "width: 100%">
           <tr>
-            <th>Checklist</th>
-            <th>User</th>
-            <th>Completed at</th>
-            <th>Completed for</th>
+            <th style = "width: 50%">Checklist</th>
+            <th style = "width: 5%">User</th>
+            <th style = "width: 5%">Completed at</th>
+            <th style = "width: 40%">Completed for</th>
+
           </tr>
         </table>
     '''
 
     @day_entry_row_template = _.template '''
       <tr>
-        <td class = "first"><%= row.checklist_name %></td>
-        <td><%= row.user_name %></td>
-        <td><%= row.display_time %></td>
-        <td><%= row.notes %></td>
+        <td style = "width: 50%" class = "first"><%= row.checklist_name %></td>
+        <td style = "width: 5%"><%= row.user_name %></td>
+        <td style = "width: 5%"><%= row.display_time %></td>
+        <td style = "width: 40%"><%= row.notes %></td>
       </tr>
     '''
     @no_entries_template = _.template '''
