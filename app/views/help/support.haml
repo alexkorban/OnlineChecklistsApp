@@ -4,7 +4,6 @@
 :javascript
   $(function() {
     $("a.page").click(function (e) {
-      console.log(e);
       $("div.page").hide();
       $($(e.target).attr("href")).show();
     });
