@@ -1,6 +1,12 @@
 - content_for :heading do
   Sign up
 
+:javascript
+  $("#toggle_licence").live("click", function() {
+    $("#licence").toggle();
+  });
+
+
 = form_for(resource, :as => resource_name, :url => registration_path(resource_name)) do |f|
   = devise_error_messages!
   = f.hidden_field :plan, :value => flash.now[:plan]
@@ -24,6 +30,13 @@
     = f.label :password_confirmation
     %br/
     = f.password_field :password_confirmation
+
+  %p
+    By pressing "Sign up", you agree to the
+    %a#toggle_licence(href = "#") OnlineChecklists Terms of use
+    #licence(style = "display: none")= render :partial => "licence"
+
+
   %p= f.submit "Sign up"
 = render :partial => "devise/shared/links"
 

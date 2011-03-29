@@ -316,6 +316,9 @@ li {
   margin-left: 25px;
   padding-left: 20px;
   width: 60%; }
+  #licence li {
+    font-size: 14px;
+    color: #363636; }
 
 .time_zone select {
   padding: 10px; }
