@@ -147,7 +147,7 @@
         return;
       }
       if (e.target.name === "notes") {
-        $(".checklist_item").not(".checked").first().toggleClass("selected");
+        $(".checklist_item").not(".checked").first().toggleClass("selected").scrollintoview();
         $(e.target).blur();
         if ($(".checklist_item").length === 0) {
           $("#completion_message").show();
@@ -159,13 +159,14 @@
       next = last_selected.length > 0 ? last_selected.next(".checklist_item").not(".checked") : $(".checklist_item").not(".checked").first();
       last_selected.addClass("checked").removeClass("selected");
       if (next.length > 0) {
-        next.addClass("selected");
+        next.addClass("selected").scrollintoview();
         $("body").focus();
         return e.preventDefault();
       } else {
         if ($(".checklist_item").not(".checked").length === 0) {
           $("#completion_message").show();
           $("#incomplete_warning").hide();
+          $(".complete").scrollintoview();
           return e.preventDefault();
         }
       }

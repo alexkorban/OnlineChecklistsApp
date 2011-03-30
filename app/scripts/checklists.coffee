@@ -395,6 +395,8 @@ class root.EditChecklistView extends Backbone.View
 
   on_add_item: (e) ->
     @model.items.add()
+    @$("input[type=text]").last().focus().select()
+    @$(e.target).scrollintoview()
     e.preventDefault()
     e.stopPropagation()
 
@@ -412,12 +414,11 @@ class root.EditChecklistView extends Backbone.View
     view = new EditItemView {model: item, collection: @model.items}
     item.view = view
     @item_el.append view.render()
-    @$("input[type=text]").last().focus().select()
 
 
   add_items: =>
     @model.items.each(@add_item)
-    @$("input[type=text]").first().focus().select()
+    @$("input[type=text]").first().focus().select().scrollintoview()
 
 
   remove_item: (item) ->

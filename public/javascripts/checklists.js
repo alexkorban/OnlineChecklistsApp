@@ -318,6 +318,8 @@
     };
     EditChecklistView.prototype.on_add_item = function(e) {
       this.model.items.add();
+      this.$("input[type=text]").last().focus().select();
+      this.$(e.target).scrollintoview();
       e.preventDefault();
       return e.stopPropagation();
     };
@@ -341,12 +343,11 @@
         collection: this.model.items
       });
       item.view = view;
-      this.item_el.append(view.render());
-      return this.$("input[type=text]").last().focus().select();
+      return this.item_el.append(view.render());
     };
     EditChecklistView.prototype.add_items = function() {
       this.model.items.each(this.add_item);
-      return this.$("input[type=text]").first().focus().select();
+      return this.$("input[type=text]").first().focus().select().scrollintoview();
     };
     EditChecklistView.prototype.remove_item = function(item) {
       return item.view.remove();

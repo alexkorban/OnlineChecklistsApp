@@ -133,7 +133,7 @@ $ ->
       return
 
     if e.target.name == "notes" # Enter pressed on the Notes text field
-      $(".checklist_item").not(".checked").first().toggleClass("selected")
+      $(".checklist_item").not(".checked").first().toggleClass("selected").scrollintoview()
       $(e.target).blur()
       if $(".checklist_item").length == 0
         $("#completion_message").show()
@@ -149,13 +149,14 @@ $ ->
 
     last_selected.addClass("checked").removeClass("selected")
     if next.length > 0    # we aren't on the last item
-      next.addClass("selected")
+      next.addClass("selected").scrollintoview()
       $("body").focus()
       e.preventDefault()
     else                  # we are on the last item
       if $(".checklist_item").not(".checked").length == 0   # everything is checked
         $("#completion_message").show()
         $("#incomplete_warning").hide()
+        $(".complete").scrollintoview()
         e.preventDefault()
 
 
