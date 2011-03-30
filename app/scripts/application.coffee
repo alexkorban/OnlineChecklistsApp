@@ -118,8 +118,10 @@ $ ->
   #Backbone.history.saveLocation("checklists")
   setInterval(heartbeat, 5 * 60 * 1000)    # let the server know the session is active every 5 minutes
 
-  # Enter key handler for ChecklistView
-  $(document).keypress (e) ->
+  # Enter key handler for ChecklistView;
+  # Firefox requires it to be attached to document rather than "body"
+  # IE9 doesn't work with keypress, only with keydown
+  $(document).keydown (e) ->
     if e.keyCode != 13   # something other than Enter pressed
       return
       # 38 is up, 40 is down

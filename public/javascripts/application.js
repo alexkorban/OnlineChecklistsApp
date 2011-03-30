@@ -137,7 +137,7 @@
     window.app = new AppController();
     Backbone.history.start();
     setInterval(heartbeat, 5 * 60 * 1000);
-    return $(document).keypress(function(e) {
+    return $(document).keydown(function(e) {
       var last_selected, next;
       if (e.keyCode !== 13) {
         return;
