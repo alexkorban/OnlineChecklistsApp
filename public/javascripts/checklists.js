@@ -178,14 +178,14 @@
     ChecklistView.prototype.id = "content";
     ChecklistView.prototype.events = {
       "click .complete": "on_complete",
-      "click .checklist_item": "on_click_item",
+      "click .item_select_area": "on_click_item",
       "focus input": "on_focus_input",
       "blur input": "on_blur_input",
       "error": "on_error"
     };
     function ChecklistView() {
       ChecklistView.__super__.constructor.apply(this, arguments);
-      this.template = _.template('<div class = "input_field">\n  Notes: <input name = "notes" type = "text" style = "width: 500px" />\n  <span class = "instructions">(press Enter to continue)</span>\n</div>\n<ul style = "margin-bottom: 40px; margin-top: 40px">\n<% items.each(function(item) { %>\n<li class = "checklist_item"><div style = "width: 80%"><%= item.content() %></div><span class = "instructions">(press Enter to mark as done)</span></li>\n<% }); %>\n</ul>\n<div class = "message" id = "incomplete_warning" style = "display: none; margin-bottom: 20px">Please complete and check off all the items in the checklist first.</div>\n<div class = "message" id = "completion_message" style = "display: none; margin-bottom: 20px">Press Enter or click Complete! to submit the checklist.</div>\n<button class = "complete">Complete!</button>\n<span style = "margin-left: 20px; margin-right: 10px">or</span>  <a href = "#checklists">Cancel</a>');
+      this.template = _.template('<div class = "input_field">\n  Notes: <input name = "notes" type = "text" style = "width: 500px" />\n  <span class = "instructions">(press Enter to continue)</span>\n</div>\n<ul style = "margin-bottom: 40px; margin-top: 40px">\n<% items.each(function(item) { %>\n<li class = "checklist_item item_select_area"><div class = "item_select_area" style = "width: 80%"><%= item.content() %></div><span class = "instructions">(press Enter to mark as done)</span></li>\n<% }); %>\n</ul>\n<div class = "message" id = "incomplete_warning" style = "display: none; margin-bottom: 20px">Please complete and check off all the items in the checklist first.</div>\n<div class = "message" id = "completion_message" style = "display: none; margin-bottom: 20px">Press Enter or click Complete! to submit the checklist.</div>\n<button class = "complete">Complete!</button>\n<span style = "margin-left: 20px; margin-right: 10px">or</span>  <a href = "#checklists">Cancel</a>');
       $("#" + this.id).replaceWith(this.el);
       this.model.items.fetch({
         success: __bind(function() {
@@ -218,7 +218,10 @@
       return window.location.hash = "checklists";
     };
     ChecklistView.prototype.on_click_item = function(e) {
-      this.$(e.target).toggleClass("checked");
+      var item_el;
+      item_el = this.$(e.target).not("li") ? this.$(e.target).closest("li") : this.$(e.target);
+      item_el.toggleClass("checked");
+      e.stopPropagation();
       if (this.$(".checklist_item").not(".checked").length === 0) {
         return this.$("#completion_message").show();
       } else {

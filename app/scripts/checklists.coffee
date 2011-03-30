@@ -230,7 +230,7 @@ class root.ChecklistView extends Backbone.View
   # only created once that way
   events: {
     "click .complete": "on_complete"
-    "click .checklist_item": "on_click_item"
+    "click .item_select_area": "on_click_item"
     "focus input": "on_focus_input"
     "blur input": "on_blur_input"
     "error": "on_error"
@@ -247,7 +247,7 @@ class root.ChecklistView extends Backbone.View
       </div>
       <ul style = "margin-bottom: 40px; margin-top: 40px">
       <% items.each(function(item) { %>
-      <li class = "checklist_item"><div style = "width: 80%"><%= item.content() %></div><span class = "instructions">(press Enter to mark as done)</span></li>
+      <li class = "checklist_item item_select_area"><div class = "item_select_area" style = "width: 80%"><%= item.content() %></div><span class = "instructions">(press Enter to mark as done)</span></li>
       <% }); %>
       </ul>
       <div class = "message" id = "incomplete_warning" style = "display: none; margin-bottom: 20px">Please complete and check off all the items in the checklist first.</div>
@@ -283,7 +283,10 @@ class root.ChecklistView extends Backbone.View
 
 
   on_click_item: (e) ->
-    @$(e.target).toggleClass("checked")
+    # the target could be the <li> or the <div> inside it, so we need to make sure we're modifying the <li>
+    item_el = if @$(e.target).not("li") then @$(e.target).closest("li") else @$(e.target)
+    item_el.toggleClass("checked")
+    e.stopPropagation()
     if @$(".checklist_item").not(".checked").length == 0
       @$("#completion_message").show()
     else
