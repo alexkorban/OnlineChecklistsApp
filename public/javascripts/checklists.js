@@ -144,7 +144,7 @@
       return e.stopPropagation();
     };
     ChecklistListView.prototype.on_doubleclick = function(e) {
-      return window.location.hash = "checklists/" + e.target.id;
+      return window.location.hash = "checklists/" + e.currentTarget.id;
     };
     ChecklistListView.prototype.on_delete = function(e) {
       var cid, controls;

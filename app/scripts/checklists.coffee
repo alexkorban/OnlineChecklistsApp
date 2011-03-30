@@ -190,7 +190,7 @@ class root.ChecklistListView extends Backbone.View
     e.stopPropagation()
 
   on_doubleclick: (e) ->
-    window.location.hash = "checklists/#{e.target.id}"
+    window.location.hash = "checklists/#{e.currentTarget.id}"
 
 
   on_delete: (e) ->
