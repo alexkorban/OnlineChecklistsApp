@@ -112,7 +112,8 @@
     ChecklistListView.prototype.events = {
       "click .create": "on_create",
       "click .delete": "on_delete",
-      "dblclick li": "on_doubleclick",
+      "click .edit": "on_edit",
+      "click .name": "on_click",
       "click .confirm_delete": "on_confirm_delete",
       "click .cancel_delete": "on_cancel_delete"
     };
@@ -122,7 +123,7 @@
         return model.id != null;
       }));
       $("#" + this.id).replaceWith(this.el);
-      this.template = _.template('<div id = "buttons">\n  <a class = "create button" href = "#">Create checklist</a>\n  <a class = "button" href = "#timeline">View timeline</a>\n  <a class = "button" href = "#charts">View charts</a>\n  <% if (current_user.role == "admin") { %> <a class = "button" href = "#users">Invite users</a> <% } %>\n</div>\n<div class = "message" style = "display: none">\n  You\'ve reached the limit of your plan with <%= window.Plan.checklists %> checklists.\n  <% if (current_user.role == "admin") { %>\n    <a href = "/billing">Please consider upgrading to a larger plan</a>.\n  <% } else { %>\n    Please ask the administrator of your account to upgrade to a larger plan.\n  <% } %>\n</div>\n<% if (flash != null) { %>\n  <div id = \'flash\' class = \'notice\'><div><%= flash %></div></div>\n<% } %>\n<% if (checklists.length == 0) { %>\n  <div>\n    <img src = "/images/up_32.png" style = "display: block; margin-left: 50px; margin-top: 10px; margin-bottom: 10px" />\n    It\'s time to create some checklists because you don\'t have any!<br/><br/>Press the <b>Create checklist</b> button above to create one.\n  </div>\n<% } %>\n<ul class = "checklists">\n<% checklists.each(function(checklist) { %>\n<li class = "checklist" id = "<%= checklist.cid %>"><span class = "name"><%= checklist.name() %></span>\n  <span class = "controls">\n    <a href="#checklists/<%= checklist.cid %>">Fill out</a> |\n    <a class = "secondary" href = "#checklists/<%= checklist.cid %>/edit">Edit</a> |\n    <a class = "secondary delete" id = "delete_<%= checklist.cid %>" href = "#">Delete</a>\n  </span>\n</li>\n<% }); %>\n</ul>');
+      this.template = _.template('<div id = "buttons">\n  <a class = "create button" href = "#">Create checklist</a>\n  <a class = "button" href = "#timeline">View timeline</a>\n  <a class = "button" href = "#charts">View charts</a>\n  <% if (current_user.role == "admin") { %> <a class = "button" href = "#users">Invite users</a> <% } %>\n</div>\n<div class = "message" style = "display: none">\n  You\'ve reached the limit of your plan with <%= window.Plan.checklists %> checklists.\n  <% if (current_user.role == "admin") { %>\n    <a href = "/billing">Please consider upgrading to a larger plan</a>.\n  <% } else { %>\n    Please ask the administrator of your account to upgrade to a larger plan.\n  <% } %>\n</div>\n<% if (flash != null) { %>\n  <div id = \'flash\' class = \'notice\'><div><%= flash %></div></div>\n<% } %>\n<% if (checklists.length == 0) { %>\n  <div>\n    <img src = "/images/up_32.png" style = "display: block; margin-left: 50px; margin-top: 10px; margin-bottom: 10px" />\n    It\'s time to create some checklists because you don\'t have any!<br/><br/>Press the <b>Create checklist</b> button above to create one.\n  </div>\n<% } %>\n<% if (checklists.length > 0) { %>\n  <div class = "instructions">Click on a checklist name to fill out that checklist.</div>\n<% } %>\n<ul class = "checklists">\n<% checklists.each(function(checklist) { %>\n<li class = "checklist" id = "<%= checklist.cid %>"><span class = "name"><%= checklist.name() %></span>\n  <span class = "controls">\n    <a href="#checklists/<%= checklist.cid %>">Fill out</a> |\n    <a class = "secondary edit" href = "#checklists/<%= checklist.cid %>/edit">Edit</a> |\n    <a class = "secondary delete" id = "delete_<%= checklist.cid %>" href = "#">Delete</a>\n  </span>\n</li>\n<% }); %>\n</ul>');
       this.render();
     }
     ChecklistListView.prototype.render = function() {
@@ -143,8 +144,15 @@
       e.preventDefault();
       return e.stopPropagation();
     };
-    ChecklistListView.prototype.on_doubleclick = function(e) {
-      return window.location.hash = "checklists/" + e.currentTarget.id;
+    ChecklistListView.prototype.on_click = function(e) {
+      window.location.hash = "checklists/" + (this.$(e.currentTarget).closest("li").attr("id"));
+      e.preventDefault();
+      return e.stopPropagation();
+    };
+    ChecklistListView.prototype.on_edit = function(e) {
+      window.location.hash = "checklists/" + (this.$(e.currentTarget).closest("li").attr("id")) + "/edit";
+      e.preventDefault();
+      return e.stopPropagation();
     };
     ChecklistListView.prototype.on_delete = function(e) {
       var cid, controls;
@@ -152,7 +160,8 @@
       controls = this.$(e.target).closest(".controls");
       this.controls_contents[cid] = controls.html();
       controls.html("<b>Delete checklist?</b>\n<a class = 'confirm_delete' id = 'confirm_delete_" + cid + "' href = '#'>Delete</a> or\n<a class = 'cancel_delete' id = 'cancel_delete_" + cid + "' href = '#'>Cancel</a>");
-      return e.preventDefault();
+      e.preventDefault();
+      return e.stopPropagation();
     };
     ChecklistListView.prototype.on_confirm_delete = function(e) {
       var checklist;

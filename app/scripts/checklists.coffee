@@ -121,7 +121,8 @@ class root.ChecklistListView extends Backbone.View
   events: {
     "click .create": "on_create"
     "click .delete": "on_delete"
-    "dblclick li": "on_doubleclick"
+    "click .edit": "on_edit"
+    "click .name": "on_click"
     "click .confirm_delete": "on_confirm_delete"
     "click .cancel_delete": "on_cancel_delete"
   }
@@ -158,12 +159,15 @@ class root.ChecklistListView extends Backbone.View
           It's time to create some checklists because you don't have any!<br/><br/>Press the <b>Create checklist</b> button above to create one.
         </div>
       <% } %>
+      <% if (checklists.length > 0) { %>
+        <div class = "instructions">Click on a checklist name to fill out that checklist.</div>
+      <% } %>
       <ul class = "checklists">
       <% checklists.each(function(checklist) { %>
       <li class = "checklist" id = "<%= checklist.cid %>"><span class = "name"><%= checklist.name() %></span>
         <span class = "controls">
           <a href="#checklists/<%= checklist.cid %>">Fill out</a> |
-          <a class = "secondary" href = "#checklists/<%= checklist.cid %>/edit">Edit</a> |
+          <a class = "secondary edit" href = "#checklists/<%= checklist.cid %>/edit">Edit</a> |
           <a class = "secondary delete" id = "delete_<%= checklist.cid %>" href = "#">Delete</a>
         </span>
       </li>
@@ -190,8 +194,17 @@ class root.ChecklistListView extends Backbone.View
     e.preventDefault()
     e.stopPropagation()
 
-  on_doubleclick: (e) ->
-    window.location.hash = "checklists/#{e.currentTarget.id}"
+
+  on_click: (e) ->
+    window.location.hash = "checklists/#{@$(e.currentTarget).closest("li").attr("id")}"
+    e.preventDefault()
+    e.stopPropagation()
+
+
+  on_edit: (e) ->
+    window.location.hash = "checklists/#{@$(e.currentTarget).closest("li").attr("id")}/edit"
+    e.preventDefault()
+    e.stopPropagation()
 
 
   on_delete: (e) ->
@@ -204,6 +217,7 @@ class root.ChecklistListView extends Backbone.View
       <a class = 'cancel_delete' id = 'cancel_delete_#{cid}' href = '#'>Cancel</a>
       """)
     e.preventDefault()
+    e.stopPropagation()
 
 
   on_confirm_delete: (e) ->

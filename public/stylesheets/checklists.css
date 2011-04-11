@@ -140,6 +140,9 @@ li {
       border: none;
       vertical-align: middle;
       padding-left: 5px; }
+#content .instructions {
+  color: #a0a0a0;
+  font-size: 12px; }
 #content ul.checklists {
   width: 90%;
   padding-left: 0;

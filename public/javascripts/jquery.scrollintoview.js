@@ -250,9 +250,9 @@
 
       var overflow = {
 
-        x: scrollValue[styles.overflowX.toLowerCase()] || false,
+        x: ((typeof styles != "undefined") && "overflowX" in styles ? scrollValue[styles.overflowX.toLowerCase()] : false) || false,
 
-        y: scrollValue[styles.overflowY.toLowerCase()] || false,
+        y: ((typeof styles != "undefined") && "overflowY" in styles ? scrollValue[styles.overflowY.toLowerCase()] : false) || false,
 
         isRoot: element.nodeName.toLowerCase() == "html"
 
