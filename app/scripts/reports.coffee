@@ -88,7 +88,7 @@ class root.TimelineView extends Backbone.View
             <th style = "width: 40%">Checklist</th>
             <th style = "width: 10%">User</th>
             <th style = "width: 15%">Completed at</th>
-            <th style = "width: 35%">Completed for</th>
+            <th style = "width: 35%">Notes</th>
 
           </tr>
         </table>
