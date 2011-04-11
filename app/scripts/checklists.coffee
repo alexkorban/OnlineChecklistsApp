@@ -137,7 +137,8 @@ class root.ChecklistListView extends Backbone.View
     @template = _.template('''
       <div id = "buttons">
         <a class = "create button" href = "#">Create checklist</a>
-        <a class = "button" href = "#timeline">View reports</a>
+        <a class = "button" href = "#timeline">View timeline</a>
+        <a class = "button" href = "#charts">View charts</a>
         <% if (current_user.role == "admin") { %> <a class = "button" href = "#users">Invite users</a> <% } %>
       </div>
       <div class = "message" style = "display: none">
