@@ -293,6 +293,16 @@ class root.ChartView extends Backbone.View
         <tr>
           <td>
             <div id = "timeline_chart" style='width: 700px; height: 400px; display: inline-block'></div>
+            <div style = "padding-top: 15px; width: 700px">
+              The chart shows the number of times the selected checklist has been completed by the selected users
+              during each reporting period (daily, weekly or monthly).
+              <br/><br/>
+              The summary chart below the main chart has handles which allow you to resize the visible area to get a more
+              detailed view at a certain period.
+              <br/><br/>
+              As you hover your mouse over the chart, you will see checklist completion counts for the selected date
+              shown at the top of the chart.
+            </div>
           </td>
           <td style = "padding-left: 20px; vertical-align: top">
             <% _.each(users, function(user, index) { %>
