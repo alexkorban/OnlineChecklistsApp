@@ -79,8 +79,14 @@ li {
   min-height: 200px;
   padding-top: 15px;
   padding-left: 20px;
+  padding-right: 35px;
   background: white url("/images/bg-container.gif") repeat-x 0% 0%;
   border-top: 1px solid white; }
+  #main #feedback_image {
+    position: fixed;
+    top: 200px;
+    right: 0px;
+    border: none; }
   #main #buttons {
     margin-bottom: 20px;
     border-bottom: 1px dotted silver;
@@ -325,3 +331,6 @@ li {
 
 .time_zone select {
   padding: 10px; }
+
+#fancybox-close {
+  border-bottom: none; }

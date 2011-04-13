@@ -26,6 +26,10 @@
 
     = stylesheet_link_tag "checklists"
 
+    - if current_user && user_signed_in?
+      = javascript_include_tag "fancybox/jquery.fancybox-1.3.4.pack"
+      = stylesheet_link_tag "fancybox/jquery.fancybox-1.3.4"
+
     :javascript
       var current_user = #{current_user.to_json(:only => User::JSON_FIELDS)};
       var current_account = #{current_user ? current_user.account.to_json(:only => [:time_zone]) : "null"};
@@ -53,7 +57,18 @@
         = yield :heading
 
     #main
+      - if current_user && user_signed_in?
+        %a#feedback_button(href = "#feedback_form")
+          %img#feedback_image(src = "/images/feedback.gif" alt = "Feedback")
+        %div(style = "display: none")
+          #feedback_form
+            %textarea(id = "feedback_message" name = "message" style = "width: 95%; margin-top: 10px; margin-left: auto; margin-right: auto; display: block; height: 370px")
+            %div(style = "margin-top: 10px; margin-left: auto; margin-right: auto; width: 95%; padding: 0")
+              %button Send
+
+
       = yield
+
 
     :javascript
       $(function() {
@@ -67,3 +82,24 @@
         else
           $(document).ajaxSend(function(e, xhr){ CSRFProtection(xhr) });
       });
+
+    - if current_user && user_signed_in?
+      :javascript
+        $(function() {
+          $("#feedback_button").fancybox({
+            autoDimensions: false,
+            width: 700,
+            height: 450,
+            frameHeight: 450
+          });
+          $("#feedback_form button").click(function(event) {
+            $.post("/help/support",
+              {
+                message: $("#feedback_message").val(),
+                location: window.location.href
+              }
+            );
+            $("#feedback_message").val("");
+            $.fancybox.close();
+          });
+        });
