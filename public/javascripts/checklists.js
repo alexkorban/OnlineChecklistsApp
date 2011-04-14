@@ -218,13 +218,21 @@
         e.preventDefault();
         return;
       }
+      this.$(e.target).attr("disabled", true).text("Saving...");
       entry = new Entry({
         checklist_id: this.model.id,
         notes: this.$("input[name=notes]").val()
       });
-      entry.save();
-      window.app.flash = "Completed checklist: " + (this.model.name());
-      return window.location.hash = "checklists";
+      return entry.save({}, {
+        success: __bind(function(model, response) {
+          window.app.flash = "Completed checklist: " + (this.model.name());
+          return window.location.hash = "checklists";
+        }, this),
+        error: __bind(function(model, error) {
+          this.on_error(error);
+          return this.$(e.target).attr("disabled", false).text("Complete!");
+        }, this)
+      });
     };
     ChecklistView.prototype.on_click_item = function(e) {
       var item_el;
@@ -292,7 +300,7 @@
       this.on_error = __bind(this.on_error, this);;
       this.add_items = __bind(this.add_items, this);;
       this.add_item = __bind(this.add_item, this);;      EditChecklistView.__super__.constructor.apply(this, arguments);
-      this.template = _.template('<div class = "message" style = "display: none"></div>\nChecklist: <input type = "text" class = "checklist_name" style = "width: 80%" value = "<%= name %>" /><br/>\n<br/>\n<ul>\n</ul>\n<ul><li><a class = "button add_item" href = "#">Add step</a></li></ul>\n<br/>\n<br/>\n<a class = "button save" href = "#">Save checklist</a>\n<span style = "margin-left: 20px; margin-right: 10px">or</span>  <a href = "#checklists">Cancel</a>');
+      this.template = _.template('<div class = "message" style = "display: none"></div>\nChecklist: <input type = "text" class = "checklist_name" style = "width: 80%" value = "<%= name %>" /><br/>\n<br/>\n<ul>\n</ul>\n<ul><li><a class = "button add_item" href = "#">Add step</a></li></ul>\n<br/>\n<br/>\n<button class = "save">Save checklist</button>\n<span style = "margin-left: 20px; margin-right: 10px">or</span>  <a href = "#checklists">Cancel</a>');
       this.model.items.bind("add", this.add_item);
       this.model.items.bind("remove", this.remove_item);
       this.model.items.bind("refresh", this.add_items);
@@ -311,6 +319,7 @@
         e.preventDefault();
         return;
       }
+      this.$(e.target).attr("disabled", true).text("Saving...");
       this.model.set({
         "name": this.$(".checklist_name").val()
       });
@@ -320,7 +329,8 @@
           return window.location.hash = "checklists";
         }, this),
         error: __bind(function(model, error) {
-          return this.on_error(error);
+          this.on_error(error);
+          return this.$(e.target).attr("disabled", false).text("Save checklist");
         }, this)
       });
       return e.preventDefault();

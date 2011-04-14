@@ -188,7 +188,7 @@ class root.InvitationView extends Backbone.View
   id: "invitations"
   events: {
     "click .add_item": "on_add_item"
-    "click .save": "on_save"
+    "click .send_invitations": "on_send_invitations"
   }
 
   constructor: (users) ->
@@ -216,7 +216,7 @@ class root.InvitationView extends Backbone.View
 
         <a class = "button add_item" href = "#">Add another invitation</a>
         <br/><br/><br/>
-        <a class = "button save" href = "#">Send invitations</a>
+        <button class = "send_invitations">Send invitations</button>
       <% } %>
       """)
 
@@ -256,14 +256,16 @@ class root.InvitationView extends Backbone.View
     e.preventDefault()
 
 
-  on_save: (e) ->
+  on_send_invitations: (e) ->
+    @$(e.target).attr("disabled", true).text("Sending...")
     @invitations.save({},
     {
       success: (model, response) =>
         @users.refresh(response)
+        @$(e.target).attr("disabled", false).text("Send invitations")
       error: (model, xhr) =>
         @$("#submit_errors").html(@error_template({errors: $.parseJSON(xhr.responseText)})).show()
-
+        @$(e.target).attr("disabled", false).text("Send invitations")
     })
     e.preventDefault()
 

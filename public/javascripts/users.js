@@ -166,7 +166,7 @@
     InvitationView.prototype.id = "invitations";
     InvitationView.prototype.events = {
       "click .add_item": "on_add_item",
-      "click .save": "on_save"
+      "click .send_invitations": "on_send_invitations"
     };
     function InvitationView(users) {
       this.remove_item = __bind(this.remove_item, this);;
@@ -175,7 +175,7 @@
       this.users = users;
       $("#" + this.id).replaceWith(this.el);
       message = "You've reached the limits of your plan with <%= window.Plan.users %> users.\n<a href = \"/billing\">Please consider upgrading to a larger plan</a>.";
-      this.template = _.template("<h2>Invite users</h2>\n<div class = \"message\" id = \"submit_errors\" style = \"display:none\"></div>\n<% if (Users.length >= Plan.users) { %>\n  <div class = \"message\">" + message + "</div>\n<% } else { %>\n  <div id = \"invitation_items\" style = \"margin-bottom: 20px\"></div>\n  <div class = \"message\" style = \"margin-bottom: 20px; display: none\">\n    You cannot invite more than " + (Plan.users - Users.length) + " users on your current plan.<br/>\n    <a href = \"/billing\">Please consider upgrading to a larger plan</a> if you need more users.\n  </div>\n\n  <a class = \"button add_item\" href = \"#\">Add another invitation</a>\n  <br/><br/><br/>\n  <a class = \"button save\" href = \"#\">Send invitations</a>\n<% } %>");
+      this.template = _.template("<h2>Invite users</h2>\n<div class = \"message\" id = \"submit_errors\" style = \"display:none\"></div>\n<% if (Users.length >= Plan.users) { %>\n  <div class = \"message\">" + message + "</div>\n<% } else { %>\n  <div id = \"invitation_items\" style = \"margin-bottom: 20px\"></div>\n  <div class = \"message\" style = \"margin-bottom: 20px; display: none\">\n    You cannot invite more than " + (Plan.users - Users.length) + " users on your current plan.<br/>\n    <a href = \"/billing\">Please consider upgrading to a larger plan</a> if you need more users.\n  </div>\n\n  <a class = \"button add_item\" href = \"#\">Add another invitation</a>\n  <br/><br/><br/>\n  <button class = \"send_invitations\">Send invitations</button>\n<% } %>");
       this.error_template = _.template("Please correct the following errors:<br/>\n<ul>\n<% _.each(errors, function(error) { %>\n  <li><%= error %></li>\n<% }); %>\n</ul>");
     }
     InvitationView.prototype.render = function() {
@@ -206,15 +206,18 @@
       }
       return e.preventDefault();
     };
-    InvitationView.prototype.on_save = function(e) {
+    InvitationView.prototype.on_send_invitations = function(e) {
+      this.$(e.target).attr("disabled", true).text("Sending...");
       this.invitations.save({}, {
         success: __bind(function(model, response) {
-          return this.users.refresh(response);
+          this.users.refresh(response);
+          return this.$(e.target).attr("disabled", false).text("Send invitations");
         }, this),
         error: __bind(function(model, xhr) {
-          return this.$("#submit_errors").html(this.error_template({
+          this.$("#submit_errors").html(this.error_template({
             errors: $.parseJSON(xhr.responseText)
           })).show();
+          return this.$(e.target).attr("disabled", false).text("Send invitations");
         }, this)
       });
       return e.preventDefault();

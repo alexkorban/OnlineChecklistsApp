@@ -291,10 +291,16 @@ class root.ChecklistView extends Backbone.View
       @$("#completion_message").hide()
       e.preventDefault()
       return
+    @$(e.target).attr("disabled", true).text("Saving...")
     entry = new Entry({checklist_id: @model.id, notes: @$("input[name=notes]").val()})
-    entry.save()
-    window.app.flash = "Completed checklist: #{@model.name()}"
-    window.location.hash = "checklists"
+    entry.save {},
+      { success: (model, response) =>
+          window.app.flash = "Completed checklist: #{@model.name()}"
+          window.location.hash = "checklists"
+        error: (model, error) =>
+          @on_error(error)
+          @$(e.target).attr("disabled", false).text("Complete!")
+      }
 
 
   on_click_item: (e) ->
@@ -371,7 +377,7 @@ class root.EditChecklistView extends Backbone.View
       <ul><li><a class = "button add_item" href = "#">Add step</a></li></ul>
       <br/>
       <br/>
-      <a class = "button save" href = "#">Save checklist</a>
+      <button class = "save">Save checklist</button>
       <span style = "margin-left: 20px; margin-right: 10px">or</span>  <a href = "#checklists">Cancel</a>
       ''')
 
@@ -397,6 +403,8 @@ class root.EditChecklistView extends Backbone.View
       e.preventDefault()
       return
 
+    @$(e.target).attr("disabled", true).text("Saving...")
+
     @model.set {"name": @$(".checklist_name").val()}
 
     @model.save {},
@@ -405,6 +413,7 @@ class root.EditChecklistView extends Backbone.View
           window.location.hash = "checklists"
         error: (model, error) =>
           @on_error(error)
+          @$(e.target).attr("disabled", false).text("Save checklist")
       }
     e.preventDefault()
 
