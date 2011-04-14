@@ -291,6 +291,9 @@ class root.ChecklistView extends Backbone.View
       @$("#completion_message").hide()
       e.preventDefault()
       return
+
+    return if @$(e.target).attr("disabled") is true
+
     @$(e.target).attr("disabled", true).text("Saving...")
     entry = new Entry({checklist_id: @model.id, notes: @$("input[name=notes]").val()})
     entry.save {},
@@ -402,6 +405,8 @@ class root.EditChecklistView extends Backbone.View
       @on_error("Please enter a name for the checklist")
       e.preventDefault()
       return
+
+    return if @$(e.target).attr("disabled") is true
 
     @$(e.target).attr("disabled", true).text("Saving...")
 

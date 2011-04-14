@@ -218,6 +218,9 @@
         e.preventDefault();
         return;
       }
+      if (this.$(e.target).attr("disabled") === true) {
+        return;
+      }
       this.$(e.target).attr("disabled", true).text("Saving...");
       entry = new Entry({
         checklist_id: this.model.id,
@@ -317,6 +320,9 @@
       if ($.trim(this.$(".checklist_name").val()).length === 0) {
         this.on_error("Please enter a name for the checklist");
         e.preventDefault();
+        return;
+      }
+      if (this.$(e.target).attr("disabled") === true) {
         return;
       }
       this.$(e.target).attr("disabled", true).text("Saving...");

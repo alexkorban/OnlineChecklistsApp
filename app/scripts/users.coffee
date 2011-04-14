@@ -257,6 +257,7 @@ class root.InvitationView extends Backbone.View
 
 
   on_send_invitations: (e) ->
+    return if @$(e.target).attr("disabled") is true
     @$(e.target).attr("disabled", true).text("Sending...")
     @invitations.save({},
     {

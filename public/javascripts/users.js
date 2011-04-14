@@ -207,6 +207,9 @@
       return e.preventDefault();
     };
     InvitationView.prototype.on_send_invitations = function(e) {
+      if (this.$(e.target).attr("disabled") === true) {
+        return;
+      }
       this.$(e.target).attr("disabled", true).text("Sending...");
       this.invitations.save({}, {
         success: __bind(function(model, response) {
