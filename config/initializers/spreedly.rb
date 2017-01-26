@@ -5,12 +5,12 @@ else
 end
 
 if Rails.env.staging?
-  Spreedly.configure("OnlineChecklists-staging", "***REMOVED***")
+  Spreedly.configure("OnlineChecklists-staging", "**REMOVED**")
 elsif Rails.env.production?
-  Spreedly.configure("OnlineChecklists", "***REMOVED***")
+  Spreedly.configure("OnlineChecklists", "**REMOVED**")
 else
-  #Spreedly.configure("OnlineChecklists-paytest", "***REMOVED***")
-  Spreedly.configure("OnlineChecklists-dev", "***REMOVED***")
+  #Spreedly.configure("OnlineChecklists-paytest", "**REMOVED**")
+  Spreedly.configure("OnlineChecklists-dev", "**REMOVED**")
 end
 
 # this should only be done for testing

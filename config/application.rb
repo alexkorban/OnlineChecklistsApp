@@ -54,15 +54,15 @@ module OnlineChecklistsApp
       :domain => "onlinechecklists.com",
       :authentication => :plain,
       :user_name => "alex@onlinechecklists.com",
-      :password => "***REMOVED***",
+      :password => "**REMOVED**",
       :enable_starttls_auto => true
     }
 #    config.action_mailer.smtp_settings = {
 #      :address => "smtp.gmail.com",
 #      :port => "587",
 #      :authentication => :plain,
-#      :user_name => "***REMOVED***",
-#      :password => "***REMOVED***",
+#      :user_name => "abc@example.com",
+#      :password => "**REMOVED**",
 #      :enable_starttls_auto => true
 #    }
 
